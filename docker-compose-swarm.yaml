@@ -36,8 +36,6 @@ services:
       - traefik-public
 
   app:
-    build:
-      context: .
     image: ghcr.io/smashedr/node-badges:latest
     command: "npm start"
     deploy:

@@ -24,9 +24,7 @@ services:
       - "80:80"
 
   app:
-    build:
-      context: .
-    image: node-badges:latest
+    image: ghcr.io/smashedr/node-badges:latest
     command: "npm start"
     deploy:
       replicas: 1
