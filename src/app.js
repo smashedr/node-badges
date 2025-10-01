@@ -75,7 +75,7 @@ app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
     const message = formatSize(total)
     console.log('message:', message)
 
-    const badge = getBadge(req, message, 'size', 'scale')
+    const badge = getBadge(req, message, 'size', 'container')
     res.setHeader('Content-Type', 'image/svg+xml')
     res.send(badge)
 })

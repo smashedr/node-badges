@@ -32,8 +32,6 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
   - [Badge Specific Parameters](#badge-specific-parameters)
 - [Troubleshooting](#Troubleshooting)
 - [Development](#development)
-  - [Docker](#docker)
-  - [NPM](#npm)
 
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
@@ -58,10 +56,10 @@ Without the `tag` it defaults to `latest`, these are equivalent.
 
 _Supports all available [Query Parameters](#query-parameters)._
 
-[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=container&color=seagreen&style=for-the-badge&label=my%20image)](#query-parameters)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=scale&color=seagreen&style=for-the-badge&label=node%20badges)](#query-parameters)
 
 ```text
-https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=container&color=seagreen&style=for-the-badge&label=my%20image
+https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=scale&color=seagreen&style=for-the-badge&label=node%20badges
 ```
 
 ### GHCR Image Tags
