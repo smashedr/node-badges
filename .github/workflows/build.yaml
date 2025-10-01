@@ -78,6 +78,7 @@ jobs:
       #      *.cache-from=type=gha
       #      *.cache-to=type=gha,mode=max
 
+  # NOTE: Consider triggering deploy.yaml here instead
   deploy:
     name: "Deploy"
     runs-on: ubuntu-latest
