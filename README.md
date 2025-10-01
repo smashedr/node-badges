@@ -33,12 +33,12 @@ Available Badges:
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 
-`/ghcr/size/owner/pacakge/tag`
+`/ghcr/size/{owner}/{pacakge}/{tag}`
 
-Without the `tag` it defaults to `latest`
+Without the `tag` it defaults to `latest`, these are equivalent.
 
-- `https://badges.cssnr.com/ghrc/size/owner/package`
-- `https://badges.cssnr.com/ghrc/size/owner/package/latest`
+- `https://badges.cssnr.com/ghrc/size/smashedr/node-badges`
+- `https://badges.cssnr.com/ghrc/size/smashedr/node-badges/latest`
 
 _Supports all available [Query Parameters](#query-parameters)._
 
