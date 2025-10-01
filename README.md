@@ -42,8 +42,8 @@ Available Badges:
 
 Without the `tag` it defaults to `latest`, these are equivalent.
 
-- `https://badges.cssnr.com/ghrc/size/smashedr/node-badges`
-- `https://badges.cssnr.com/ghrc/size/smashedr/node-badges/latest`
+- `https://badges.cssnr.com/ghcr/size/smashedr/node-badges`
+- `https://badges.cssnr.com/ghcr/size/smashedr/node-badges/latest`
 
 _Supports all available [Query Parameters](#query-parameters)._
 
@@ -67,3 +67,11 @@ https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lu
 For more details see the documentation for the related library, [badge-maker](https://www.npmjs.com/package/badge-maker).
 
 _More examples coming soon..._
+
+## Troubleshooting
+
+GitHub's media proxy caches images for 1 hour. You can purge the cache by sending a PURGE request.
+
+```text
+curl -X PURGE 'https://camo.githubusercontent.com/xxx'
+```
