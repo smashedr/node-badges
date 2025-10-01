@@ -19,14 +19,21 @@
 
 # Node Badges
 
-This is a Work in Progress, but Works...
+This is a Work in Progress, but Works!
+
+Currently this supports GitHub Container Registry (GHCR) Image Size and Tags.
+
+Please [let us know](https://github.com/smashedr/node-badges/discussions/categories/feature-requests) if you want to see a specific badge or feature....
 
 - [Badges](#badges)
   - [GHCR Image Size](#ghcr-image-size)
   - [GHCR Image Tags](#ghcr-image-tags)
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
+- [Troubleshooting](#Troubleshooting)
 - [Development](#development)
+  - [Docker](#docker)
+  - [NPM](#npm)
 
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
