@@ -23,7 +23,9 @@ This is a Work in Progress, but Works...
 
 - [Badges](#badges)
   - [GHCR Image Size](#ghcr-image-size)
+  - [GHCR Image Tags](#ghcr-image-tags)
 - [Query Parameters](#query-parameters)
+  - [Badge Specific Parameters](#badge-specific-parameters)
 
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
@@ -38,12 +40,12 @@ Available Badges:
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 
-`/ghcr/size/{owner}/{pacakge}/{tag}`
+`/ghcr/size/{owner}/{pacakge}/{tag}?`
 
 Without the `tag` it defaults to `latest`, these are equivalent.
 
-- `https://badges.cssnr.com/ghcr/size/smashedr/node-badges`
-- `https://badges.cssnr.com/ghcr/size/smashedr/node-badges/latest`
+- https://badges.cssnr.com/ghcr/size/smashedr/node-badges
+- https://badges.cssnr.com/ghcr/size/smashedr/node-badges/latest
 
 _Supports all available [Query Parameters](#query-parameters)._
 
@@ -53,7 +55,29 @@ _Supports all available [Query Parameters](#query-parameters)._
 https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=container&color=seagreen&style=for-the-badge&label=my%20image
 ```
 
+### GHCR Image Tags
+
+[add example image x2 here]
+
+`/ghcr/tags/{owner}/{pacakge}/{tag}/latest?`
+
+Without `latest` it returns the `n` most recent tags, otherwise only the latest tag.
+
+- https://badges.cssnr.com/ghcr/tags/smashedr/node-badges
+- https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest
+
+The `n` [parameter](#badge-specific-parameters) defaults to `3`, these are equivalent.
+
+```text
+http://badges.cssnr.com/ghcr/tags/smashedr/node-badges
+http://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
+```
+
+[add example image x2 here]
+
 ## Query Parameters
+
+The following query parameters are supported on all badges.
 
 | Parameter    | Default&nbsp;Param&nbsp;Value | Description&nbsp;of&nbsp;the&nbsp;Parameter                 |
 | :----------- | :---------------------------: | :---------------------------------------------------------- |
@@ -65,6 +89,14 @@ https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lu
 | `iconColor`  |            `#fff`             | Icon Color                                                  |
 
 For more details see the documentation for the related library, [badge-maker](https://www.npmjs.com/package/badge-maker).
+
+### Badge Specific Parameters
+
+These are specific to certain badges. Refer to the [Badges](#badges) for more details.
+
+| Parameter | Example | Description&nbsp;of&nbsp;the&nbsp;Parameter |
+| :-------- | :-----: | :------------------------------------------ |
+| `n`       |   `3`   | Number of items to include in the badge.    |
 
 _More examples coming soon..._
 
