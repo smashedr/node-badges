@@ -60,9 +60,9 @@ Without the `tag` it defaults to `latest`, these are equivalent.
 - https://badges.cssnr.com/ghcr/size/smashedr/node-badges
 - https://badges.cssnr.com/ghcr/size/smashedr/node-badges/latest
 
-_Supports all available [Query Parameters](#query-parameters)._
+_For more options see the [Query Parameters](#query-parameters)._
 
-[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=scale&color=seagreen&style=for-the-badge&label=node%20badges)](#query-parameters)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=scale&color=seagreen&style=for-the-badge&label=node%20badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=scale&color=seagreen&style=for-the-badge&label=node%20badges)
 
 ```text
 https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=scale&color=seagreen&style=for-the-badge&label=node%20badges
@@ -147,10 +147,11 @@ docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-
 
 Then visit: http://localhost/
 
-Note: this mounts your `./src` directory into the container for live reloading.  
+Note: this mounts the `./src` directory into the container for live reloading.
+To use a different source path, set the `APP_FILES` environment variable.
 See the [docker-compose-dev.yaml](docker-compose-dev.yaml) file for more details.
 
-To use a different port set the `PORT` variable.
+To use a different port set the `PORT` environment variable.
 
 ```shell
 export PORT=8080
@@ -158,7 +159,7 @@ export PORT=8080
 
 ## NPM
 
-Make sure you have a redis server running and set the `REDIS_URL`.
+Make sure you have a redis server running and set the `REDIS_URL` environment variable.
 
 ```shell
 export REDIS_URL=redis://localhost:6379
@@ -168,7 +169,7 @@ npm run dev
 
 Then visit: http://localhost:3000/
 
-To use a different port set the `PORT` variable.
+To use a different port set the `PORT` environment variable.
 
 ```shell
 export PORT=8080
