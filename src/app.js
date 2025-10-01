@@ -1,14 +1,13 @@
 // noinspection JSUnresolvedReference
+import express from 'express'
+import cors from 'cors'
 
-const express = require('express')
-const cors = require('cors')
+import camelCase from 'camelcase'
+import lucide from 'lucide-static'
+import { makeBadge } from 'badge-maker'
+import { siGithubactions } from 'simple-icons'
 
-const { makeBadge } = require('badge-maker')
-const { siGithubactions } = require('simple-icons')
-const lucide = require('lucide-static')
-const camelCase = require('camelcase').default
-
-const { Api } = require('./api')
+import { Api } from './api.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -56,6 +55,7 @@ app.get('/uptime', (req, res) => {
     console.log('message:', message)
 
     const badge = getBadge(req, message, 'clock-arrow-up')
+    res.setHeader('Content-Type', 'image/svg+xml')
     res.send(badge)
 })
 
@@ -71,7 +71,7 @@ app.get('/badge', (req, res) => {
         color: req.query.color || 'brightgreen',
         style: req.query.style || 'flat',
     })
-    // res.setHeader('Content-Type', 'image/svg+xml')
+    res.setHeader('Content-Type', 'image/svg+xml')
     res.send(badge)
 })
 
