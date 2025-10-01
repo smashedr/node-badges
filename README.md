@@ -1,4 +1,4 @@
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
+[![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/releases/latest)
 [![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/swarm?logo=portainer&logoColor=white&label=swarm)](https://github.com/smashedr/node-badges/deployments/swarm)
@@ -25,7 +25,8 @@ This is a Work in Progress, but Works...
   - [GHCR Image Size](#ghcr-image-size)
 - [Query Parameters](#query-parameters)
 
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
+[![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
+[![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/)
 
 ## Badges
 
@@ -57,9 +58,9 @@ https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lu
 | Parameter    | Default&nbsp;Param&nbsp;Value | Description&nbsp;of&nbsp;the&nbsp;Parameter                 |
 | :----------- | :---------------------------: | :---------------------------------------------------------- |
 | `style`      |            `flat`             | `plastic`, `flat`, `flat-square`, `for-the-badge`, `social` |
-| `color`      |        badge specific         | Badge Background Color (right side)                         |
+| `color`      |         `brightgreen`         | Badge Background Color (right side)                         |
 | `label`      |        badge specific         | Label Text (left hand side)                                 |
-| `labelColor` |        badge specific         | Label Background Color (left hand side)                     |
+| `labelColor` |            `#555`             | Label Background Color (left hand side)                     |
 | `lucide`     |        badge specific         | Name of a [Lucide Icon](https://lucide.dev/icons/)          |
 | `iconColor`  |            `#fff`             | Icon Color                                                  |
 

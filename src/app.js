@@ -42,19 +42,16 @@ app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
     const message = formatSize(total)
     console.log('message:', message)
 
-    const badge = getBadge(req, message, 'scale')
+    const badge = getBadge(req, message, 'size', 'scale')
     res.setHeader('Content-Type', 'image/svg+xml')
-    // res.send(`<?xml version="1.0" encoding="UTF-8"?>\n${badge}`)
     res.send(badge)
 })
 
 app.get('/uptime', (req, res) => {
-    const uptime = Math.floor(process.uptime())
-
-    const message = `${uptime} sec`
+    const message = getUptime()
     console.log('message:', message)
 
-    const badge = getBadge(req, message, 'clock-arrow-up')
+    const badge = getBadge(req, message, 'uptime', 'clock-arrow-up')
     res.setHeader('Content-Type', 'image/svg+xml')
     res.send(badge)
 })
@@ -72,16 +69,17 @@ app.get('/badge', (req, res) => {
         style: req.query.style || 'flat',
     })
     res.setHeader('Content-Type', 'image/svg+xml')
+    // res.send(`<?xml version="1.0" encoding="UTF-8"?>\n${badge}`)
     res.send(badge)
 })
 
-function getBadge(req, message, icon) {
+function getBadge(req, message, label, icon) {
     const logo = getLogo(req, icon)
     return makeBadge({
         message: message.toString(),
         logoBase64: `data:image/svg+xml;base64,${logo}`,
         labelColor: req.query.labelColor || '#555',
-        label: req.query.label || 'image',
+        label: req.query.label || label,
         color: req.query.color || 'brightgreen',
         style: req.query.style || 'flat',
     })
@@ -106,4 +104,15 @@ function formatSize(bytes) {
     const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + units[i]
+}
+
+function getUptime() {
+    const seconds = process.uptime()
+    if (seconds < 60) return `${Math.floor(seconds)} sec`
+    const minutes = seconds / 60
+    if (minutes < 60) return `${Math.floor(minutes)} min`
+    const hours = minutes / 60
+    if (hours < 24) return `${Math.floor(hours)} hrs`
+    const days = hours / 24
+    return `${Math.floor(days)} days`
 }
