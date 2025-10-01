@@ -3,7 +3,7 @@ services:
     image: ghcr.io/cssnr/docker-nginx-proxy:latest
     environment:
       - SERVICE_NAME=app
-      - SERVICE_PORT=${PORT:-3000}
+      - SERVICE_PORT=3000
     deploy:
       replicas: 1
       resources:
@@ -13,7 +13,7 @@ services:
     depends_on:
       - app
     ports:
-      - "80:80"
+      - "${PORT:-80}:80"
 
   app:
     build:
