@@ -1,0 +1,47 @@
+services:
+  nginx:
+    image: ghcr.io/cssnr/docker-nginx-proxy:latest
+    environment:
+      - SERVICE_NAME=app
+      - SERVICE_PORT=${PORT:-3000}
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 32M
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+
+  app:
+    build:
+      context: .
+    image: node-badges-app:latest
+    command: "npm run dev"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 64M
+    depends_on:
+      - redis
+    volumes:
+      - ${APP_FILES:-./src}:/app/src
+
+  redis:
+    image: redis:6-alpine
+    command: "redis-server --appendonly yes"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 32M
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
