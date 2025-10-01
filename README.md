@@ -1,4 +1,4 @@
-[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?color=brightgreen)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/releases/latest)
 [![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/swarm?logo=portainer&logoColor=white&label=swarm)](https://badges.cssnr.com/)
 [![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/release.yaml?logo=cachet&label=release)](https://github.com/smashedr/node-badges/actions/workflows/release.yaml)
@@ -8,7 +8,7 @@
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/node-badges?logo=github&label=updated)](https://github.com/smashedr/node-badges/pulse)
 [![GitHub Contributors](https://img.shields.io/github/contributors-anon/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/graphs/contributors)
 [![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/node-badges?logo=bookstack&logoColor=white&label=repo%20size)](https://github.com/smashedr/node-badges?tab=readme-ov-file#readme)
-[![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/node-badges?logo=htmx)](https://github.com/smashedr/node-badges)
+[![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/node-badges?logo=htmx)](https://github.com/smashedr/node-badges/tree/master/src)
 [![GitHub Discussions](https://img.shields.io/github/discussions/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/discussions)
 [![GitHub Forks](https://img.shields.io/github/forks/smashedr/node-badges?style=flat&logo=github)](https://github.com/smashedr/node-badges/forks)
 [![GitHub Repo Stars](https://img.shields.io/github/stars/smashedr/node-badges?style=flat&logo=github)](https://github.com/smashedr/node-badges/stargazers)
@@ -21,6 +21,7 @@
 This is a Work in Progress.
 
 - [Badges](#badges)
+  - [GHCR Image Size](#ghcr-image-size)
 - [Query Parameters](#query-parameters)
 
 ## Badges
