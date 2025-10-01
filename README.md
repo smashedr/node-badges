@@ -105,8 +105,6 @@ These are specific to certain badges. Refer to the [Badges](#badges) for more de
 | :-------- | :-----: | :------------------------------------------ |
 | `n`       |   `3`   | Number of items to include in the badge.    |
 
-_More examples coming soon..._
-
 ## Troubleshooting
 
 GitHub's media proxy caches images for 1 hour. You can purge the cache by sending a PURGE request.
@@ -131,7 +129,7 @@ docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-
 
 Then visit: http://localhost/
 
-Note: this mounts your `./src` directory into the container for live reloading.
+Note: this mounts your `./src` directory into the container for live reloading.  
 See the [docker-compose-dev.yaml](docker-compose-dev.yaml) file for more details.
 
 To use a different port set the `PORT` variable.
@@ -142,7 +140,7 @@ export PORT=8080
 
 ## NPM
 
-Make sure you have a redis server running and set the `REDIS_URL`
+Make sure you have a redis server running and set the `REDIS_URL`.
 
 ```shell
 export REDIS_URL=redis://localhost:6379
