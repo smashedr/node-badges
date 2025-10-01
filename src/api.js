@@ -63,11 +63,11 @@ export class GhcrApi {
         console.log(`REQUEST NOT CACHED: ${key}`)
 
         const indexManifest = await this.getManifest(tag)
-        console.log('indexManifest:', indexManifest)
+        // console.log('indexManifest:', indexManifest)
         let totalSize = 0
         // noinspection JSUnresolvedReference
         for (const m of indexManifest.manifests) {
-            // await new Promise((resolve) => setTimeout(resolve, 100))
+            await new Promise((resolve) => setTimeout(resolve, 50))
             const manifest = await this.getManifest(m.digest)
             const configSize = manifest.config?.size || 0
             console.log('configSize:', configSize)

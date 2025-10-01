@@ -26,6 +26,7 @@ This is a Work in Progress, but Works...
   - [GHCR Image Tags](#ghcr-image-tags)
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
+- [Development](#development)
 
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
@@ -35,6 +36,7 @@ This is a Work in Progress, but Works...
 Available Badges:
 
 - [GHCR Image Size](#ghcr-image-size)
+- [GHCR Image Tags](#ghcr-image-tags)
 
 ### GHCR Image Size
 
@@ -106,4 +108,47 @@ GitHub's media proxy caches images for 1 hour. You can purge the cache by sendin
 
 ```text
 curl -X PURGE 'https://camo.githubusercontent.com/xxx'
+```
+
+# Development
+
+You can run the dev server with [Docker](#docker) compose or [NPM](#npm) run.
+
+[Docker](#docker) is highly recommended because of the required redis server.
+
+## Docker
+
+I use Docker because it includes the redis container, and live reloads with the dev server.
+
+```shell
+docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-recreate
+```
+
+Then visit: http://localhost/
+
+Note: this mounts your `./src` directory into the container for live reloading.
+See the [docker-compose-dev.yaml](docker-compose-dev.yaml) file for more details.
+
+To use a different port set the `PORT` variable.
+
+```shell
+export PORT=8080
+```
+
+## NPM
+
+Make sure you have a redis server running and set the `REDIS_URL`
+
+```shell
+export REDIS_URL=redis://localhost:6379
+npm i
+npm run dev
+```
+
+Then visit: http://localhost:3000/
+
+To use a different port set the `PORT` variable.
+
+```shell
+export PORT=8080
 ```

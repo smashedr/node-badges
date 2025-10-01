@@ -1,7 +1,7 @@
 {
   "name": "node-badges",
-  "main": "src/app.js",
   "type": "module",
+  "main": "src/app.js",
   "scripts": {
     "dev": "npx nodemon src/app.js",
     "lint": "npx eslint src",

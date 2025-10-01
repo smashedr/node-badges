@@ -4,13 +4,6 @@ on:
   workflow_dispatch:
   release:
     types: [published]
-  #push:
-  #  branches:
-  #    - master
-  #  paths:
-  #    - "app/**"
-  #    - "nginx/**"
-  #    - "docker-compose-build.yaml"
 
 env:
   stack-name: smashedr_node-badges
@@ -66,17 +59,11 @@ jobs:
           labels: ${{ steps.tags.outputs.labels }}
           annotations: ${{ steps.tags.outputs.annotations }}
 
-      #- name: "Bake and Push"
-      #  uses: docker/bake-action@v6
-      #  with:
-      #    files: ${{ env.stack-file }}
-      #    push: true
-      #    targets: app
-      #    set: |
-      #      app.tags=ghcr.io/${{ github.repository }}-app:${{ inputs.version }}
-      #      *.platform=linux/amd64,linux/arm64
-      #      *.cache-from=type=gha
-      #      *.cache-to=type=gha,mode=max
+      - name: "Send Failure Notification"
+        if: ${{ failure() }}
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
   # NOTE: Consider triggering deploy.yaml here instead
   deploy:
@@ -99,3 +86,9 @@ jobs:
           name: ${{ env.stack-name }}
           username: ${{ vars.GHCR_USER }}
           password: ${{ secrets.GHCR_PASS }}
+
+      - name: "Send Failure Notification"
+        if: ${{ failure() }}
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}

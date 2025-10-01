@@ -46,12 +46,16 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 
     if (req.params.latest) {
         const message = processed[0]
+        console.log('message:', message)
+
         const badge = getBadge(req, message, 'latest', 'tag')
         res.setHeader('Content-Type', 'image/svg+xml')
         return res.send(badge)
     }
 
     const message = processed.join(' | ')
+    console.log('message:', message)
+
     const badge = getBadge(req, message, 'tags', 'tags')
     res.setHeader('Content-Type', 'image/svg+xml')
     res.send(badge)
@@ -114,7 +118,8 @@ app.get('/badge', (req, res) => {
  */
 function getBadge(req, message, label, icon) {
     const logo = getLogo(req, icon)
-    console.log('logo:', logo) // TODO: Handle no logo
+    // TODO: Handle no logo
+    console.log('logo:', logo)
     return makeBadge({
         message: message.toString(),
         logoBase64: `data:image/svg+xml;base64,${logo}`,

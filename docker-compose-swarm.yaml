@@ -5,7 +5,7 @@ services:
     image: ghcr.io/cssnr/docker-nginx-proxy:latest
     environment:
       - SERVICE_NAME=app
-      - SERVICE_PORT=${PORT:-3000}
+      - SERVICE_PORT=3000
     deploy:
       replicas: 1
       resources:
