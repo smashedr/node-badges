@@ -35,13 +35,26 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
 
-      - name: "Generate Tags"
+      - name: "Generate Version Tags"
+        id: version
+        uses: cssnr/update-version-tags-action@v1
+        with:
+          dry_run: true
+
+      - name: "Debug Version Tags"
+        continue-on-error: true
+        run: |
+          echo "github.ref_name: ${{ github.ref_name }}"
+          echo "steps.version.outputs.tags: ${{ steps.version.outputs.tags }}"
+
+      - name: "Generate Docker Tags"
         id: tags
         uses: smashedr/docker-tags-action@v1
         with:
           images: "ghcr.io/${{ github.repository }}"
+          tags: ${{ steps.version.outputs.tags }}
 
-      - name: "Debug Tags"
+      - name: "Debug Docker Tags"
         continue-on-error: true
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"

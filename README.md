@@ -1,6 +1,7 @@
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](#ghcr-image-tags)
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/releases/latest)
 [![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/swarm?logo=portainer&logoColor=white&label=swarm)](https://github.com/smashedr/node-badges/deployments/swarm)
 [![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/release.yaml?logo=cachet&label=release)](https://github.com/smashedr/node-badges/actions/workflows/release.yaml)
@@ -22,9 +23,13 @@
 
 This is a Work in Progress, but Works!
 
-Currently this supports GitHub Container Registry (GHCR) Image Size and Tags.
+Currently, this supports GitHub Container Registry (GHCR) Image Size and Tags.
 
 Please [let us know](https://github.com/smashedr/node-badges/discussions/categories/feature-requests) if you want to see a specific badge or feature....
+
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](#ghcr-image-size)
+[![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](#ghcr-image-tags)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](#ghcr-image-tags)
 
 - [Badges](#badges)
   - [GHCR Image Size](#ghcr-image-size)
@@ -42,7 +47,7 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 Available Badges:
 
 - [GHCR Image Size](#ghcr-image-size)
-- [GHCR Image Tags](#ghcr-image-tags)
+- [GHCR Image Tags (2)](#ghcr-image-tags)
 
 ### GHCR Image Size
 
@@ -82,12 +87,12 @@ http://badges.cssnr.com/ghcr/tags/smashedr/node-badges
 http://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
 ```
 
-You can also add the `reversed` parameter to reverse the order.
+You can also change the `sep` parameter and add `reversed` to reverse the order.
 
-[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&reversed)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 
 ```text
-https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%204&n=2&reversed
+https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed
 ```
 
 ## Query Parameters
