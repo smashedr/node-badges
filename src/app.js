@@ -68,7 +68,7 @@ app.get('/badge', (req, res) => {
         logoBase64: `data:image/svg+xml;base64,${logo}`,
         labelColor: req.query.labelColor || '#555',
         label: req.query.label || 'uptime',
-        color: req.query.color || 'green',
+        color: req.query.color || 'brightgreen',
         style: req.query.style || 'flat',
     })
     // res.setHeader('Content-Type', 'image/svg+xml')
@@ -82,7 +82,7 @@ function getBadge(req, message, icon) {
         logoBase64: `data:image/svg+xml;base64,${logo}`,
         labelColor: req.query.labelColor || '#555',
         label: req.query.label || 'image',
-        color: req.query.color || 'green',
+        color: req.query.color || 'brightgreen',
         style: req.query.style || 'flat',
     })
 }

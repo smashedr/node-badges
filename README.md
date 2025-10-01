@@ -1,5 +1,6 @@
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?color=brightgreen)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/releases/latest)
-[![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/docs?logo=portainer&logoColor=white&label=swarm)](https://badges.cssnr.com/)
+[![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/swarm?logo=portainer&logoColor=white&label=swarm)](https://badges.cssnr.com/)
 [![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/release.yaml?logo=cachet&label=release)](https://github.com/smashedr/node-badges/actions/workflows/release.yaml)
 [![Workflow Build](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/build.yaml?logo=cachet&label=build)](https://github.com/smashedr/node-badges/actions/workflows/build.yaml)
 [![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/lint.yaml?logo=cachet&label=lint)](https://github.com/smashedr/node-badges/actions/workflows/lint.yaml)
@@ -30,6 +31,8 @@ Available Badges:
 
 ### GHCR Image Size
 
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+
 `/ghcr/size/owner/pacakge/tag`
 
 Without the `tag` it defaults to `latest`
@@ -39,13 +42,23 @@ Without the `tag` it defaults to `latest`
 
 _Supports all available [Query Parameters](#query-parameters)._
 
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=container&color=seagreen&style=for-the-badge&label=my%20image)](#query-parameters)
+
+```text
+https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=container&color=seagreen&style=for-the-badge&label=my%20image
+```
+
 ## Query Parameters
 
-| Parameter    | Default&nbsp;Value | Description&nbsp;of&nbsp;the&nbsp;Parameter                   |
-| :----------- | :----------------: | :------------------------------------------------------------ |
-| `style`      |       `flat`       | [`plastic`, `flat`, `flat-square`, `for-the-badge`, `social`] |
-| `color`      |   badge specific   | Badge Background Color (right side)                           |
-| `label`      |   badge specific   | Label Text (left hand side)                                   |
-| `labelColor` |   badge specific   | Label Background Color (left hand side)                       |
-| `lucide`     |   badge specific   | Name of a [Lucide Icon](https://lucide.dev/icons/)            |
-| `iconColor`  |       `#fff`       | Icon Color                                                    |
+| Parameter    | Default&nbsp;Param&nbsp;Value | Description&nbsp;of&nbsp;the&nbsp;Parameter                 |
+| :----------- | :---------------------------: | :---------------------------------------------------------- |
+| `style`      |            `flat`             | `plastic`, `flat`, `flat-square`, `for-the-badge`, `social` |
+| `color`      |        badge specific         | Badge Background Color (right side)                         |
+| `label`      |        badge specific         | Label Text (left hand side)                                 |
+| `labelColor` |        badge specific         | Label Background Color (left hand side)                     |
+| `lucide`     |        badge specific         | Name of a [Lucide Icon](https://lucide.dev/icons/)          |
+| `iconColor`  |            `#fff`             | Icon Color                                                  |
+
+For more details see the documentation for the related library, [badge-maker](https://www.npmjs.com/package/badge-maker).
+
+_More examples coming soon..._
