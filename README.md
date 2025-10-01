@@ -27,9 +27,9 @@ Currently, this supports GitHub Container Registry (GHCR) Image Size and Tags.
 
 Please [let us know](https://github.com/smashedr/node-badges/discussions/categories/feature-requests) if you want to see a specific badge or feature....
 
-[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](#ghcr-image-size)
-[![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](#ghcr-image-tags)
-[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](#ghcr-image-tags)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
+[![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
 
 - [Badges](#badges)
   - [GHCR Image Size](#ghcr-image-size)
@@ -51,7 +51,7 @@ Available Badges:
 
 ### GHCR Image Size
 
-[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 
 `/ghcr/size/{owner}/{pacakge}/{tag}?`
 
@@ -70,8 +70,8 @@ https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lu
 
 ### GHCR Image Tags
 
-[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
-[![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+[![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
 
 `/ghcr/tags/{owner}/{pacakge}/{tag}/latest?`
 
@@ -89,7 +89,7 @@ http://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
 
 You can also change the `sep` parameter and add `reversed` to reverse the order.
 
-[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed)
 
 ```text
 https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed
