@@ -9,7 +9,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: 32M
+          memory: 64M
     depends_on:
       - app
     ports:
@@ -25,7 +25,7 @@ services:
       resources:
         limits:
           cpus: "2.0"
-          memory: 64M
+          memory: 256M
     depends_on:
       - redis
     volumes:
@@ -39,7 +39,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: 32M
+          memory: 128M
     volumes:
       - redis_data:/data
 

@@ -11,7 +11,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: 32M
+          memory: 64M
       labels:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
@@ -43,7 +43,7 @@ services:
       resources:
         limits:
           cpus: "2.0"
-          memory: 64M
+          memory: 256M
     healthcheck:
       test: ["CMD-SHELL", "curl -sf localhost:3000/app-health-check || exit 1"]
       interval: 30s
@@ -61,7 +61,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: 32M
+          memory: 128M
     volumes:
       - redis_data:/data
     networks:
