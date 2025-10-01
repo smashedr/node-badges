@@ -1,5 +1,7 @@
+[![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/releases/latest)
-[![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/docs?logo=portainer&logoColor=white&label=swarm)](https://badges.cssnr.com/)
+[![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/swarm?logo=portainer&logoColor=white&label=swarm)](https://github.com/smashedr/node-badges/deployments/swarm)
 [![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/release.yaml?logo=cachet&label=release)](https://github.com/smashedr/node-badges/actions/workflows/release.yaml)
 [![Workflow Build](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/build.yaml?logo=cachet&label=build)](https://github.com/smashedr/node-badges/actions/workflows/build.yaml)
 [![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/lint.yaml?logo=cachet&label=lint)](https://github.com/smashedr/node-badges/actions/workflows/lint.yaml)
@@ -7,7 +9,7 @@
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/node-badges?logo=github&label=updated)](https://github.com/smashedr/node-badges/pulse)
 [![GitHub Contributors](https://img.shields.io/github/contributors-anon/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/graphs/contributors)
 [![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/node-badges?logo=bookstack&logoColor=white&label=repo%20size)](https://github.com/smashedr/node-badges?tab=readme-ov-file#readme)
-[![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/node-badges?logo=htmx)](https://github.com/smashedr/node-badges)
+[![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/node-badges?logo=htmx)](https://github.com/smashedr/node-badges/tree/master/src)
 [![GitHub Discussions](https://img.shields.io/github/discussions/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/discussions)
 [![GitHub Forks](https://img.shields.io/github/forks/smashedr/node-badges?style=flat&logo=github)](https://github.com/smashedr/node-badges/forks)
 [![GitHub Repo Stars](https://img.shields.io/github/stars/smashedr/node-badges?style=flat&logo=github)](https://github.com/smashedr/node-badges/stargazers)
@@ -17,10 +19,14 @@
 
 # Node Badges
 
-This is a Work in Progress.
+This is a Work in Progress, but Works...
 
 - [Badges](#badges)
+  - [GHCR Image Size](#ghcr-image-size)
 - [Query Parameters](#query-parameters)
+
+[![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
+[![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/)
 
 ## Badges
 
@@ -30,22 +36,34 @@ Available Badges:
 
 ### GHCR Image Size
 
-`/ghcr/size/owner/pacakge/tag`
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 
-Without the `tag` it defaults to `latest`
+`/ghcr/size/{owner}/{pacakge}/{tag}`
 
-- `https://badges.cssnr.com/ghrc/size/owner/package`
-- `https://badges.cssnr.com/ghrc/size/owner/package/latest`
+Without the `tag` it defaults to `latest`, these are equivalent.
+
+- `https://badges.cssnr.com/ghrc/size/smashedr/node-badges`
+- `https://badges.cssnr.com/ghrc/size/smashedr/node-badges/latest`
 
 _Supports all available [Query Parameters](#query-parameters)._
 
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=container&color=seagreen&style=for-the-badge&label=my%20image)](#query-parameters)
+
+```text
+https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lucide=container&color=seagreen&style=for-the-badge&label=my%20image
+```
+
 ## Query Parameters
 
-| Parameter    | Default&nbsp;Value | Description&nbsp;of&nbsp;the&nbsp;Parameter                   |
-| :----------- | :----------------: | :------------------------------------------------------------ |
-| `style`      |       `flat`       | [`plastic`, `flat`, `flat-square`, `for-the-badge`, `social`] |
-| `color`      |   badge specific   | Badge Background Color (right side)                           |
-| `label`      |   badge specific   | Label Text (left hand side)                                   |
-| `labelColor` |   badge specific   | Label Background Color (left hand side)                       |
-| `lucide`     |   badge specific   | Name of a [Lucide Icon](https://lucide.dev/icons/)            |
-| `iconColor`  |       `#fff`       | Icon Color                                                    |
+| Parameter    | Default&nbsp;Param&nbsp;Value | Description&nbsp;of&nbsp;the&nbsp;Parameter                 |
+| :----------- | :---------------------------: | :---------------------------------------------------------- |
+| `style`      |            `flat`             | `plastic`, `flat`, `flat-square`, `for-the-badge`, `social` |
+| `color`      |         `brightgreen`         | Badge Background Color (right side)                         |
+| `label`      |        badge specific         | Label Text (left hand side)                                 |
+| `labelColor` |            `#555`             | Label Background Color (left hand side)                     |
+| `lucide`     |        badge specific         | Name of a [Lucide Icon](https://lucide.dev/icons/)          |
+| `iconColor`  |            `#fff`             | Icon Color                                                  |
+
+For more details see the documentation for the related library, [badge-maker](https://www.npmjs.com/package/badge-maker).
+
+_More examples coming soon..._

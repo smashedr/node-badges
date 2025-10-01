@@ -1,15 +1,16 @@
-const axios = require('axios')
-const { Buffer } = require('buffer')
-const { createClient } = require('redis')
+import axios from 'axios'
+// noinspection JSUnresolvedReference
+import { Buffer } from 'node:buffer'
+import { createClient } from 'redis'
 
 // const NodeCache = require('node-cache')
 // const cache = new NodeCache({ stdTTL: 60 * 60 })
 
 const client = createClient({ url: 'redis://redis:6379' })
+// client.connect().catch(console.error)
+await client.connect()
 
-client.connect().catch(console.error)
-
-class Api {
+export class Api {
     constructor(packageOwner, packageName) {
         this.packageOwner = packageOwner
         this.packageName = packageName
@@ -73,4 +74,4 @@ async function cacheSet(key, value, EX = 60 * 60) {
     await client.set(key, JSON.stringify(value), { EX })
 }
 
-module.exports = { Api }
+// module.exports = { Api }
