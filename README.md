@@ -1,5 +1,6 @@
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+[![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/releases/latest)
 [![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/swarm?logo=portainer&logoColor=white&label=swarm)](https://github.com/smashedr/node-badges/deployments/swarm)
 [![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/release.yaml?logo=cachet&label=release)](https://github.com/smashedr/node-badges/actions/workflows/release.yaml)
@@ -64,7 +65,8 @@ https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lu
 
 ### GHCR Image Tags
 
-[add example image x2 here]
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+[![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 
 `/ghcr/tags/{owner}/{pacakge}/{tag}/latest?`
 
@@ -80,7 +82,13 @@ http://badges.cssnr.com/ghcr/tags/smashedr/node-badges
 http://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
 ```
 
-[add example image x2 here]
+You can also add the `reversed` parameter to reverse the order.
+
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&reversed)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
+
+```text
+https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%204&n=2&reversed
+```
 
 ## Query Parameters
 
@@ -90,8 +98,8 @@ The following query parameters are supported on all badges.
 | :----------- | :---------------------------: | :---------------------------------------------------------- |
 | `style`      |            `flat`             | `plastic`, `flat`, `flat-square`, `for-the-badge`, `social` |
 | `color`      |         `brightgreen`         | Badge Background Color (right side)                         |
-| `label`      |        badge specific         | Label Text (left hand side)                                 |
-| `labelColor` |            `#555`             | Label Background Color (left hand side)                     |
+| `label`      |        badge specific         | Label Text (left side)                                      |
+| `labelColor` |            `#555`             | Label Background Color (left side)                          |
 | `lucide`     |        badge specific         | Name of a [Lucide Icon](https://lucide.dev/icons/)          |
 | `iconColor`  |            `#fff`             | Icon Color                                                  |
 
@@ -101,9 +109,11 @@ For more details see the documentation for the related library, [badge-maker](ht
 
 These are specific to certain badges. Refer to the [Badges](#badges) for more details.
 
-| Parameter | Example | Description&nbsp;of&nbsp;the&nbsp;Parameter |
-| :-------- | :-----: | :------------------------------------------ |
-| `n`       |   `3`   | Number of items to include in the badge.    |
+| Parameter  | Example | Description&nbsp;of&nbsp;the&nbsp;Parameter |
+| :--------- | :-----: | :------------------------------------------ |
+| `n`        |   `3`   | Number of items to include in the badge.    |
+| `sep`      |  `\|`   | List item seperator where applicable.       |
+| `reversed` |    -    | Reverse the order of returned items.        |
 
 ## Troubleshooting
 
@@ -112,6 +122,9 @@ GitHub's media proxy caches images for 1 hour. You can purge the cache by sendin
 ```text
 curl -X PURGE 'https://camo.githubusercontent.com/xxx'
 ```
+
+This application caches API responses for 1 hour. Currently, there is no endpoint to purge this cache.  
+Only the API response is cached, not the badge. All query parameters changes will instantly update.
 
 # Development
 
