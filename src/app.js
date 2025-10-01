@@ -35,13 +35,14 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
     console.log('req.params.owner:', req.params.owner)
     console.log('req.params.package:', req.params.package)
     console.log('req.params.latest:', req.params.latest)
+    console.log('req.query.n:', req.query.n)
+    console.log('req.query.reversed:', req.query.reversed)
     if (req.params.latest && req.params.latest !== 'latest') res.sendStatus(404)
 
     const api = new GhcrApi(req.params.owner, req.params.package)
     const tags = await api.getImageTags()
     console.log('tags:', tags)
-
-    const processed = getTags(tags, req.params.n || 3)
+    const processed = getTags(tags, Number.parseInt(req.query.n) || 3)
     console.log('processed:', processed)
 
     if (req.params.latest) {
@@ -52,8 +53,8 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
         res.setHeader('Content-Type', 'image/svg+xml')
         return res.send(badge)
     }
-
-    const message = processed.join(' | ')
+    if (req.query.reversed !== undefined) processed.reverse()
+    const message = processed.join(` ${req.query.sep || '|'} `)
     console.log('message:', message)
 
     const badge = getBadge(req, message, 'tags', 'tags')
