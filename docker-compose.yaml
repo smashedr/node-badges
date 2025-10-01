@@ -26,7 +26,7 @@ services:
   app:
     build:
       context: .
-    image: node-badges-app:latest
+    image: node-badges:latest
     command: "node app.js"
     deploy:
       replicas: 1

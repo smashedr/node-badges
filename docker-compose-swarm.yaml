@@ -38,7 +38,7 @@ services:
   app:
     build:
       context: .
-    image: ghcr.io/smashedr/node-badges-app:latest
+    image: ghcr.io/smashedr/node-badges:latest
     command: "node app.js"
     deploy:
       replicas: 1

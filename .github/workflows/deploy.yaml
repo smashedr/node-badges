@@ -1,0 +1,38 @@
+name: "Deploy"
+
+on:
+  workflow_dispatch:
+  #release:
+  #  types: [published]
+  #push:
+  #  branches:
+  #    - master
+  #  paths:
+  #    - "app/**"
+  #    - "nginx/**"
+  #    - "docker-compose-build.yaml"
+
+env:
+  stack-name: smashedr_node-badges
+  stack-file: docker-compose-swarm.yaml
+
+jobs:
+  deploy:
+    name: "Deploy"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    environment:
+      name: swarm
+      url: https://badges.cssnr.com/
+
+    steps:
+      - name: "Portainer Deploy"
+        uses: cssnr/portainer-stack-deploy-action@v1
+        with:
+          url: ${{ secrets.PORTAINER_URL }}
+          token: ${{ secrets.PORTAINER_TOKEN }}
+          file: ${{ env.stack-file }}
+          name: ${{ env.stack-name }}
+          username: ${{ vars.GHCR_USER }}
+          password: ${{ secrets.GHCR_PASS }}
