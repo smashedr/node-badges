@@ -36,10 +36,10 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
 - [Troubleshooting](#Troubleshooting)
-- [Support](#Support)
-- [Contributing](#Contributing)
 - [Developing](#Developing)
 - [Deploying](#Deploying)
+- [Support](#Support)
+- [Contributing](#Contributing)
 
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
