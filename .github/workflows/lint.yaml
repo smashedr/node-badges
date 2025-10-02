@@ -70,6 +70,13 @@ jobs:
           echo "::endgroup::"
           "${RUNNER_TEMP}/actionlint" -color -verbose -shellcheck= -pyflakes=
 
+      - name: "Hadolint"
+        if: ${{ !cancelled() }}
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: Dockerfile
+          ignore: "DL3018"
+
       - name: "ESLint Annotate"
         if: ${{ !cancelled() && steps.eslint.outcome != 'success' }}
         continue-on-error: true

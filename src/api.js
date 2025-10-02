@@ -56,7 +56,6 @@ export class GhcrApi {
      */
     async getImageSize(tag = 'latest') {
         const key = `ghcr/size/${this.packageOwner}/${this.packageName}/${tag}`
-        // const cached = cache.get(key)
         const cached = await cacheGet(key)
         console.log('cached:', cached)
         if (cached) return cached
@@ -77,7 +76,6 @@ export class GhcrApi {
             totalSize += configSize + layerSize
         }
         console.log('totalSize:', totalSize)
-        // cache.set(key, totalSize)
         await cacheSet(key, totalSize)
         return totalSize
     }
@@ -99,10 +97,12 @@ export class GhcrApi {
 }
 
 async function cacheGet(key) {
+    // return cache.get(key)
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
 }
 
 async function cacheSet(key, value, EX = 60 * 60) {
+    // cache.set(key, totalSize)
     await client.set(key, JSON.stringify(value), { EX })
 }

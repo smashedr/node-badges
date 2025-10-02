@@ -12,12 +12,12 @@ services:
         limits:
           cpus: "1.0"
           memory: 64M
-    #healthcheck:
-    #  test: ["CMD-SHELL", "curl -sf localhost:80/health-check || exit 1"]
-    #  interval: 30s
-    #  timeout: 10s
-    #  retries: 3
-    #  start_period: 30s
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf localhost:80/health-check || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     depends_on:
       - app
     ports:
@@ -38,6 +38,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    depends_on:
+      - redis
 
   redis:
     image: redis:6-alpine

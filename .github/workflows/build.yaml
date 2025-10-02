@@ -2,6 +2,10 @@ name: "Build"
 
 on:
   workflow_dispatch:
+    inputs:
+      tags:
+        description: "Extra Tags: comma,separated"
+        required: false
   release:
     types: [published]
 
@@ -39,7 +43,8 @@ jobs:
         id: version
         uses: cssnr/update-version-tags-action@v1
         with:
-          dry_run: true
+          tags: ${{ inputs.tags }}
+          prefix: ""
 
       - name: "Debug Version Tags"
         continue-on-error: true
