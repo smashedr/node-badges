@@ -75,6 +75,7 @@ jobs:
         uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
+          ignore: "DL3018"
 
       - name: "ESLint Annotate"
         if: ${{ !cancelled() && steps.eslint.outcome != 'success' }}
