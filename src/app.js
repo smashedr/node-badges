@@ -31,17 +31,21 @@ app.get('/', (req, res) => {
     res.send(`Server Uptime: ${uptime} (${seconds} seconds)`)
 })
 
+// app.use('/ghcr', (req, res, next) => {
+//     res.setHeader('Content-Type', 'image/svg+xml')
+//     res.setHeader('Cache-Control', 'public, max-age=3600')
+//     next()
+// })
+
 app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
-    console.log('req.params.owner:', req.params.owner)
-    console.log('req.params.package:', req.params.package)
-    console.log('req.params.latest:', req.params.latest)
-    console.log('req.query.n:', req.query.n)
-    console.log('req.query.reversed:', req.query.reversed)
+    console.log(
+        `/ghcr/tags/${req.params.owner}/${req.params.package}/${req.params.latest}`
+    )
     if (req.params.latest && req.params.latest !== 'latest') res.sendStatus(404)
 
     const api = new GhcrApi(req.params.owner, req.params.package)
     const tags = await api.getImageTags()
-    console.log('tags:', tags)
+    console.log('getImageTags - tags:', tags)
     const processed = getTags(tags, Number.parseInt(req.query.n) || 3)
     console.log('processed:', processed)
 
@@ -50,35 +54,32 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
         console.log('message:', message)
 
         const badge = getBadge(req, message, 'latest', 'tag')
-        res.setHeader('Content-Type', 'image/svg+xml')
-        return res.send(badge)
+        // return res.send(badge)
+        return sendBadge(res, badge)
     }
     if (req.query.reversed !== undefined) processed.reverse()
     const message = processed.join(` ${req.query.sep || '|'} `)
     console.log('message:', message)
 
     const badge = getBadge(req, message, 'tags', 'tags')
-    res.setHeader('Content-Type', 'image/svg+xml')
-    res.send(badge)
+    // res.send(badge)
+    sendBadge(res, badge)
 })
 
 app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
-    console.log('req.params.owner:', req.params.owner)
-    console.log('req.params.package:', req.params.package)
-    console.log('req.params.tag:', req.params.tag)
+    console.log(`/ghcr/size/${req.params.owner}/${req.params.package}/${req.params.tag}`)
 
     const api = new GhcrApi(req.params.owner, req.params.package)
     const tag = req.params.tag || 'latest'
-    console.log('tag:', tag)
     const total = await api.getImageSize(tag)
-    console.log('total:', total)
+    console.log('getImageSize - total:', total)
 
     const message = formatSize(total)
     console.log('message:', message)
 
     const badge = getBadge(req, message, 'size', 'container')
-    res.setHeader('Content-Type', 'image/svg+xml')
-    res.send(badge)
+    // res.send(badge)
+    sendBadge(res, badge)
 })
 
 app.get('/uptime', (req, res) => {
@@ -110,6 +111,17 @@ app.get('/badge', (req, res) => {
 })
 
 /**
+ * Send Badge
+ * @param {Response} res
+ * @param {String} badge
+ */
+function sendBadge(res, badge) {
+    res.setHeader('Content-Type', 'image/svg+xml')
+    res.setHeader('Cache-Control', 'public, max-age=3600')
+    res.send(badge)
+}
+
+/**
  * Get Badge
  * @param {Request} req
  * @param {String} message
@@ -120,7 +132,7 @@ app.get('/badge', (req, res) => {
 function getBadge(req, message, label, icon) {
     const logo = getLogo(req, icon)
     // TODO: Handle no logo
-    console.log('logo:', logo)
+    // console.log('logo:', logo)
     return makeBadge({
         message: message.toString(),
         logoBase64: `data:image/svg+xml;base64,${logo}`,
@@ -140,14 +152,14 @@ function getBadge(req, message, label, icon) {
  */
 function getLogo(req, icon, color = '#fff') {
     const iconName = camelCase(req.query.lucide || icon, { pascalCase: true })
-    console.log('iconName:', iconName)
+    // console.log('iconName:', iconName)
     let svg = lucide[iconName]
     if (!svg) {
-        console.warn('SVG NOT FOUND:', iconName)
+        console.warn('SVG NOT FOUND - iconName:', iconName)
         return ''
     }
     const iconColor = req.query.iconColor || color
-    console.log('iconColor:', iconColor)
+    // console.log('iconColor:', iconColor)
     const result = svg.replace('<svg', `<svg color="${iconColor}"`)
     return Buffer.from(result).toString('base64')
 }
@@ -191,11 +203,9 @@ function getTags(tags, count = 3) {
     // console.log('sorted:', sorted)
     tags.reverse()
     const results = []
-    for (let i = 0; i < tags.length; i++) {
-        console.log(`count i: ${i} - `, tags[i])
-        if (tags[i] === 'latest') continue
-        results.push(tags[i])
-        console.log('results.length:', results.length)
+    for (const tag of tags) {
+        if (tag === 'latest') continue
+        results.push(tag)
         if (results.length === count) break
     }
     return results
