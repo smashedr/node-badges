@@ -39,14 +39,13 @@ export class GhcrApi {
      */
     async getImageTags() {
         const url = `${this.packageOwner}/${this.packageName}/tags/list`
-        console.log('url:', url)
-        const cached = await cacheGet(`ghcr/tags/${url}`)
-        console.log('cached:', cached)
+        const key = `ghcr/tags/${url}`
+        const cached = await cacheGet(key)
         if (cached) return cached
-        console.log(`REQUEST NOT CACHED: ghcr/tags/${url}`)
+        console.log(`-- CACHE MISS: ${key}`)
 
         const response = await this.client.get(url)
-        await cacheSet(`ghcr/tags/${url}`, response.data.tags)
+        await cacheSet(key, response.data.tags)
         return response.data.tags
     }
 
@@ -57,9 +56,8 @@ export class GhcrApi {
     async getImageSize(tag = 'latest') {
         const key = `ghcr/size/${this.packageOwner}/${this.packageName}/${tag}`
         const cached = await cacheGet(key)
-        console.log('cached:', cached)
         if (cached) return cached
-        console.log(`REQUEST NOT CACHED: ${key}`)
+        console.log(`-- CACHE MISS: ${key}`)
 
         const indexManifest = await this.getManifest(tag)
         // console.log('indexManifest:', indexManifest)
@@ -69,10 +67,10 @@ export class GhcrApi {
             await new Promise((resolve) => setTimeout(resolve, 50))
             const manifest = await this.getManifest(m.digest)
             const configSize = manifest.config?.size || 0
-            console.log('configSize:', configSize)
+            // console.log('configSize:', configSize)
             // noinspection JSUnresolvedReference
             const layerSize = manifest.layers?.reduce((a, l) => a + (l.size || 0), 0) || 0
-            console.log('layerSize:', layerSize)
+            // console.log('layerSize:', layerSize)
             totalSize += configSize + layerSize
         }
         console.log('totalSize:', totalSize)
