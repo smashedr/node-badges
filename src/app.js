@@ -46,19 +46,22 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
     const api = new GhcrApi(req.params.owner, req.params.package)
     const tags = await api.getImageTags()
     console.log('getImageTags - tags:', tags)
-    const processed = getTags(tags, Number.parseInt(req.query.n) || 3)
-    console.log('processed:', processed)
+    const results = getTags(tags, Number.parseInt(req.query.n) || 3)
+    console.log('results:', results)
+
+    results.sort((a, b) => a.localeCompare(b))
+    console.log('results.sort:', results)
 
     if (req.params.latest) {
-        const message = processed[0]
+        const message = results.at(-1)
         console.log('message:', message)
 
         const badge = getBadge(req, message, 'latest', 'tag')
         // return res.send(badge)
         return sendBadge(res, badge)
     }
-    if (req.query.reversed !== undefined) processed.reverse()
-    const message = processed.join(` ${req.query.sep || '|'} `)
+    if (req.query.reversed !== undefined) results.reverse()
+    const message = results.join(` ${req.query.sep || '|'} `)
     console.log('message:', message)
 
     const badge = getBadge(req, message, 'tags', 'tags')
