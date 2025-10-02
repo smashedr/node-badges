@@ -28,7 +28,7 @@ app.get('/app-health-check', (req, res) => {
 app.get('/', (req, res) => {
     const uptime = getUptime()
     const seconds = Math.floor(process.uptime())
-    res.send(`Server Uptime: ${uptime} (${seconds} seconds)`)
+    res.send(`Version: ${process.env.APP_VERSION} - Uptime: ${uptime} (${seconds} s)`)
 })
 
 // app.use('/ghcr', (req, res, next) => {

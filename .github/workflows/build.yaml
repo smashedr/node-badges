@@ -76,6 +76,8 @@ jobs:
           tags: ${{ steps.tags.outputs.tags }}
           labels: ${{ steps.tags.outputs.labels }}
           annotations: ${{ steps.tags.outputs.annotations }}
+          build-args: |
+            VERSION=${{ github.ref_name }}
 
       - name: "Send Failure Notification"
         if: ${{ failure() }}
