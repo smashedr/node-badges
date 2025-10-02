@@ -30,13 +30,14 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
 
-- [Badges](#badges)
+- [Badges](#Badges)
   - [GHCR Image Size](#ghcr-image-size)
   - [GHCR Image Tags](#ghcr-image-tags)
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
 - [Troubleshooting](#Troubleshooting)
-- [Development](#development)
+- [Developing](#Developing)
+- [Deploying](#Deploying)
 
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
@@ -130,13 +131,13 @@ curl -X PURGE 'https://camo.githubusercontent.com/xxx'
 This application caches API responses for 1 hour. Currently, there is no endpoint to purge this cache.  
 Only the API response is cached, not the badge. All query parameters changes will instantly update.
 
-# Development
+# Developing
 
-You can run the dev server with [Docker](#docker) compose or [NPM](#npm) run.
+You can run the dev server with [Docker](#with-docker) compose or [Node](#with-node) run.
 
-[Docker](#docker) is highly recommended because of the required redis server.
+[Docker](#with-docker) is highly recommended because of the required redis server.
 
-## Docker
+### With Docker
 
 I use Docker because it includes the redis container, and live reloads with the dev server.
 
@@ -156,7 +157,7 @@ To use a different port set the `PORT` environment variable.
 export PORT=8080
 ```
 
-## NPM
+### With Node
 
 Make sure you have a redis server running and set the `REDIS_URL` environment variable.
 
@@ -173,3 +174,24 @@ To use a different port set the `PORT` environment variable.
 ```shell
 export PORT=8080
 ```
+
+# Deploying
+
+This is ready for deployment using both [Docker](#to-docker) and [Node](#to-node).
+If using Node you need a Redis server.
+
+### To Docker
+
+This is designed to be deployed to Docker out of the box which includes redis.
+
+To deploy to a Swarm cluster using Traefik seee the [docker-compose-swarm.yaml](docker-compose-swarm.yaml).
+
+### To Node
+
+This is ready to be deployed to services like Render assuming you have a redis server.
+You can set the redis server url with the `REDIS_URL` environment variable.  
+The default value is `redis://redis:6379`.
+
+The server installs with `npm i`, starts with `npm start`, and listens on `PORT` environment variable.
+
+To use without redis, install `node-cache`, comment out the redis lines, and uncomment the node-cache lines.
