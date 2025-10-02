@@ -36,6 +36,8 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
 - [Troubleshooting](#Troubleshooting)
+- [Support](#Support)
+- [Contributing](#Contributing)
 - [Developing](#Developing)
 - [Deploying](#Deploying)
 
@@ -195,3 +197,29 @@ The default value is `redis://redis:6379`.
 The server installs with `npm i`, starts with `npm start`, and listens on `PORT` environment variable.
 
 To use without redis, install `node-cache`, comment out the redis lines, and uncomment the node-cache lines.
+
+# Support
+
+For general help or to request a feature, see:
+
+- Q&A Discussion: https://github.com/smashedr/node-badges/discussions/categories/q-a
+- Request a Feature: https://github.com/smashedr/node-badges/discussions/categories/feature-requests
+
+If you are experiencing an issue/bug or getting unexpected results, you can:
+
+- Report an Issue: https://github.com/smashedr/node-badges/issues
+- Chat with us on Discord: https://discord.gg/wXy6m2X8wY
+- Provide General Feedback: [https://cssnr.github.io/feedback/](https://cssnr.github.io/feedback/?app=Update%20Release%20Notes)
+
+For more information, see the CSSNR [SUPPORT.md](https://github.com/cssnr/.github/blob/master/.github/SUPPORT.md#support).
+
+# Contributing
+
+If you would like to submit a PR, please review the [CONTRIBUTING.md](#contributing-ov-file).
+
+Please consider making a donation to support the development of this project
+and [additional](https://cssnr.com/) open source projects.
+
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/cssnr)
+
+For a full list of current projects visit: [https://cssnr.github.io/](https://cssnr.github.io/)
