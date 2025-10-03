@@ -1,15 +1,15 @@
 FROM node:lts-alpine
 
-ARG VERSION="source"
-ENV APP_VERSION=$VERSION
+ARG VERSION=source
 
 ENV TZ=UTC
-ENV NODE_ENV production
+ENV NODE_ENV=production
+ENV APP_VERSION="${VERSION}"
 
 LABEL org.opencontainers.image.source="https://github.com/smashedr/node-badges"
 LABEL org.opencontainers.image.description="Node Badges"
 LABEL org.opencontainers.image.authors="smashedr"
-LABEL org.opencontainers.image.version=$VERSION
+LABEL org.opencontainers.image.version="${VERSION}"
 
 RUN apk add --no-cache curl
 

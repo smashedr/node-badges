@@ -1,5 +1,6 @@
 {
   "name": "node-badges",
+  "private": true,
   "type": "module",
   "main": "src/app.js",
   "scripts": {

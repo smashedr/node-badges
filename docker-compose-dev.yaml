@@ -22,6 +22,8 @@ services:
       context: .
     image: node-badges:latest
     command: "npm run dev"
+    #environment:
+    #  DEBUG: "express:*"
     deploy:
       replicas: 1
       resources:
