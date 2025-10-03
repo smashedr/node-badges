@@ -68,7 +68,7 @@ export class GhcrApi {
             !indexManifest.mediaType.includes('list') &&
             !indexManifest.mediaType.includes('index')
         ) {
-            console.log('indexManifest - list/index:', indexManifest)
+            console.log('indexManifest - !list + !index:', indexManifest)
             const size = indexManifest.layers.reduce((sum, layer) => sum + layer.size, 0)
             totalSize = size + (indexManifest.config.size || 0)
             console.log('totalSize:', totalSize)
