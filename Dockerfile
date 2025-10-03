@@ -4,7 +4,7 @@ ARG VERSION="source"
 ENV APP_VERSION=$VERSION
 
 ENV TZ=UTC
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 LABEL org.opencontainers.image.source="https://github.com/smashedr/node-badges"
 LABEL org.opencontainers.image.description="Node Badges"
