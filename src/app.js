@@ -48,10 +48,18 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 
     tags = tags.filter((tag) => tag !== 'latest')
     console.log('tags - filter(latest):', tags)
+
     tags = tags.toReversed()
     console.log('tags - toReversed:', tags)
+
+    if (req.query.semver !== undefined) {
+        tags = tags.filter((str) => semver.valid(str))
+        console.log('tags - semver:', tags)
+    }
+
     tags = tags.slice(0, count)
     console.log('tags - slice(count):', tags)
+
     tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
     console.log('tags - localCompare:', tags)
 
@@ -64,10 +72,6 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
         return sendBadge(res, badge)
     }
 
-    if (req.query.semver !== undefined) {
-        tags = tags.filter((str) => semver.valid(str))
-        console.log('tags - semver:', tags)
-    }
     if (req.query.reversed !== undefined) {
         tags.reverse()
         console.log('tags - reverse:', tags)
@@ -122,7 +126,8 @@ app.get('/badge', (req, res) => {
     })
     res.setHeader('Content-Type', 'image/svg+xml')
     // res.send(`<?xml version="1.0" encoding="UTF-8"?>\n${badge}`)
-    res.send(badge)
+    // res.send(badge)
+    sendBadge(res, badge)
 })
 
 /**

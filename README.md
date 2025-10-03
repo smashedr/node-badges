@@ -89,12 +89,12 @@ http://badges.cssnr.com/ghcr/tags/smashedr/node-badges
 http://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
 ```
 
-You can also change the `sep` parameter and add `reversed` to reverse the order.
+You can also change the `sep` parameter, add `reversed` and filter by valid `semver` tags.
 
-[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)
 
 ```text
-https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed
+https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver
 ```
 
 ## Query Parameters
@@ -116,11 +116,12 @@ For more details see the documentation for the related library, [badge-maker](ht
 
 These are specific to certain badges. Refer to the [Badges](#badges) for more details.
 
-| Parameter  | Example | Description&nbsp;of&nbsp;the&nbsp;Parameter |
-| :--------- | :-----: | :------------------------------------------ |
-| `n`        |   `3`   | Number of items to include in the badge.    |
-| `sep`      |  `\|`   | List item seperator where applicable.       |
-| `reversed` |    -    | Reverse the order of returned items.        |
+| Parameter  | Example | Description&nbsp;of&nbsp;the&nbsp;Parameter                                      |
+| :--------- | :-----: | :------------------------------------------------------------------------------- |
+| `n`        |   `3`   | Number of items to include in the badge.                                         |
+| `sep`      |  `\|`   | List item seperator where applicable.                                            |
+| `semver`   |    -    | Filter items by valid [semantic](https://www.npmjs.com/package/semver) versions. |
+| `reversed` |    -    | Reverse the order of returned items.                                             |
 
 ## Troubleshooting
 
