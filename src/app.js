@@ -1,9 +1,7 @@
-// noinspection JSUnresolvedReference
-
 import express from 'express'
 import cors from 'cors'
 
-// import semver from 'semver'
+import semver from 'semver'
 import camelCase from 'camelcase'
 import lucide from 'lucide-static'
 import { makeBadge } from 'badge-maker'
@@ -18,7 +16,7 @@ app.use(express.json())
 app.use(cors())
 
 app.listen(port, () => {
-    console.log(`listening on port: ${port}`)
+    console.log(`listening on PORT: ${port}`)
 })
 
 app.get('/app-health-check', (req, res) => {
@@ -38,31 +36,49 @@ app.get('/', (req, res) => {
 // })
 
 app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
-    console.log(
-        `/ghcr/tags/${req.params.owner}/${req.params.package}/${req.params.latest}`
-    )
+    console.log(req.originalUrl)
     if (req.params.latest && req.params.latest !== 'latest') res.sendStatus(404)
 
-    const api = new GhcrApi(req.params.owner, req.params.package)
-    const tags = await api.getImageTags()
-    console.log('getImageTags - tags:', tags)
-    const results = getTags(tags, Number.parseInt(req.query.n) || 3)
-    console.log('results:', results)
+    const count = Number.parseInt(req.query.n) || 3
+    console.log('count:', count)
 
-    results.sort((a, b) => a.localeCompare(b))
-    console.log('results.sort:', results)
+    const api = new GhcrApi(req.params.owner, req.params.package)
+    let tags = await api.getImageTags()
+    console.log('getImageTags - tags:', tags)
+
+    tags = tags.filter((tag) => tag !== 'latest')
+    console.log('tags - filter(latest):', tags)
+
+    tags = tags.toReversed()
+    console.log('tags - toReversed:', tags)
+
+    if (req.query.semver !== undefined) {
+        tags = tags.filter((str) => semver.valid(str))
+        console.log('tags - semver:', tags)
+    }
+
+    tags = tags.slice(0, count)
+    console.log('tags - slice(count):', tags)
+
+    tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    console.log('tags - localCompare:', tags)
 
     if (req.params.latest) {
-        const message = results.at(-1)
-        console.log('message:', message)
+        const message = tags.at(-1)
+        console.log('latest - message:', message)
 
         const badge = getBadge(req, message, 'latest', 'tag')
         // return res.send(badge)
         return sendBadge(res, badge)
     }
-    if (req.query.reversed !== undefined) results.reverse()
-    const message = results.join(` ${req.query.sep || '|'} `)
-    console.log('message:', message)
+
+    if (req.query.reversed !== undefined) {
+        tags.reverse()
+        console.log('tags - reverse:', tags)
+    }
+
+    const message = tags.join(` ${req.query.sep || '|'} `)
+    console.log('tags - message:', message)
 
     const badge = getBadge(req, message, 'tags', 'tags')
     // res.send(badge)
@@ -70,7 +86,7 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 })
 
 app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
-    console.log(`/ghcr/size/${req.params.owner}/${req.params.package}/${req.params.tag}`)
+    console.log(req.originalUrl)
 
     const api = new GhcrApi(req.params.owner, req.params.package)
     const tag = req.params.tag || 'latest'
@@ -110,7 +126,8 @@ app.get('/badge', (req, res) => {
     })
     res.setHeader('Content-Type', 'image/svg+xml')
     // res.send(`<?xml version="1.0" encoding="UTF-8"?>\n${badge}`)
-    res.send(badge)
+    // res.send(badge)
+    sendBadge(res, badge)
 })
 
 /**
@@ -192,24 +209,4 @@ function getUptime() {
     if (hours < 24) return `${Math.floor(hours)} hrs`
     const days = hours / 24
     return `${Math.floor(days)} days`
-}
-
-/**
- * Get Tags Count
- * @param {String[]} tags
- * @param {Number} count
- * @return {String[]}
- */
-function getTags(tags, count = 3) {
-    // TODO: Add option to sort by semver and verify reverse() works as expected
-    // const sorted = tags.filter((t) => semver.valid(t)).sort(semver.rcompare)
-    // console.log('sorted:', sorted)
-    tags.reverse()
-    const results = []
-    for (const tag of tags) {
-        if (tag === 'latest') continue
-        results.push(tag)
-        if (results.length === count) break
-    }
-    return results
 }

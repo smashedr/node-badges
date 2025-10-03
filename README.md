@@ -22,13 +22,13 @@
 
 This is a Work in Progress, but Works!
 
-Currently, this supports GitHub Container Registry (GHCR) Image Size and Tags.
-
-Please [let us know](https://github.com/smashedr/node-badges/discussions/categories/feature-requests) if you want to see a specific badge or feature....
+Badges include GitHub Container Registry (GHCR) Image Size and Tags.
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
+
+Please [let us know](https://github.com/smashedr/node-badges/discussions/categories/feature-requests) if you want to see a specific badge or feature....
 
 - [Badges](#Badges)
   - [GHCR Image Size](#ghcr-image-size)
@@ -40,6 +40,12 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 - [Deploying](#Deploying)
 - [Support](#Support)
 - [Contributing](#Contributing)
+
+Public Server Base URL:
+
+```text
+https://badges.cssnr.com/
+```
 
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
@@ -89,12 +95,12 @@ http://badges.cssnr.com/ghcr/tags/smashedr/node-badges
 http://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
 ```
 
-You can also change the `sep` parameter and add `reversed` to reverse the order.
+You can also change the `sep` parameter, add `reversed` and filter by valid `semver` tags.
 
-[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)
 
 ```text
-https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20two&n=2&sep=-&reversed
+https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver
 ```
 
 ## Query Parameters
@@ -116,11 +122,12 @@ For more details see the documentation for the related library, [badge-maker](ht
 
 These are specific to certain badges. Refer to the [Badges](#badges) for more details.
 
-| Parameter  | Example | Description&nbsp;of&nbsp;the&nbsp;Parameter |
-| :--------- | :-----: | :------------------------------------------ |
-| `n`        |   `3`   | Number of items to include in the badge.    |
-| `sep`      |  `\|`   | List item seperator where applicable.       |
-| `reversed` |    -    | Reverse the order of returned items.        |
+| Parameter  | Example | Description&nbsp;of&nbsp;the&nbsp;Parameter                                      |
+| :--------- | :-----: | :------------------------------------------------------------------------------- |
+| `n`        |   `3`   | Number of items to include in the badge.                                         |
+| `sep`      |  `\|`   | List item seperator where applicable.                                            |
+| `semver`   |    -    | Filter items by valid [semantic](https://www.npmjs.com/package/semver) versions. |
+| `reversed` |    -    | Reverse the order of returned items.                                             |
 
 ## Troubleshooting
 
