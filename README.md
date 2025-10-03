@@ -1,4 +1,7 @@
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
+[![GitHub Tag Major](https://img.shields.io/github/v/tag/smashedr/node-badges?sort=semver&filter=!*.*&logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/smashedr/node-badges/tags)
+[![GitHub Tag Minor](https://img.shields.io/github/v/tag/smashedr/node-badges?sort=semver&filter=!*.*.*&logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/smashedr/node-badges/releases)
+[![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/smashedr/node-badges/releases/latest)
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
