@@ -2,6 +2,11 @@ name: "Deploy"
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version Tag"
+        default: "latest"
+        required: false
   workflow_run:
     workflows: ["Build"]
     types: [completed]
@@ -10,6 +15,7 @@ env:
   stack-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}
   stack-file: docker-compose-swarm.yaml
   traefik-host: badges.cssnr.com
+  version: ${{ inputs.version || github.event.workflow_run.head_branch || github.ref_name }}
 
 jobs:
   deploy:
@@ -23,10 +29,15 @@ jobs:
       url: https://badges.cssnr.com/
 
     steps:
+      - name: "Debug Event"
+        continue-on-error: true
+        run: |
+          cat "${GITHUB_EVENT_PATH}"
+
       - name: "Debug Variables"
         continue-on-error: true
         run: |
-          echo "VERSION: ${{ github.ref_name }}"
+          echo "VERSION: ${{ env.version == 'master' && 'latest' || env.version }}"
           echo "STACK_NAME: ${{ env.stack-name }}"
           echo "TRAEFIK_HOST: ${{ env.traefik-host }}"
 
@@ -41,7 +52,7 @@ jobs:
           password: ${{ secrets.GHCR_PASS }}
           env_json: |
             {
-              "VERSION": "${{ github.ref_name }}",
+              "VERSION": "${{ env.version == 'master' && 'latest' || env.version }}",
               "STACK_NAME": "${{ env.stack-name }}",
               "TRAEFIK_HOST": "${{ env.traefik-host }}"
             }
