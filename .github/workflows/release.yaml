@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: write
 
+    # NOTE: Look into running build.yaml and deploy.yaml inline here
     steps:
       - name: "Update Release Notes Action"
         continue-on-error: true
