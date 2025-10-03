@@ -3,14 +3,13 @@ name: "Deploy"
 on:
   workflow_dispatch:
   workflow_run:
-    workflows:
-      - "Build"
-    types:
-      - completed
+    workflows: ["Build"]
+    types: [completed]
 
 env:
-  stack-name: smashedr_node-badges
+  stack-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}
   stack-file: docker-compose-swarm.yaml
+  traefik-host: badges.cssnr.com
 
 jobs:
   deploy:
@@ -24,6 +23,13 @@ jobs:
       url: https://badges.cssnr.com/
 
     steps:
+      - name: "Debug Variables"
+        continue-on-error: true
+        run: |
+          echo "VERSION: ${{ github.ref_name }}"
+          echo "STACK_NAME: ${{ env.stack-name }}"
+          echo "TRAEFIK_HOST: ${{ env.traefik-host }}"
+
       - name: "Portainer Deploy"
         uses: cssnr/portainer-stack-deploy-action@v1
         with:
@@ -33,3 +39,9 @@ jobs:
           name: ${{ env.stack-name }}
           username: ${{ vars.GHCR_USER }}
           password: ${{ secrets.GHCR_PASS }}
+          env_json: |
+            {
+              "VERSION": "${{ github.ref_name }}",
+              "STACK_NAME": "${{ env.stack-name }}",
+              "TRAEFIK_HOST": "${{ env.traefik-host }}"
+            }
