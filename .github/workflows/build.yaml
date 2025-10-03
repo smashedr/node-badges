@@ -9,10 +9,6 @@ on:
   release:
     types: [published]
 
-env:
-  stack-name: smashedr_node-badges
-  stack-file: docker-compose-swarm.yaml
-
 jobs:
   build:
     name: "Build"
@@ -84,31 +80,3 @@ jobs:
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-
-  # NOTE: Verify the workflow_run trigger works then remove this
-  #deploy:
-  #  name: "Deploy"
-  #  runs-on: ubuntu-latest
-  #  timeout-minutes: 5
-  #  needs: [build]
-  #
-  #  environment:
-  #    name: swarm
-  #    url: https://badges.cssnr.com/
-  #
-  #  steps:
-  #    - name: "Portainer Deploy"
-  #      uses: cssnr/portainer-stack-deploy-action@v1
-  #      with:
-  #        url: ${{ secrets.PORTAINER_URL }}
-  #        token: ${{ secrets.PORTAINER_TOKEN }}
-  #        file: ${{ env.stack-file }}
-  #        name: ${{ env.stack-name }}
-  #        username: ${{ vars.GHCR_USER }}
-  #        password: ${{ secrets.GHCR_PASS }}
-  #
-  #    - name: "Send Failure Notification"
-  #      if: ${{ failure() }}
-  #      uses: sarisia/actions-status-discord@v1
-  #      with:
-  #        webhook: ${{ secrets.DISCORD_WEBHOOK }}

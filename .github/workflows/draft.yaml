@@ -2,10 +2,10 @@ name: "Draft Release"
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
   push:
     branches: ["master"]
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
