@@ -50,7 +50,7 @@ jobs:
 
       - name: "Generate Docker Tags"
         id: tags
-        uses: smashedr/docker-tags-action@v1
+        uses: cssnr/docker-tags-action@v1
         with:
           images: "ghcr.io/${{ github.repository }}"
           tags: ${{ steps.version.outputs.tags }}
