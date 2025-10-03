@@ -60,9 +60,23 @@ export class GhcrApi {
         console.log(`-- CACHE MISS: ${key}`)
 
         const indexManifest = await this.getManifest(tag)
-        // console.log('indexManifest:', indexManifest)
+        console.log('mediaType:', indexManifest.mediaType)
+
         let totalSize = 0
-        // noinspection JSUnresolvedReference
+
+        if (
+            !indexManifest.mediaType.includes('list') &&
+            !indexManifest.mediaType.includes('index')
+        ) {
+            console.log('indexManifest - !list + !index:', indexManifest)
+            const size = indexManifest.layers.reduce((sum, layer) => sum + layer.size, 0)
+            totalSize = size + (indexManifest.config.size || 0)
+            console.log('totalSize:', totalSize)
+            await cacheSet(key, totalSize)
+            return totalSize
+        }
+
+        console.log('indexManifest.manifests?.length:', indexManifest.manifests?.length)
         for (const m of indexManifest.manifests) {
             await new Promise((resolve) => setTimeout(resolve, 50))
             const manifest = await this.getManifest(m.digest)
