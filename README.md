@@ -97,7 +97,7 @@ http://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
 
 You can also change the `sep` parameter, add `reversed` and filter by valid `semver` tags.
 
-[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=olivedrab&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)
 
 ```text
 https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver

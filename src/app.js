@@ -47,14 +47,14 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
     console.log('getImageTags - tags:', tags)
 
     tags = tags.filter((tag) => tag !== 'latest')
-    console.log('tags - filter(latest):', tags)
+    // console.log('tags - filter(latest):', tags)
 
     tags = tags.toReversed()
-    console.log('tags - toReversed:', tags)
+    // console.log('tags - toReversed:', tags)
 
     if (req.query.semver !== undefined) {
         tags = tags.filter((str) => semver.valid(str))
-        console.log('tags - semver:', tags)
+        // console.log('tags - semver:', tags)
     }
 
     tags = tags.slice(0, count)
