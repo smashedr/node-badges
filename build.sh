@@ -41,10 +41,10 @@ echo "${REGISTRY_HOST}/${REGISTRY_USER}/${REGISTRY_REPO}:${VERSION}"
 #docker login "${REGISTRY_HOST}"
 
 
-docker buildx create --use
-docker buildx build -t "${REGISTRY_HOST}/${REGISTRY_USER}/${REGISTRY_REPO}:${VERSION}" \
-    --platform linux/amd64,linux/arm64 \
-    "${BUILD_CONTEXT}"
+#docker buildx create --use
+#docker buildx build -t "${REGISTRY_HOST}/${REGISTRY_USER}/${REGISTRY_REPO}:${VERSION}" \
+#    --platform linux/amd64,linux/arm64 \
+#    "${BUILD_CONTEXT}"
 
 docker build -t "${REGISTRY_HOST}/${REGISTRY_USER}/${REGISTRY_REPO}:${VERSION}" \
     "${BUILD_CONTEXT}"
