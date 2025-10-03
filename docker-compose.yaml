@@ -24,7 +24,7 @@ services:
       - "${PORT:-80}:80"
 
   app:
-    image: ghcr.io/smashedr/node-badges:latest
+    image: ghcr.io/smashedr/node-badges:${VERSION:-latest}
     command: "npm start"
     deploy:
       replicas: 1
