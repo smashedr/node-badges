@@ -22,7 +22,7 @@
 
 This is a Work in Progress, but Works!
 
-Currently, this supports GitHub Container Registry (GHCR) Image Size and Tags.
+Badges include GitHub Container Registry (GHCR) Image Size and Tags.
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
@@ -41,14 +41,14 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 - [Support](#Support)
 - [Contributing](#Contributing)
 
-[![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
-[![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
-
-Base URL:
+Public Server Base URL:
 
 ```text
 https://badges.cssnr.com/
 ```
+
+[![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
+[![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
 
 ## Badges
 
