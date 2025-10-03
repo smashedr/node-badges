@@ -7,7 +7,7 @@ services:
       - SERVICE_NAME=app
       - SERVICE_PORT=3000
     deploy:
-      mode: global
+      replicas: 1
       resources:
         limits:
           cpus: "1.0"
@@ -40,7 +40,7 @@ services:
     image: ghcr.io/smashedr/node-badges:${VERSION:-latest}
     command: "npm start"
     deploy:
-      mode: global
+      replicas: 1
       resources:
         limits:
           cpus: "2.0"
