@@ -35,6 +35,7 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 - [Badges](#Badges)
   - [GHCR Image Size](#ghcr-image-size)
   - [GHCR Image Tags](#ghcr-image-tags)
+  - [YAML JSONPath](#yaml-jsonpath)
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
 - [Troubleshooting](#Troubleshooting)
@@ -58,6 +59,7 @@ Available Badges:
 
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
+- [YAML JSONPath](#yaml-jsonpath)
 
 ### GHCR Image Size
 
