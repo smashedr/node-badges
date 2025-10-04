@@ -4,9 +4,8 @@
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://github.com/smashedr/node-badges/pkgs/container/node-badges)
 [![GitHub Tag Major](https://img.shields.io/github/v/tag/smashedr/node-badges?sort=semver&filter=!*.*&logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/smashedr/node-badges/tags)
 [![GitHub Tag Minor](https://img.shields.io/github/v/tag/smashedr/node-badges?sort=semver&filter=!*.*.*&logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/smashedr/node-badges/releases)
-[![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/smashedr/node-badges/releases/latest)
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/releases/latest)
-[![Deployments Pages](https://img.shields.io/github/deployments/smashedr/node-badges/swarm?logo=portainer&logoColor=white&label=swarm)](https://github.com/smashedr/node-badges/deployments/swarm)
+[![Deployments Swarm](https://img.shields.io/github/deployments/smashedr/node-badges/swarm?logo=portainer&logoColor=white&label=swarm)](https://github.com/smashedr/node-badges/deployments/swarm)
 [![Workflow Build](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/build.yaml?logo=cachet&label=build)](https://github.com/smashedr/node-badges/actions/workflows/build.yaml)
 [![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/lint.yaml?logo=cachet&label=lint)](https://github.com/smashedr/node-badges/actions/workflows/lint.yaml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smashedr_node-badges&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smashedr_node-badges)
@@ -36,6 +35,7 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 - [Badges](#Badges)
   - [GHCR Image Size](#ghcr-image-size)
   - [GHCR Image Tags](#ghcr-image-tags)
+  - [YAML JSONPath](#yaml-jsonpath)
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
 - [Troubleshooting](#Troubleshooting)
@@ -59,6 +59,7 @@ Available Badges:
 
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
+- [YAML JSONPath](#yaml-jsonpath)
 
 ### GHCR Image Size
 
@@ -106,6 +107,14 @@ You can also change the `sep` parameter, add `reversed` and filter by valid `sem
 https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver
 ```
 
+### YAML JSONPath
+
+`/yaml/{url}/{path}`
+
+Both `url` and `path` are URL encoded. The `path` is a [JSONPath](https://jsonpath.com/).
+
+This endpoint accepts `split` and `index`.
+
 ## Query Parameters
 
 The following query parameters are supported on all badges.
@@ -131,6 +140,8 @@ These are specific to certain badges. Refer to the [Badges](#badges) for more de
 | `sep`      |  `\|`   | List item seperator where applicable.                                            |
 | `semver`   |    -    | Filter items by valid [semantic](https://www.npmjs.com/package/semver) versions. |
 | `reversed` |    -    | Reverse the order of returned items.                                             |
+| `split`    |    -    | Split the item at the delimiter.                                                 |
+| `index`    |   `0`   | Index of item after splitting.                                                   |
 
 ## Troubleshooting
 
