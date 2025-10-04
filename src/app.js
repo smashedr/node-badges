@@ -1,17 +1,20 @@
 import express from 'express'
 import cors from 'cors'
 
+import lucide from 'lucide-static'
+import jp from 'jsonpath'
 import semver from 'semver'
 import camelCase from 'camelcase'
-import lucide from 'lucide-static'
+import { parse } from 'yaml'
 import { makeBadge } from 'badge-maker'
 import { siGithubactions } from 'simple-icons'
 
-import { GhcrApi } from './api.js'
+import { cacheGet, cacheSet, GhcrApi } from './api.js'
 
 const app = express()
 const port = process.env.PORT || 3000
 
+// app.use(express.static('src/public'))
 app.use(express.json())
 app.use(cors())
 
@@ -66,10 +69,7 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
     if (req.params.latest) {
         const message = tags.at(-1)
         console.log('latest - message:', message)
-
-        const badge = getBadge(req, message, 'latest', 'tag')
-        // return res.send(badge)
-        return sendBadge(res, badge)
+        return getBadge(req, message, 'latest', 'tag', res)
     }
 
     if (req.query.reversed !== undefined) {
@@ -79,10 +79,7 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 
     const message = tags.join(` ${req.query.sep || '|'} `)
     console.log('tags - message:', message)
-
-    const badge = getBadge(req, message, 'tags', 'tags')
-    // res.send(badge)
-    sendBadge(res, badge)
+    return getBadge(req, message, 'tags', 'tags', res)
 })
 
 app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
@@ -95,20 +92,61 @@ app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
 
     const message = formatSize(total)
     console.log('message:', message)
+    return getBadge(req, message, 'size', 'container', res)
+})
 
-    const badge = getBadge(req, message, 'size', 'container')
-    // res.send(badge)
-    sendBadge(res, badge)
+app.get('/yaml/:url/:path', async (req, res) => {
+    console.log('req.path:', req.path)
+    console.log(req.originalUrl)
+    console.log('req.params.url:', req.params.url)
+    // return res.sendStatus(200)
+
+    const cached = await cacheGet(req.originalUrl)
+    console.log('cached:', cached)
+    if (cached) return getBadge(req, cached, 'result', 'code', res)
+
+    const url = new URL(req.params.url)
+    console.log('url.href:', url.href)
+
+    const response = await fetch(url)
+    // console.log('response:', response)
+    console.log('response.status:', response.status)
+
+    const length = response.headers.get('content-length')
+    console.log('content-length:', length)
+
+    const text = await response.text()
+    console.log('text.length:', text.length)
+    // console.log('text:', text)
+
+    const encoder = new TextEncoder().encode(text)
+    console.log('encoder.length:', encoder.length)
+
+    const data = parse(text)
+    // console.log('data:', data)
+
+    let result = jp.query(data, req.params.path)[0]
+    console.log('result:', result)
+    if (req.query.split) {
+        const split = result.split(req.query.split)
+        result = split[req.query.index || 0]
+        console.log('result:', result)
+    }
+    if (result) {
+        await cacheSet(req.originalUrl, result)
+        return getBadge(req, result, 'result', 'code-xml', res)
+    } else {
+        res.sendStatus(404)
+    }
 })
 
 app.get('/uptime', (req, res) => {
     // Note: this is an internal badge endpoint for server uptime
     const message = getUptime()
     console.log('message:', message)
-
+    // return getBadge(req, message, 'uptime', 'clock-arrow-up', res)
     const badge = getBadge(req, message, 'uptime', 'clock-arrow-up')
-    res.setHeader('Content-Type', 'image/svg+xml')
-    res.send(badge)
+    sendBadge(res, badge)
 })
 
 app.get('/badge', (req, res) => {
@@ -131,6 +169,31 @@ app.get('/badge', (req, res) => {
 })
 
 /**
+ * Get Badge
+ * @param {Request} req
+ * @param {String} message
+ * @param {String} label
+ * @param {String} icon
+ * @param {Response} [res]
+ * @return {String}
+ */
+function getBadge(req, message, label, icon, res) {
+    const logo = getLogo(req, icon)
+    // TODO: Handle no logo
+    // console.log('logo:', logo)
+    const badge = makeBadge({
+        message: message.toString(),
+        logoBase64: `data:image/svg+xml;base64,${logo}`,
+        labelColor: req.query.labelColor || '#555',
+        label: req.query.label || label,
+        color: req.query.color || 'brightgreen',
+        style: req.query.style || 'flat',
+    })
+    if (res) sendBadge(res, badge)
+    return badge
+}
+
+/**
  * Send Badge
  * @param {Response} res
  * @param {String} badge
@@ -139,28 +202,6 @@ function sendBadge(res, badge) {
     res.setHeader('Content-Type', 'image/svg+xml')
     res.setHeader('Cache-Control', 'public, max-age=3600')
     res.send(badge)
-}
-
-/**
- * Get Badge
- * @param {Request} req
- * @param {String} message
- * @param {String} label
- * @param {String} icon
- * @return {String}
- */
-function getBadge(req, message, label, icon) {
-    const logo = getLogo(req, icon)
-    // TODO: Handle no logo
-    // console.log('logo:', logo)
-    return makeBadge({
-        message: message.toString(),
-        logoBase64: `data:image/svg+xml;base64,${logo}`,
-        labelColor: req.query.labelColor || '#555',
-        label: req.query.label || label,
-        color: req.query.color || 'brightgreen',
-        style: req.query.style || 'flat',
-    })
 }
 
 /**

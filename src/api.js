@@ -108,13 +108,13 @@ export class GhcrApi {
     // }
 }
 
-async function cacheGet(key) {
+export async function cacheGet(key) {
     // return cache.get(key)
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
 }
 
-async function cacheSet(key, value, EX = 60 * 60) {
+export async function cacheSet(key, value, EX = 60 * 60) {
     // cache.set(key, totalSize)
     await client.set(key, JSON.stringify(value), { EX })
 }
