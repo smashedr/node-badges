@@ -193,24 +193,23 @@ function sendBadge(res, badge) {
  * @return {String}
  */
 function getLogo(req, icon, color = '#fff') {
-    const iconName = camelCase(req.query.icon || req.query.lucide || icon, {
-        pascalCase: true,
-    })
-    console.log('iconName:', iconName)
+    const iconName = req.query.icon || req.query.lucide || icon
+    const name = camelCase(iconName, { pascalCase: true })
+    // console.log('name:', name)
     let svg
     let colorType
     if (req.query.icon) {
-        console.log('Simple Icons')
-        svg = icons[`si${iconName}`].svg
+        // console.log('Simple Icons')
+        svg = icons[`si${name}`].svg
         colorType = 'fill'
     } else {
-        console.log('Lucide Icon')
-        svg = lucide[iconName]
+        // console.log('Lucide Icon')
+        svg = lucide[name]
         colorType = 'color'
     }
 
     if (!svg) {
-        console.warn('SVG NOT FOUND - iconName:', iconName)
+        console.warn(`SVG NOT FOUND - icon: ${iconName} - name: ${name}`)
         return ''
     }
 
