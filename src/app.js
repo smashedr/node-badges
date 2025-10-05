@@ -195,6 +195,7 @@ function sendBadge(res, badge) {
  * @return {String}
  */
 function getLogo(req, icon, color = '#fff') {
+    if (req.query.icon !== undefined && !req.query.icon) return ''
     const iconName = req.query.icon || req.query.lucide || icon
     const name = camelCase(iconName, { pascalCase: true })
     // console.log('name:', name)

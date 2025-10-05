@@ -144,7 +144,7 @@ The following query parameters are supported on all badges.
 | `lucide`     |        badge specific         | Name of a [Lucide Icon](https://lucide.dev/icons/)          |
 | `iconColor`  |            `#fff`             | Icon Color                                                  |
 
-Note: You can set `icon` or `lucide` but not both.
+Note: You can set `icon` or `lucide` but not both. To disable the icon, add it to the query with no value.
 
 For more details see the documentation for the related library, [badge-maker](https://www.npmjs.com/package/badge-maker).
 
