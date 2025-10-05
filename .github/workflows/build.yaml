@@ -13,7 +13,7 @@ jobs:
   build:
     name: "Build"
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     permissions:
       contents: write
@@ -35,7 +35,7 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
 
-      - name: "Generate Version Tags"
+      - name: "Update Version Tags"
         id: version
         uses: cssnr/update-version-tags-action@v1
         with:
@@ -72,6 +72,8 @@ jobs:
           tags: ${{ steps.tags.outputs.tags }}
           labels: ${{ steps.tags.outputs.labels }}
           annotations: ${{ steps.tags.outputs.annotations }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.ref_name }}
 

@@ -7,7 +7,7 @@ import semver from 'semver'
 import camelCase from 'camelcase'
 import { parse } from 'yaml'
 import { makeBadge } from 'badge-maker'
-import { siGithubactions } from 'simple-icons'
+import * as icons from 'simple-icons'
 
 import { cacheGet, cacheSet, GhcrApi } from './api.js'
 
@@ -149,25 +149,6 @@ app.get('/uptime', (req, res) => {
     sendBadge(res, badge)
 })
 
-app.get('/badge', (req, res) => {
-    // Note: this is a simple-icons testing endpoint
-    const uptime = Math.floor(process.uptime())
-    const svg = siGithubactions.svg.replace('<path ', '<path fill="#ffffff" ')
-    const logo = Buffer.from(svg).toString('base64')
-    const badge = makeBadge({
-        message: `${uptime} sec`,
-        logoBase64: `data:image/svg+xml;base64,${logo}`,
-        labelColor: req.query.labelColor || '#555',
-        label: req.query.label || 'uptime',
-        color: req.query.color || 'brightgreen',
-        style: req.query.style || 'flat',
-    })
-    res.setHeader('Content-Type', 'image/svg+xml')
-    // res.send(`<?xml version="1.0" encoding="UTF-8"?>\n${badge}`)
-    // res.send(badge)
-    sendBadge(res, badge)
-})
-
 /**
  * Get Badge
  * @param {Request} req
@@ -212,16 +193,31 @@ function sendBadge(res, badge) {
  * @return {String}
  */
 function getLogo(req, icon, color = '#fff') {
-    const iconName = camelCase(req.query.lucide || icon, { pascalCase: true })
-    // console.log('iconName:', iconName)
-    let svg = lucide[iconName]
+    const iconName = camelCase(req.query.icon || req.query.lucide || icon, {
+        pascalCase: true,
+    })
+    console.log('iconName:', iconName)
+    let svg
+    let colorType
+    if (req.query.icon) {
+        console.log('Simple Icons')
+        svg = icons[`si${iconName}`].svg
+        colorType = 'fill'
+    } else {
+        console.log('Lucide Icon')
+        svg = lucide[iconName]
+        colorType = 'color'
+    }
+
     if (!svg) {
         console.warn('SVG NOT FOUND - iconName:', iconName)
         return ''
     }
+
     const iconColor = req.query.iconColor || color
     // console.log('iconColor:', iconColor)
-    const result = svg.replace('<svg', `<svg color="${iconColor}"`)
+    const result = svg.replace('<svg', `<svg ${colorType}="${iconColor}"`)
+    // console.log('result:', result)
     return Buffer.from(result).toString('base64')
 }
 
