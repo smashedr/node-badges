@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: node-badges-web
+    name: node-badges
     repo: https://github.com/smashedr/node-badges
     plan: free
     runtime: docker
