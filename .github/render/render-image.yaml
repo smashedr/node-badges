@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: node-badges
+    name: node-badges-web
     repo: https://github.com/smashedr/node-badges
     plan: free
     runtime: image
