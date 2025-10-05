@@ -191,7 +191,7 @@ function getLogo(req, icon, color = '#fff') {
     let colorType
     if (req.query.icon) {
         // console.log('Simple Icons')
-        svg = icons[`si${name}`].svg
+        svg = icons[`si${name}`]?.svg
         colorType = 'fill'
     } else {
         // console.log('Lucide Icon')

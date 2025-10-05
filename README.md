@@ -31,12 +31,13 @@ Badges include GitHub Container Registry (GHCR) Image Size and Tags.
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
+[![YAML Command](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Flabel%2Fdocker-compose-dev.yaml/%24.services.app.command?lucide=terminal&label=cmd)](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Flabel%2Fdocker-compose-dev.yaml/%24.services.app.command?lucide=terminal&label=cmd)
 
 Please [let us know](https://github.com/smashedr/node-badges/discussions/categories/feature-requests) if you want to see a specific badge or feature....
 
 - [Badges](#Badges)
   - [GHCR Image Size](#ghcr-image-size)
-  - [GHCR Image Tags](#ghcr-image-tags)
+  - [GHCR Image Tags (2)](#ghcr-image-tags)
   - [YAML JSONPath](#yaml-jsonpath)
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
@@ -144,7 +145,7 @@ The following query parameters are supported on all badges.
 | `lucide`     |        badge specific         | Name of a [Lucide Icon](https://lucide.dev/icons/)          |
 | `iconColor`  |            `#fff`             | Icon Color                                                  |
 
-> **¹** Empty Allowed. Set to an empty value to remove it from the badge.
+> **¹** Allowed Empty. Set to an empty value to remove it from the badge.
 
 Note: You can set `icon` or `lucide` but not both. To disable the icon, add it to the query with no value.
 
