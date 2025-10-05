@@ -47,7 +47,7 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 
     const api = new GhcrApi(req.params.owner, req.params.package)
     let tags = await api.getImageTags()
-    console.log('getImageTags - tags:', tags)
+    // console.log('getImageTags - tags:', tags)
 
     tags = tags.filter((tag) => tag !== 'latest')
     // console.log('tags - filter(latest):', tags)
@@ -61,10 +61,10 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
     }
 
     tags = tags.slice(0, count)
-    console.log('tags - slice(count):', tags)
+    // console.log('tags - slice(count):', tags)
 
     tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-    console.log('tags - localCompare:', tags)
+    // console.log('tags - localCompare:', tags)
 
     if (req.params.latest) {
         const message = tags.at(-1)
@@ -74,7 +74,7 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 
     if (req.query.reversed !== undefined) {
         tags.reverse()
-        console.log('tags - reverse:', tags)
+        // console.log('tags - reverse:', tags)
     }
 
     const message = tags.join(` ${req.query.sep || '|'} `)
@@ -119,8 +119,8 @@ app.get('/yaml/:url/:path', async (req, res) => {
     console.log('text.length:', text.length)
     // console.log('text:', text)
 
-    const encoder = new TextEncoder().encode(text)
-    console.log('encoder.length:', encoder.length)
+    // const encoder = new TextEncoder().encode(text)
+    // console.log('encoder.length:', encoder.length)
 
     const data = parse(text)
     // console.log('data:', data)
