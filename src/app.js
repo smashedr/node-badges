@@ -159,17 +159,19 @@ app.get('/uptime', (req, res) => {
  * @return {String}
  */
 function getBadge(req, message, label, icon, res) {
-    const logo = getLogo(req, icon)
-    // TODO: Handle no logo
-    // console.log('logo:', logo)
-    const badge = makeBadge({
+    const data = {
         message: message.toString(),
-        logoBase64: `data:image/svg+xml;base64,${logo}`,
-        labelColor: req.query.labelColor || '#555',
         label: req.query.label || label,
         color: req.query.color || 'brightgreen',
         style: req.query.style || 'flat',
-    })
+    }
+    const logo = getLogo(req, icon)
+    if (logo) {
+        data.logoBase64 = `data:image/svg+xml;base64,${logo}`
+        data.labelColor = req.query.labelColor || '#555'
+    }
+    console.log('data:', data)
+    const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
     return badge
 }
