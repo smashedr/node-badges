@@ -1,11 +1,9 @@
 services:
   - type: web
     name: node-badges
-    repo: https://github.com/smashedr/node-badges
+    image: ghcr.io/smashedr/node-badges:latest
     plan: free
     runtime: image
-    image:
-      url: ghcr.io/smashedr/node-badges:latest
     dockerCommand: npm start
     envVars:
       - key: REDIS_URL
