@@ -137,18 +137,21 @@ app.get('/uptime', (req, res) => {
 /**
  * Get Badge
  * @param {Request} req
- * @param {String} message
- * @param {String} label
- * @param {String} icon
- * @param {Response} [res]
+ * @param {String} message Required Badge Message
+ * @param {String} [label] Default Label - empty string for none
+ * @param {String} [icon] Default Icon - empty string for none
+ * @param {Response} [res] Will also sendBadge if provided
  * @return {String}
  */
-function getBadge(req, message, label, icon, res) {
+function getBadge(req, message, label = '', icon = '', res = null) {
     const data = {
         message: message.toString(),
-        label: req.query.label || label,
         color: req.query.color || 'brightgreen',
         style: req.query.style || 'flat',
+    }
+    label = req.query.label !== undefined ? req.query.label : label
+    if (label) {
+        data.label = label
     }
     const logo = getLogo(req, icon)
     if (logo) {

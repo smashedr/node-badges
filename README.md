@@ -138,11 +138,13 @@ The following query parameters are supported on all badges.
 | :----------- | :---------------------------: | :---------------------------------------------------------- |
 | `style`      |            `flat`             | `plastic`, `flat`, `flat-square`, `for-the-badge`, `social` |
 | `color`      |         `brightgreen`         | Badge Background Color (right side)                         |
-| `label`      |        badge specific         | Label Text (left side)                                      |
+| `label`**¹** |        badge specific         | Label Text (left side)                                      |
 | `labelColor` |            `#555`             | Label Background Color (left side)                          |
-| `icon`       |        badge specific         | Name of a [Simple Icon](https://simpleicons.org/)           |
+| `icon`**¹**  |        badge specific         | Name of a [Simple Icon](https://simpleicons.org/)           |
 | `lucide`     |        badge specific         | Name of a [Lucide Icon](https://lucide.dev/icons/)          |
 | `iconColor`  |            `#fff`             | Icon Color                                                  |
+
+> **¹** Empty Allowed. Set to an empty value to remove it from the badge.
 
 Note: You can set `icon` or `lucide` but not both. To disable the icon, add it to the query with no value.
 
