@@ -7,12 +7,14 @@ services:
     startCommand: npm start
     envVars:
       - key: REDIS_URL
-        sync: true
+        fromService:
+          type: keyvalue
+          name: node-badges-redis
+          property: connectionString
     healthCheckPath: /app-health-check
 
-databases:
   - type: keyvalue
     name: node-badges-redis
     plan: free
-    access:
-      internal: true
+    maxmemoryPolicy: volatile-ttl
+    ipAllowList: []
