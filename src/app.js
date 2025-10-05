@@ -41,30 +41,20 @@ app.get('/', (req, res) => {
 app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
     console.log(req.originalUrl)
     if (req.params.latest && req.params.latest !== 'latest') res.sendStatus(404)
-
     const count = Number.parseInt(req.query.n) || 3
     console.log('count:', count)
 
     const api = new GhcrApi(req.params.owner, req.params.package)
     let tags = await api.getImageTags()
-    // console.log('getImageTags - tags:', tags)
-
     tags = tags.filter((tag) => tag !== 'latest')
-    // console.log('tags - filter(latest):', tags)
-
     tags = tags.toReversed()
-    // console.log('tags - toReversed:', tags)
 
     if (req.query.semver !== undefined) {
         tags = tags.filter((str) => semver.valid(str))
-        // console.log('tags - semver:', tags)
     }
 
     tags = tags.slice(0, count)
-    // console.log('tags - slice(count):', tags)
-
     tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-    // console.log('tags - localCompare:', tags)
 
     if (req.params.latest) {
         const message = tags.at(-1)
@@ -74,12 +64,11 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 
     if (req.query.reversed !== undefined) {
         tags.reverse()
-        // console.log('tags - reverse:', tags)
     }
 
     const message = tags.join(` ${req.query.sep || '|'} `)
     console.log('tags - message:', message)
-    return getBadge(req, message, 'tags', 'tags', res)
+    getBadge(req, message, 'tags', 'tags', res)
 })
 
 app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
@@ -92,14 +81,13 @@ app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
 
     const message = formatSize(total)
     console.log('message:', message)
-    return getBadge(req, message, 'size', 'container', res)
+    getBadge(req, message, 'size', 'container', res)
 })
 
 app.get('/yaml/:url/:path', async (req, res) => {
-    console.log('req.path:', req.path)
     console.log(req.originalUrl)
+    console.log('req.path:', req.path)
     console.log('req.params.url:', req.params.url)
-    // return res.sendStatus(200)
 
     const cached = await cacheGet(req.originalUrl)
     console.log('cached:', cached)
@@ -117,8 +105,6 @@ app.get('/yaml/:url/:path', async (req, res) => {
 
     const text = await response.text()
     console.log('text.length:', text.length)
-    // console.log('text:', text)
-
     // const encoder = new TextEncoder().encode(text)
     // console.log('encoder.length:', encoder.length)
 
@@ -142,11 +128,10 @@ app.get('/yaml/:url/:path', async (req, res) => {
 
 app.get('/uptime', (req, res) => {
     // Note: this is an internal badge endpoint for server uptime
+    console.log(req.originalUrl)
     const message = getUptime()
     console.log('message:', message)
-    // return getBadge(req, message, 'uptime', 'clock-arrow-up', res)
-    const badge = getBadge(req, message, 'uptime', 'clock-arrow-up')
-    sendBadge(res, badge)
+    getBadge(req, message, 'uptime', 'clock-arrow-up', res)
 })
 
 /**
@@ -170,7 +155,7 @@ function getBadge(req, message, label, icon, res) {
         data.logoBase64 = `data:image/svg+xml;base64,${logo}`
         data.labelColor = req.query.labelColor || '#555'
     }
-    console.log('data:', data)
+    // console.log('data:', data)
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
     return badge
