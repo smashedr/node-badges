@@ -137,18 +137,21 @@ app.get('/uptime', (req, res) => {
 /**
  * Get Badge
  * @param {Request} req
- * @param {String} message
- * @param {String} label
- * @param {String} icon
- * @param {Response} [res]
+ * @param {String} message Badge Message
+ * @param {String} [label] Default Label
+ * @param {String} [icon] Default Icon
+ * @param {Response} [res] To also sendBadge
  * @return {String}
  */
-function getBadge(req, message, label, icon, res) {
+function getBadge(req, message, label = '', icon = '', res = null) {
     const data = {
         message: message.toString(),
-        label: req.query.label || label,
         color: req.query.color || 'brightgreen',
         style: req.query.style || 'flat',
+    }
+    label = req.query.label !== undefined ? req.query.label : label
+    if (label) {
+        data.label = label
     }
     const logo = getLogo(req, icon)
     if (logo) {
@@ -188,7 +191,7 @@ function getLogo(req, icon, color = '#fff') {
     let colorType
     if (req.query.icon) {
         // console.log('Simple Icons')
-        svg = icons[`si${name}`].svg
+        svg = icons[`si${name}`]?.svg
         colorType = 'fill'
     } else {
         // console.log('Lucide Icon')
