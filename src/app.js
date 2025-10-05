@@ -137,10 +137,10 @@ app.get('/uptime', (req, res) => {
 /**
  * Get Badge
  * @param {Request} req
- * @param {String} message Required Badge Message
- * @param {String} [label] Default Label - empty string for none
- * @param {String} [icon] Default Icon - empty string for none
- * @param {Response} [res] Will also sendBadge if provided
+ * @param {String} message Badge Message
+ * @param {String} [label] Default Label
+ * @param {String} [icon] Default Icon
+ * @param {Response} [res] To also sendBadge
  * @return {String}
  */
 function getBadge(req, message, label = '', icon = '', res = null) {
