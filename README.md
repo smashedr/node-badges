@@ -103,15 +103,15 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
 
 You can also change the `sep` parameter, add `reversed` and filter by valid `semver` tags.
 
-[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=olivedrab&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)
+[![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=activity&iconColor=black&color=paleturquoise&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=activity&iconColor=black&color=paleturquoise&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver)
 
 ```text
-https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=activity&color=crimson&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver
+https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=activity&iconColor=black&color=paleturquoise&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver
 ```
 
 ### YAML JSONPath
 
-[![App Image](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.app.image?lucide=container&label=image)](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml#L40)
+[![App Image](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.app.image?lucide=container&label=image)](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.app.image?lucide=container&label=image)
 
 `/yaml/{url}/{path}`
 
