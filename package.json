@@ -20,9 +20,10 @@
     "jsonpath": "^1.1.1",
     "lucide-static": "^0.544.0",
     "nodemon": "^3.1.10",
+    "pug": "^3.0.3",
     "redis": "^5.8.3",
     "semver": "^7.7.2",
-    "simple-icons": "^15.16.0",
+    "simple-icons": "^15.16.1",
     "yaml": "^2.8.1"
   },
   "devDependencies": {
