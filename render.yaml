@@ -12,9 +12,7 @@ services:
         sync: true
     healthCheckPath: /app-health-check
 
-databases:
   - type: keyvalue
     name: node-badges-redis
     plan: free
-    access:
-      internal: true
+    maxmemoryPolicy: volatile-ttl
