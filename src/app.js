@@ -14,9 +14,13 @@ import { cacheGet, cacheSet, GhcrApi } from './api.js'
 const app = express()
 const port = process.env.PORT || 3000
 
-// app.use(express.static('src/public'))
+app.use(express.static('src/public'))
 app.use(express.json())
 app.use(cors())
+
+app.set('views', '/app/src/views')
+app.set('view engine', 'pug')
+app.disable('view cache')
 
 app.listen(port, () => {
     console.log(`listening on PORT: ${port}`)
@@ -29,7 +33,14 @@ app.get('/app-health-check', (req, res) => {
 app.get('/', (req, res) => {
     const uptime = getUptime()
     const seconds = Math.floor(process.uptime())
-    res.send(`Version: ${process.env.APP_VERSION} - Uptime: ${uptime} (${seconds} s)`)
+    // res.send(`Version: ${process.env.APP_VERSION} - Uptime: ${uptime} (${seconds} s)`)
+    res.render('index', {
+        version: process.env.APP_VERSION,
+        uptime: uptime,
+        seconds: seconds,
+        title: 'Node Badges',
+        source: 'https://github.com/smashedr/node-badges',
+    })
 })
 
 // app.use('/ghcr', (req, res, next) => {

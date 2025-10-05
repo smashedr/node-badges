@@ -179,11 +179,9 @@ Only the API response is cached, not the badge. All query parameters changes wil
 
 You can run the dev server with [Docker](#with-docker) compose or [Node](#with-node) run.
 
-[Docker](#with-docker) is highly recommended because of the required redis server.
-
 ### With Docker
 
-I use Docker because it includes the redis container, and live reloads with the dev server.
+Docker is recommended because it includes redis and supports live reloading.
 
 ```shell
 docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-recreate
@@ -191,9 +189,9 @@ docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-
 
 Then visit: http://localhost/
 
-Note: this mounts the `./src` directory into the container for live reloading.
+_Note: this mounts the `./src` directory into the container for live reloading.
 To use a different source path, set the `APP_FILES` environment variable.
-See the [docker-compose-dev.yaml](docker-compose-dev.yaml) file for more details.
+See the [docker-compose-dev.yaml](docker-compose-dev.yaml) file for more details._
 
 To use a different port set the `PORT` environment variable.
 
@@ -226,15 +224,16 @@ If using Node you need a Redis server.
 
 ### To Docker
 
+[![Deploy to Render](https://img.shields.io/badge/Deploy_to_Render-4351E8?style=for-the-badge&logo=render)](https://render.com/deploy?repo=https://github.com/smashedr/node-badges)
+
 This is designed to be deployed to Docker out of the box which includes redis.
 
 To deploy to a Swarm cluster using Traefik seee the [docker-compose-swarm.yaml](docker-compose-swarm.yaml).
 
 ### To Node
 
-This is ready to be deployed to services like Render assuming you have a redis server.
-You can set the redis server url with the `REDIS_URL` environment variable.  
-The default value is `redis://redis:6379`.
+This is ready to be deployed to services like Render using their Redis ([Render Key Value](https://render.com/docs/key-value)) store.
+You can set the redis server url with the `REDIS_URL` environment variable. The default value is `redis://redis:6379`.
 
 The server installs with `npm i`, starts with `npm start`, and listens on `PORT` environment variable.
 

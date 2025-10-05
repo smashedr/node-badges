@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: node-badges
+    repo: https://github.com/smashedr/node-badges
+    plan: starter
+    runtime: node
+    startCommand: npm start
+    envVars:
+      - key: REDIS_URL
+        sync: true
+    healthCheckPath: /app-health-check
+
+databases:
+  - type: keyvalue
+    name: node-badges-redis
+    plan: free
+    access:
+      internal: true

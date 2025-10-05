@@ -1,15 +1,11 @@
 FROM node:lts-alpine
 
-ARG VERSION=source
-
 ENV TZ=UTC
 ENV NODE_ENV=production
-ENV APP_VERSION="${VERSION}"
 
 LABEL org.opencontainers.image.source="https://github.com/smashedr/node-badges"
 LABEL org.opencontainers.image.description="Node Badges"
 LABEL org.opencontainers.image.authors="smashedr"
-LABEL org.opencontainers.image.version="${VERSION}"
 
 RUN apk add --no-cache curl
 
@@ -23,6 +19,11 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 
 COPY --chown=node:node ./src ./src
 
+ARG VERSION=source
+ENV APP_VERSION="${VERSION}"
+LABEL org.opencontainers.image.version="${VERSION}"
+
 USER node
 
 ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
+CMD ["npm", "start"]

@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title #{title}
+    link(rel="icon" href="/favicon.ico" sizes="any")
+    style.
+      body { background-color: #313131; color: #e8e6e3; }
+      a { color: white; text-decoration: underline; }
+      a:hover { text-decoration: none; }
+  body
+    h1 #{title}
+    p Version: #{version}
+    p Uptime: #{uptime} (#{seconds} s) Badge: #[a(href="/uptime") uptime]
+    p Source: #[a(href=source) #{source}]
