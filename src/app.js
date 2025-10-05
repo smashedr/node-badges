@@ -7,7 +7,7 @@ import semver from 'semver'
 import camelCase from 'camelcase'
 import { parse } from 'yaml'
 import { makeBadge } from 'badge-maker'
-import { siGithubactions } from 'simple-icons'
+import * as icons from 'simple-icons'
 
 import { cacheGet, cacheSet, GhcrApi } from './api.js'
 
@@ -41,30 +41,20 @@ app.get('/', (req, res) => {
 app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
     console.log(req.originalUrl)
     if (req.params.latest && req.params.latest !== 'latest') res.sendStatus(404)
-
     const count = Number.parseInt(req.query.n) || 3
     console.log('count:', count)
 
     const api = new GhcrApi(req.params.owner, req.params.package)
     let tags = await api.getImageTags()
-    console.log('getImageTags - tags:', tags)
-
     tags = tags.filter((tag) => tag !== 'latest')
-    // console.log('tags - filter(latest):', tags)
-
     tags = tags.toReversed()
-    // console.log('tags - toReversed:', tags)
 
     if (req.query.semver !== undefined) {
         tags = tags.filter((str) => semver.valid(str))
-        // console.log('tags - semver:', tags)
     }
 
     tags = tags.slice(0, count)
-    console.log('tags - slice(count):', tags)
-
     tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-    console.log('tags - localCompare:', tags)
 
     if (req.params.latest) {
         const message = tags.at(-1)
@@ -74,12 +64,11 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 
     if (req.query.reversed !== undefined) {
         tags.reverse()
-        console.log('tags - reverse:', tags)
     }
 
     const message = tags.join(` ${req.query.sep || '|'} `)
     console.log('tags - message:', message)
-    return getBadge(req, message, 'tags', 'tags', res)
+    getBadge(req, message, 'tags', 'tags', res)
 })
 
 app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
@@ -92,14 +81,13 @@ app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
 
     const message = formatSize(total)
     console.log('message:', message)
-    return getBadge(req, message, 'size', 'container', res)
+    getBadge(req, message, 'size', 'container', res)
 })
 
 app.get('/yaml/:url/:path', async (req, res) => {
-    console.log('req.path:', req.path)
     console.log(req.originalUrl)
+    console.log('req.path:', req.path)
     console.log('req.params.url:', req.params.url)
-    // return res.sendStatus(200)
 
     const cached = await cacheGet(req.originalUrl)
     console.log('cached:', cached)
@@ -117,10 +105,8 @@ app.get('/yaml/:url/:path', async (req, res) => {
 
     const text = await response.text()
     console.log('text.length:', text.length)
-    // console.log('text:', text)
-
-    const encoder = new TextEncoder().encode(text)
-    console.log('encoder.length:', encoder.length)
+    // const encoder = new TextEncoder().encode(text)
+    // console.log('encoder.length:', encoder.length)
 
     const data = parse(text)
     // console.log('data:', data)
@@ -142,30 +128,10 @@ app.get('/yaml/:url/:path', async (req, res) => {
 
 app.get('/uptime', (req, res) => {
     // Note: this is an internal badge endpoint for server uptime
+    console.log(req.originalUrl)
     const message = getUptime()
     console.log('message:', message)
-    // return getBadge(req, message, 'uptime', 'clock-arrow-up', res)
-    const badge = getBadge(req, message, 'uptime', 'clock-arrow-up')
-    sendBadge(res, badge)
-})
-
-app.get('/badge', (req, res) => {
-    // Note: this is a simple-icons testing endpoint
-    const uptime = Math.floor(process.uptime())
-    const svg = siGithubactions.svg.replace('<path ', '<path fill="#ffffff" ')
-    const logo = Buffer.from(svg).toString('base64')
-    const badge = makeBadge({
-        message: `${uptime} sec`,
-        logoBase64: `data:image/svg+xml;base64,${logo}`,
-        labelColor: req.query.labelColor || '#555',
-        label: req.query.label || 'uptime',
-        color: req.query.color || 'brightgreen',
-        style: req.query.style || 'flat',
-    })
-    res.setHeader('Content-Type', 'image/svg+xml')
-    // res.send(`<?xml version="1.0" encoding="UTF-8"?>\n${badge}`)
-    // res.send(badge)
-    sendBadge(res, badge)
+    getBadge(req, message, 'uptime', 'clock-arrow-up', res)
 })
 
 /**
@@ -178,17 +144,19 @@ app.get('/badge', (req, res) => {
  * @return {String}
  */
 function getBadge(req, message, label, icon, res) {
-    const logo = getLogo(req, icon)
-    // TODO: Handle no logo
-    // console.log('logo:', logo)
-    const badge = makeBadge({
+    const data = {
         message: message.toString(),
-        logoBase64: `data:image/svg+xml;base64,${logo}`,
-        labelColor: req.query.labelColor || '#555',
         label: req.query.label || label,
         color: req.query.color || 'brightgreen',
         style: req.query.style || 'flat',
-    })
+    }
+    const logo = getLogo(req, icon)
+    if (logo) {
+        data.logoBase64 = `data:image/svg+xml;base64,${logo}`
+        data.labelColor = req.query.labelColor || '#555'
+    }
+    // console.log('data:', data)
+    const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
     return badge
 }
@@ -212,16 +180,31 @@ function sendBadge(res, badge) {
  * @return {String}
  */
 function getLogo(req, icon, color = '#fff') {
-    const iconName = camelCase(req.query.lucide || icon, { pascalCase: true })
-    // console.log('iconName:', iconName)
-    let svg = lucide[iconName]
+    if (req.query.icon !== undefined && !req.query.icon) return ''
+    const iconName = req.query.icon || req.query.lucide || icon
+    const name = camelCase(iconName, { pascalCase: true })
+    // console.log('name:', name)
+    let svg
+    let colorType
+    if (req.query.icon) {
+        // console.log('Simple Icons')
+        svg = icons[`si${name}`].svg
+        colorType = 'fill'
+    } else {
+        // console.log('Lucide Icon')
+        svg = lucide[name]
+        colorType = 'color'
+    }
+
     if (!svg) {
-        console.warn('SVG NOT FOUND - iconName:', iconName)
+        console.warn(`SVG NOT FOUND - icon: ${iconName} - name: ${name}`)
         return ''
     }
+
     const iconColor = req.query.iconColor || color
     // console.log('iconColor:', iconColor)
-    const result = svg.replace('<svg', `<svg color="${iconColor}"`)
+    const result = svg.replace('<svg', `<svg ${colorType}="${iconColor}"`)
+    // console.log('result:', result)
     return Buffer.from(result).toString('base64')
 }
 

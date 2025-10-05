@@ -24,6 +24,8 @@
 
 This is a Work in Progress, but Works!
 
+Supports both [Simple Icon](https://simpleicons.org/) and [Lucide Icon](https://lucide.dev/icons/).
+
 Badges include GitHub Container Registry (GHCR) Image Size and Tags.
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
@@ -95,8 +97,8 @@ Without `latest` it returns the `n` most recent tags, otherwise only the latest 
 The `n` [parameter](#badge-specific-parameters) defaults to `3`, these are equivalent.
 
 ```text
-http://badges.cssnr.com/ghcr/tags/smashedr/node-badges
-http://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
+https://badges.cssnr.com/ghcr/tags/smashedr/node-badges
+https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?n=3
 ```
 
 You can also change the `sep` parameter, add `reversed` and filter by valid `semver` tags.
@@ -109,11 +111,24 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=blue&lucide=a
 
 ### YAML JSONPath
 
+[![App Image](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.app.image?lucide=container&label=image)](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml#L40)
+
 `/yaml/{url}/{path}`
 
-Both `url` and `path` are URL encoded. The `path` is a [JSONPath](https://jsonpath.com/).
+Both `url` and `path` are both [URL Encoded](https://www.urlencoder.org/).  
+The `path` is a [JSONPath](https://jsonpath.com/).
 
 This endpoint accepts `split` and `index`.
+
+Example showing the redis version from this [docker-compose-swarm.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml#L60).
+
+[![Redis Version](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.redis.image?split=:&index=1&lucide=database&label=redis)](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.redis.image?split=:&index=1&lucide=database&label=redis)
+
+```text
+https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.redis.image?split=:&index=1&lucide=database&label=redis
+```
+
+_Note: the badge at the top is also from this [docker-compose-swarm.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml#L40) file._
 
 ## Query Parameters
 
@@ -125,8 +140,11 @@ The following query parameters are supported on all badges.
 | `color`      |         `brightgreen`         | Badge Background Color (right side)                         |
 | `label`      |        badge specific         | Label Text (left side)                                      |
 | `labelColor` |            `#555`             | Label Background Color (left side)                          |
+| `icon`       |        badge specific         | Name of a [Simple Icon](https://simpleicons.org/)           |
 | `lucide`     |        badge specific         | Name of a [Lucide Icon](https://lucide.dev/icons/)          |
 | `iconColor`  |            `#fff`             | Icon Color                                                  |
+
+Note: You can set `icon` or `lucide` but not both. To disable the icon, add it to the query with no value.
 
 For more details see the documentation for the related library, [badge-maker](https://www.npmjs.com/package/badge-maker).
 
