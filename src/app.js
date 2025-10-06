@@ -51,7 +51,7 @@ app.get('/', (req, res) => {
 
 app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
     console.log(req.originalUrl)
-    if (req.params.latest && req.params.latest !== 'latest') res.sendStatus(404)
+    if (req.params.latest && req.params.latest !== 'latest') return res.sendStatus(404)
     const count = Number.parseInt(req.query.n) || 3
     console.log('count:', count)
 
@@ -95,8 +95,10 @@ app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
     getBadge(req, message, 'size', 'container', res)
 })
 
-app.get('/yaml/:url/:path', async (req, res) => {
+app.get('/{:type}/:url/:path', async (req, res) => {
     console.log(req.originalUrl)
+    console.log('req.params.type:', req.params.type)
+    if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
     console.log('req.path:', req.path)
     console.log('req.params.url:', req.params.url)
 
@@ -119,7 +121,12 @@ app.get('/yaml/:url/:path', async (req, res) => {
     // const encoder = new TextEncoder().encode(text)
     // console.log('encoder.length:', encoder.length)
 
-    const data = parse(text)
+    let data
+    if (req.params.type === 'yaml') {
+        data = parse(text)
+    } else {
+        data = JSON.parse(text)
+    }
     // console.log('data:', data)
 
     let result = jp.query(data, req.params.path)[0]

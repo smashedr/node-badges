@@ -25,7 +25,6 @@ services:
 
   app:
     image: ghcr.io/smashedr/node-badges:${VERSION:-latest}
-    command: "npm start"
     deploy:
       replicas: 1
       resources:
