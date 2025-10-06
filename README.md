@@ -10,7 +10,6 @@
 [![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/lint.yaml?logo=cachet&label=lint)](https://github.com/smashedr/node-badges/actions/workflows/lint.yaml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smashedr_node-badges&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smashedr_node-badges)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/node-badges?logo=github&label=updated)](https://github.com/smashedr/node-badges/pulse)
-[![GitHub Contributors](https://img.shields.io/github/contributors-anon/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/graphs/contributors)
 [![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/node-badges?logo=bookstack&logoColor=white&label=repo%20size)](https://github.com/smashedr/node-badges?tab=readme-ov-file#readme)
 [![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/node-badges?logo=htmx)](https://github.com/smashedr/node-badges/tree/master/src)
 [![GitHub Discussions](https://img.shields.io/github/discussions/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/discussions)
@@ -26,7 +25,7 @@ This is a Work in Progress, but Works!
 
 Supports both [Simple Icon](https://simpleicons.org/) and [Lucide Icon](https://lucide.dev/icons/).
 
-Badges include GitHub Container Registry (GHCR) Image Size and Tags.
+Badges include GitHub Container Registry (GHCR) Image Size and Tags, and [more](#badges)...
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
@@ -38,7 +37,7 @@ Please [let us know](https://github.com/smashedr/node-badges/discussions/categor
 - [Badges](#Badges)
   - [GHCR Image Size](#ghcr-image-size)
   - [GHCR Image Tags (2)](#ghcr-image-tags)
-  - [YAML JSONPath](#yaml-jsonpath)
+  - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
 - [Query Parameters](#query-parameters)
   - [Badge Specific Parameters](#badge-specific-parameters)
 - [Troubleshooting](#Troubleshooting)
@@ -63,7 +62,7 @@ Available Badges:
 
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
-- [YAML JSONPath](#yaml-jsonpath)
+- [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
 
 ### GHCR Image Size
 
@@ -111,10 +110,11 @@ You can also change the `sep` parameter, add `reversed` and filter by valid `sem
 https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=activity&iconColor=black&color=paleturquoise&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver
 ```
 
-### YAML JSONPath
+### JSON/YAML JSONPath
 
 [![App Image](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.app.image?lucide=container&label=image)](https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fnode-badges%2Frefs%2Fheads%2Fmaster%2Fdocker-compose-swarm.yaml/%24.services.app.image?lucide=container&label=image)
 
+`/json/{url}/{path}`  
 `/yaml/{url}/{path}`
 
 Both `url` and `path` are both [URL Encoded](https://www.urlencoder.org/).  
@@ -221,22 +221,36 @@ export PORT=8080
 # Deploying
 
 This is ready for deployment using both [Docker](#to-docker) and [Node](#to-node).
-If using Node you need a Redis server.
+
+If using [Node](#to-node) you need a [Redis](https://github.com/redis/redis) server.
 
 ### To Docker
 
 [![Deploy to Render](https://img.shields.io/badge/Deploy_to_Render-4351E8?style=for-the-badge&logo=render)](https://render.com/deploy?repo=https://github.com/smashedr/node-badges)
 
-This is designed to be deployed to Docker out of the box which includes redis.
+This is designed to be deployed with Docker Compose which includes redis.
 
-To deploy to a Swarm cluster using Traefik seee the [docker-compose-swarm.yaml](docker-compose-swarm.yaml).
+To deploy to a Standalone Docker host, see [docker-compose.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose.yaml).
+
+To deploy to a Swarm cluster using Traefik, see [docker-compose-swarm.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml).
+
+To run directly, you need to set the `REDIS_URL`.
+
+```shell
+docker run -e "REDIS_URL=redis://redis:6379" -p 80:80 ghcr.io/smashedr/node-badges:latest
+```
 
 ### To Node
 
 This is ready to be deployed to services like Render using their Redis ([Render Key Value](https://render.com/docs/key-value)) store.
 You can set the redis server url with the `REDIS_URL` environment variable. The default value is `redis://redis:6379`.
 
-The server installs with `npm i`, starts with `npm start`, and listens on `PORT` environment variable.
+The server listens on the `PORT` environment variable and installs/starts normally.
+
+```shell
+npm install
+npm start
+```
 
 To use without redis, install `node-cache`, comment out the redis lines, and uncomment the node-cache lines.
 
