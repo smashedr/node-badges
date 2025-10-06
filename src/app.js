@@ -148,7 +148,7 @@ app.get(
         if (!result) {
             throw new Error('No Result for Query')
         } else if (typeof result === 'object') {
-            throw new Error('Object Result')
+            throw new TypeError('Object Result')
         } else {
             result = result.toString()
             await cacheSet(req.originalUrl, result)
