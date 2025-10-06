@@ -1,20 +1,22 @@
 services:
   - type: web
     name: node-badges
-    repo: https://github.com/smashedr/node-badges
     plan: starter
     runtime: node
+    repo: https://github.com/smashedr/node-badges
+    autoDeployTrigger: off
+    buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /app-health-check
     envVars:
       - key: REDIS_URL
         fromService:
           type: keyvalue
           name: node-badges-redis
           property: connectionString
-    healthCheckPath: /app-health-check
 
   - type: keyvalue
     name: node-badges-redis
     plan: free
-    maxmemoryPolicy: volatile-ttl
     ipAllowList: []
+    maxmemoryPolicy: volatile-ttl

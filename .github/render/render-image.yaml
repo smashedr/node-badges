@@ -1,22 +1,21 @@
 services:
   - type: web
     name: node-badges
-    repo: https://github.com/smashedr/node-badges
     plan: free
     runtime: image
     image:
       url: ghcr.io/smashedr/node-badges:latest
     dockerCommand: npm start
+    healthCheckPath: /app-health-check
     envVars:
       - key: REDIS_URL
         fromService:
           type: keyvalue
           name: node-badges-redis
           property: connectionString
-    healthCheckPath: /app-health-check
 
   - type: keyvalue
     name: node-badges-redis
     plan: free
-    maxmemoryPolicy: volatile-ttl
     ipAllowList: []
+    maxmemoryPolicy: volatile-ttl
