@@ -10,7 +10,6 @@
 [![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/node-badges/lint.yaml?logo=cachet&label=lint)](https://github.com/smashedr/node-badges/actions/workflows/lint.yaml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smashedr_node-badges&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smashedr_node-badges)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/node-badges?logo=github&label=updated)](https://github.com/smashedr/node-badges/pulse)
-[![GitHub Contributors](https://img.shields.io/github/contributors-anon/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/graphs/contributors)
 [![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/node-badges?logo=bookstack&logoColor=white&label=repo%20size)](https://github.com/smashedr/node-badges?tab=readme-ov-file#readme)
 [![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/node-badges?logo=htmx)](https://github.com/smashedr/node-badges/tree/master/src)
 [![GitHub Discussions](https://img.shields.io/github/discussions/smashedr/node-badges?logo=github)](https://github.com/smashedr/node-badges/discussions)
@@ -26,7 +25,7 @@ This is a Work in Progress, but Works!
 
 Supports both [Simple Icon](https://simpleicons.org/) and [Lucide Icon](https://lucide.dev/icons/).
 
-Badges include GitHub Container Registry (GHCR) Image Size and Tags.
+Badges include GitHub Container Registry (GHCR) Image Size and Tags, and [more](#badges)...
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
@@ -222,7 +221,8 @@ export PORT=8080
 # Deploying
 
 This is ready for deployment using both [Docker](#to-docker) and [Node](#to-node).
-If using Node you need a Redis server.
+
+If using [Node](#to-node) you need a [Redis](https://github.com/redis/redis) server.
 
 ### To Docker
 
@@ -234,10 +234,10 @@ To deploy to a Standalone Docker host, see [docker-compose.yaml](https://github.
 
 To deploy to a Swarm cluster using Traefik, see [docker-compose-swarm.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml).
 
-To run directly, you need to specify the `REDIS_URL` with your hostname and port.
+To run directly, you need to set the `REDIS_URL`.
 
 ```shell
-docker run --name=node-badges -e "REDIS_URL=redis://hostname:6379" -p 80:80 ghcr.io/smashedr/node-badges:latest
+docker run -e "REDIS_URL=redis://redis:6379" -p 80:80 ghcr.io/smashedr/node-badges:latest
 ```
 
 ### To Node
