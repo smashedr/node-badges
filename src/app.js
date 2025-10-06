@@ -49,108 +49,142 @@ app.get('/', (req, res) => {
 //     next()
 // })
 
-app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
-    console.log(req.originalUrl)
-    if (req.params.latest && req.params.latest !== 'latest') return res.sendStatus(404)
-    const count = Number.parseInt(req.query.n) || 3
-    console.log('count:', count)
+app.get(
+    '/ghcr/tags/:owner/:package{/:latest}',
+    errorBadgeHandler(async (req, res) => {
+        console.log(req.originalUrl)
+        if (req.params.latest && req.params.latest !== 'latest')
+            return res.sendStatus(404)
+        const count = Number.parseInt(req.query.n) || 3
+        console.log('count:', count)
 
-    const api = new GhcrApi(req.params.owner, req.params.package)
-    let tags = await api.getImageTags()
-    tags = tags.filter((tag) => tag !== 'latest')
-    tags = tags.toReversed()
+        const api = new GhcrApi(req.params.owner, req.params.package)
+        let tags = await api.getImageTags()
+        tags = tags.filter((tag) => tag !== 'latest')
+        tags = tags.toReversed()
 
-    if (req.query.semver !== undefined) {
-        tags = tags.filter((str) => semver.valid(str))
-    }
+        if (req.query.semver !== undefined) {
+            tags = tags.filter((str) => semver.valid(str))
+        }
 
-    tags = tags.slice(0, count)
-    tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+        tags = tags.slice(0, count)
+        tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
 
-    if (req.params.latest) {
-        const message = tags.at(-1)
-        console.log('latest - message:', message)
-        return getBadge(req, message, 'latest', 'tag', res)
-    }
+        if (req.params.latest) {
+            const message = tags.at(-1)
+            console.log('latest - message:', message)
+            return getBadge(req, message, 'latest', 'tag', res)
+        }
 
-    if (req.query.reversed !== undefined) {
-        tags.reverse()
-    }
+        if (req.query.reversed !== undefined) {
+            tags.reverse()
+        }
 
-    const message = tags.join(` ${req.query.sep || '|'} `)
-    console.log('tags - message:', message)
-    getBadge(req, message, 'tags', 'tags', res)
-})
+        const message = tags.join(` ${req.query.sep || '|'} `)
+        console.log('tags - message:', message)
+        getBadge(req, message, 'tags', 'tags', res)
+    })
+)
 
-app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
-    console.log(req.originalUrl)
+app.get(
+    '/ghcr/size/:owner/:package{/:tag}',
+    errorBadgeHandler(async (req, res) => {
+        console.log(req.originalUrl)
 
-    const api = new GhcrApi(req.params.owner, req.params.package)
-    const tag = req.params.tag || 'latest'
-    const total = await api.getImageSize(tag)
-    console.log('getImageSize - total:', total)
+        const api = new GhcrApi(req.params.owner, req.params.package)
+        const tag = req.params.tag || 'latest'
+        const total = await api.getImageSize(tag)
+        console.log('getImageSize - total:', total)
 
-    const message = formatSize(total)
-    console.log('message:', message)
-    getBadge(req, message, 'size', 'container', res)
-})
+        const message = formatSize(total)
+        console.log('message:', message)
+        getBadge(req, message, 'size', 'container', res)
+    })
+)
 
-app.get('/{:type}/:url/:path', async (req, res) => {
-    console.log(req.originalUrl)
-    console.log('req.params.type:', req.params.type)
-    if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
-    console.log('req.path:', req.path)
-    console.log('req.params.url:', req.params.url)
+app.get(
+    '/:type/:url/:path',
+    errorBadgeHandler(async (req, res) => {
+        console.log(req.originalUrl)
+        console.log('req.params.type:', req.params.type)
+        if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
+        console.log('req.path:', req.path)
+        console.log('req.params.url:', req.params.url)
 
-    const cached = await cacheGet(req.originalUrl)
-    console.log('cached:', cached)
-    if (cached) return getBadge(req, cached, 'result', 'code', res)
+        const cached = await cacheGet(req.originalUrl)
+        console.log('cached:', cached)
+        if (cached) return getBadge(req, cached, 'result', 'code', res)
 
-    const url = new URL(req.params.url)
-    console.log('url.href:', url.href)
+        const url = new URL(req.params.url)
+        console.log('url.href:', url.href)
 
-    const response = await fetch(url)
-    // console.log('response:', response)
-    console.log('response.status:', response.status)
+        const response = await fetch(url)
+        // console.log('response:', response)
+        console.log('response.status:', response.status)
 
-    const length = response.headers.get('content-length')
-    console.log('content-length:', length)
+        const length = response.headers.get('content-length')
+        console.log('content-length:', length)
 
-    const text = await response.text()
-    console.log('text.length:', text.length)
-    // const encoder = new TextEncoder().encode(text)
-    // console.log('encoder.length:', encoder.length)
+        const text = await response.text()
+        console.log('text.length:', text.length)
+        // const encoder = new TextEncoder().encode(text)
+        // console.log('encoder.length:', encoder.length)
 
-    let data
-    if (req.params.type === 'yaml') {
-        data = parse(text)
-    } else {
-        data = JSON.parse(text)
-    }
-    // console.log('data:', data)
+        let data
+        if (req.params.type === 'yaml') {
+            data = parse(text)
+        } else {
+            data = JSON.parse(text)
+        }
+        // console.log('data:', data)
 
-    let result = jp.query(data, req.params.path)[0]
-    console.log('result:', result)
-    if (req.query.split) {
-        const split = result.split(req.query.split)
-        result = split[req.query.index || 0]
+        let result = jp.query(data, req.params.path)[0]
         console.log('result:', result)
-    }
-    if (result) {
-        await cacheSet(req.originalUrl, result)
-        return getBadge(req, result, 'result', 'code-xml', res)
-    } else {
-        res.sendStatus(404)
-    }
-})
+        if (req.query.split) {
+            const split = result.split(req.query.split)
+            result = split[req.query.index || 0]
+            console.log('result:', result)
+        }
+        if (!result) {
+            throw new Error('No Result for Query')
+        } else if (typeof result === 'object') {
+            throw new TypeError('Object Result')
+        } else {
+            result = result.toString()
+            await cacheSet(req.originalUrl, result)
+            return getBadge(req, result, 'result', 'code-xml', res)
+        }
+    })
+)
 
-app.get('/uptime', (req, res) => {
-    // Note: this is an internal badge endpoint for server uptime
-    console.log(req.originalUrl)
-    const message = getUptime()
-    console.log('message:', message)
-    getBadge(req, message, 'uptime', 'clock-arrow-up', res)
-})
+app.get(
+    '/uptime',
+    errorBadgeHandler(async (req, res) => {
+        console.log(req.originalUrl)
+        const message = getUptime()
+        console.log('message:', message)
+        getBadge(req, message, 'uptime', 'clock-arrow-up', res)
+    })
+)
+
+function errorBadgeHandler(handler) {
+    return async (req, res) => {
+        try {
+            await handler(req, res)
+        } catch (error) {
+            console.error(error)
+            console.log('error.message:', error.message)
+            const data = {
+                message: error.message,
+                color: 'red',
+                style: req.query.style || 'flat',
+            }
+            console.log('data:', data)
+            const badge = makeBadge(data)
+            if (res) sendBadge(res, badge)
+        }
+    }
+}
 
 /**
  * Get Badge
