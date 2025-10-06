@@ -120,3 +120,8 @@ export async function cacheSet(key, value, EX = 60 * 60) {
     // cache.set(key, totalSize)
     await client.set(key, JSON.stringify(value), { EX })
 }
+
+export async function cacheDelete(key) {
+    // cache.del(key, totalSize)
+    return await client.del(key)
+}

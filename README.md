@@ -167,14 +167,25 @@ These are specific to certain badges. Refer to the [Badges](#badges) for more de
 
 ## Troubleshooting
 
-GitHub's media proxy caches images for 1 hour. You can purge the cache by sending a PURGE request.
+This application caches API responses for 1 hour.
+Only API responses are cached, not the badge.
+All query parameters changes will instantly update.
+
+Your browser is also instructed to cache the response for 1 hour.
+
+To purge the server API cache, send a PURGE request to the badge URL.
+
+```shell
+curl -X PURGE 'https://badges.cssnr.com/ghcr/tags/smashedr/node-badges'
+```
+
+This returns a 200 with the number of keys purged in the response.
+
+GitHub's media proxy also caches images for 1 hour. This is purged the same way.
 
 ```text
 curl -X PURGE 'https://camo.githubusercontent.com/xxx'
 ```
-
-This application caches API responses for 1 hour. Currently, there is no endpoint to purge this cache.  
-Only the API response is cached, not the badge. All query parameters changes will instantly update.
 
 # Developing
 

@@ -9,7 +9,7 @@ import { parse } from 'yaml'
 import { makeBadge } from 'badge-maker'
 import * as icons from 'simple-icons'
 
-import { cacheGet, cacheSet, GhcrApi } from './api.js'
+import { cacheDelete, cacheGet, cacheSet, GhcrApi } from './api.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -49,12 +49,32 @@ app.get('/', (req, res) => {
 //     next()
 // })
 
+// app.use((req, res, next) => {
+//     if (req.method === 'PURGE') {
+//         console.log('PURGE request for URL:', req.originalUrl)
+//         console.log('req:', req)
+//         res.status(200).send('PURGE received')
+//         return
+//     }
+//     next()
+// })
+
+app.all('/ghcr/tags/:owner/:package{/:latest}', async (req, res, next) => {
+    if (req.method === 'PURGE') {
+        console.log('PURGE:', req.originalUrl)
+        const key = `ghcr/tags/${req.params.owner}/${req.params.package}/tags/list`
+        return purgeKey(res, key)
+    }
+    next()
+})
+
 app.get(
     '/ghcr/tags/:owner/:package{/:latest}',
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
-        if (req.params.latest && req.params.latest !== 'latest')
+        if (req.params.latest && req.params.latest !== 'latest') {
             return res.sendStatus(404)
+        }
         const count = Number.parseInt(req.query.n) || 3
         console.log('count:', count)
 
@@ -86,6 +106,16 @@ app.get(
     })
 )
 
+app.all('/ghcr/size/:owner/:package{/:tag}', async (req, res, next) => {
+    if (req.method === 'PURGE') {
+        console.log('PURGE:', req.originalUrl)
+        const tag = req.params.tag ? req.params.tag : 'latest'
+        const key = `ghcr/size/${req.params.owner}/${req.params.package}/${tag}`
+        return purgeKey(res, key)
+    }
+    next()
+})
+
 app.get(
     '/ghcr/size/:owner/:package{/:tag}',
     errorBadgeHandler(async (req, res) => {
@@ -102,6 +132,14 @@ app.get(
     })
 )
 
+app.all('/:type/:url/:path', async (req, res, next) => {
+    if (req.method === 'PURGE') {
+        console.log('PURGE:', req.originalUrl)
+        return purgeKey(res, req.originalUrl)
+    }
+    next()
+})
+
 app.get(
     '/:type/:url/:path',
     errorBadgeHandler(async (req, res) => {
@@ -111,9 +149,11 @@ app.get(
         console.log('req.path:', req.path)
         console.log('req.params.url:', req.params.url)
 
+        // NOTE: Move backend logic to api.js
         const cached = await cacheGet(req.originalUrl)
         console.log('cached:', cached)
         if (cached) return getBadge(req, cached, 'result', 'code', res)
+        console.log(`-- CACHE MISS: ${req.originalUrl}`)
 
         const url = new URL(req.params.url)
         console.log('url.href:', url.href)
@@ -288,4 +328,17 @@ function getUptime() {
     if (hours < 24) return `${Math.floor(hours)} hrs`
     const days = hours / 24
     return `${Math.floor(days)} days`
+}
+
+/**
+ * Purge Key Response
+ * @param {Response} res
+ * @param {String} key
+ * @return {Promise<void>}
+ */
+async function purgeKey(res, key) {
+    console.log(`purgeKey: ${key}`)
+    const result = await cacheDelete(key)
+    console.log('result:', result)
+    res.send(result.toString())
 }
