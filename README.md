@@ -67,8 +67,7 @@ Available Badges:
 - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
 
 > [!TIP]
-> Try out the new [Badge Maker](https://smashedr.github.io/node-badges-docs/guides/get-started).  
-> _Note: This is a WIP._
+> Try out the new [Badge Maker](https://smashedr.github.io/node-badges-docs/guides/get-started). _This is a Work in Progress._
 
 ### GHCR Image Size
 
