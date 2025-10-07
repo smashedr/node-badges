@@ -192,13 +192,13 @@ GitHub's media proxy also caches images for 1 hour. This is purged the same way.
 curl -X PURGE 'https://camo.githubusercontent.com/xxx'
 ```
 
-# Developing
+## Developing
 
 You can run the dev server with [Docker](#with-docker) compose or [Node](#with-node) run.
 
 ### With Docker
 
-Docker is recommended because it includes redis and supports live reloading.
+Docker includes Redis and live server reloading with the [docker-compose-dev.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-dev.yaml) file.
 
 ```shell
 docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-recreate
@@ -206,15 +206,17 @@ docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-
 
 Then visit: http://localhost/
 
-_Note: this mounts the `./src` directory into the container for live reloading.
-To use a different source path, set the `APP_FILES` environment variable.
-See the [docker-compose-dev.yaml](docker-compose-dev.yaml) file for more details._
+<details><summary>How Live Reloading Works in Docker</summary>
 
-To use a different port set the `PORT` environment variable.
+This mounts the `./src` directory into the container for live reloading with `nodemon`.
 
-```shell
-export PORT=8080
-```
+To use a different source path set the `APP_FILES` environment variable to your source.
+
+For more details, see the [docker-compose-dev.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-dev.yaml) file.
+
+---
+
+</details>
 
 ### With Node
 
@@ -222,19 +224,22 @@ Make sure you have a redis server running and set the `REDIS_URL` environment va
 
 ```shell
 export REDIS_URL=redis://localhost:6379
+
 npm i
 npm run dev
 ```
 
 Then visit: http://localhost:3000/
 
-To use a different port set the `PORT` environment variable.
+### With Custom Port
+
+To use a different port set the `PORT` environment variable then run the dev server.
 
 ```shell
 export PORT=8080
 ```
 
-# Deploying
+## Deploying
 
 This is ready for deployment using both [Docker](#to-docker) and [Node](#to-node).
 
@@ -276,6 +281,18 @@ npm start
 ```
 
 To use without redis, install `node-cache`, comment out the redis lines, and uncomment the node-cache lines.
+
+### Resources
+
+The app loads all [Simple Icon](https://simpleicons.org/) and [Lucide Icon](https://lucide.dev/icons/) into memory.
+This makes the base memory usage about `80 MB`. Therefore, you should allocate at least `100 MB` for request overhead.
+
+```text
+NAME                        CPU %  MEM USAGE
+smashedr-node-badges_app    0.00%  80.52MiB
+smashedr-node-badges_nginx  0.00%  4.984MiB
+smashedr-node-badges_redis  0.00%  4.879MiB
+```
 
 # Support
 
