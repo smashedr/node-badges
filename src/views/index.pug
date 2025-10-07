@@ -3,6 +3,7 @@ html
   head
     title #{title}
     link(rel="icon" href="/favicon.ico" sizes="any")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
     meta(name="darkreader-lock")
     style.
       body { background-color: #313131; color: #e8e8e8; }
@@ -12,4 +13,7 @@ html
     h1 #{title}
     p Version: #{version}
     p Uptime: #{uptime} (#{seconds} s) Badge: #[a(href="/uptime") uptime]
-    p Source: #[a(href=source) #{source}]
+    if source
+      p Source: #[a(href=source) #{source}]
+    if docs
+      p Docs: #[a(href=docs) #{docs}]

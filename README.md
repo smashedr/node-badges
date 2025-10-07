@@ -27,6 +27,8 @@ Supports both [Simple Icon](https://simpleicons.org/) and [Lucide Icon](https://
 
 Badges include GitHub Container Registry (GHCR) Image Size and Tags, and [more](#badges)...
 
+Visit the website for more details: https://smashedr.github.io/node-badges-docs/
+
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
@@ -63,6 +65,10 @@ Available Badges:
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
 - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
+
+> [!TIP]
+> Try out the new [Badge Maker](https://smashedr.github.io/node-badges-docs/guides/get-started).  
+> _Note: This is a WIP._
 
 ### GHCR Image Size
 
@@ -183,7 +189,7 @@ This returns a 200 with the number of keys purged in the response.
 
 GitHub's media proxy also caches images for 1 hour. This is purged the same way.
 
-```text
+```shell
 curl -X PURGE 'https://camo.githubusercontent.com/xxx'
 ```
 
@@ -245,10 +251,17 @@ To deploy to a Standalone Docker host, see [docker-compose.yaml](https://github.
 
 To deploy to a Swarm cluster using Traefik, see [docker-compose-swarm.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml).
 
-To run directly, you need to set the `REDIS_URL`.
+To run directly, you need to set the `REDIS_URL`. You can **NOT** use `localhost` in docker.
 
 ```shell
-docker run -e "REDIS_URL=redis://redis:6379" -p 80:80 ghcr.io/smashedr/node-badges:latest
+docker run -e "REDIS_URL=redis://redis:6379" -p 80:3000 ghcr.io/smashedr/node-badges:latest
+```
+
+Change `80` to the host port you want the app to listen on.  
+The container port should be `3000` unless you set the `PORT` variable.
+
+```shell
+docker run -e "REDIS_URL=redis://redis:6379" -e "PORT=80" -p 80:80 ghcr.io/smashedr/node-badges:latest
 ```
 
 ### To Node
