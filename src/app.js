@@ -40,6 +40,7 @@ app.get('/', (req, res) => {
         seconds: seconds,
         title: 'Node Badges',
         source: 'https://github.com/smashedr/node-badges',
+        docs: 'https://smashedr.github.io/node-badges-docs',
     })
 })
 

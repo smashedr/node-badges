@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 
 COPY --chown=node:node ./src ./src
 
-ARG VERSION=source
+ARG VERSION="Source"
 ENV APP_VERSION="${VERSION}"
 LABEL org.opencontainers.image.version="${VERSION}"
 

@@ -1,0 +1,58 @@
+name: "Deploy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version Tag"
+        default: "latest"
+        required: false
+  workflow_run:
+    workflows: ["Build"]
+    types: [completed]
+
+env:
+  traefik-host: badges.cssnr.com
+  stack-file: docker-compose-swarm.yaml
+  stack-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}
+  version: ${{ inputs.version || github.event.workflow_run.head_branch || github.ref_name }}
+
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    name: "Deploy"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    environment:
+      name: swarm
+      url: https://badges.cssnr.com/
+
+    steps:
+      - name: "Debug Event"
+        continue-on-error: true
+        run: |
+          cat "${GITHUB_EVENT_PATH}"
+
+      - name: "Debug Variables"
+        continue-on-error: true
+        run: |
+          echo "VERSION: ${{ env.version == 'master' && 'latest' || env.version }}"
+          echo "STACK_NAME: ${{ env.stack-name }}"
+          echo "TRAEFIK_HOST: ${{ env.traefik-host }}"
+
+      - name: "Portainer Deploy"
+        uses: cssnr/portainer-stack-deploy-action@v1
+        with:
+          url: ${{ secrets.PORTAINER_URL }}
+          token: ${{ secrets.PORTAINER_TOKEN }}
+          file: ${{ env.stack-file }}
+          name: ${{ env.stack-name }}
+          username: ${{ vars.GHCR_USER }}
+          password: ${{ secrets.GHCR_PASS }}
+          env_json: |
+            {
+              "VERSION": "${{ env.version == 'master' && 'latest' || env.version }}",
+              "STACK_NAME": "${{ env.stack-name }}",
+              "TRAEFIK_HOST": "${{ env.traefik-host }}"
+            }

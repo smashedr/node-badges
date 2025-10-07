@@ -27,6 +27,8 @@ Supports both [Simple Icon](https://simpleicons.org/) and [Lucide Icon](https://
 
 Badges include GitHub Container Registry (GHCR) Image Size and Tags, and [more](#badges)...
 
+Visit the website for more details: https://smashedr.github.io/node-badges-docs/
+
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
@@ -63,6 +65,9 @@ Available Badges:
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
 - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
+
+> [!TIP]
+> Try out the new [Badge Maker](https://smashedr.github.io/node-badges-docs/guides/get-started). _This is a Work in Progress._
 
 ### GHCR Image Size
 
@@ -183,17 +188,17 @@ This returns a 200 with the number of keys purged in the response.
 
 GitHub's media proxy also caches images for 1 hour. This is purged the same way.
 
-```text
+```shell
 curl -X PURGE 'https://camo.githubusercontent.com/xxx'
 ```
 
-# Developing
+## Developing
 
 You can run the dev server with [Docker](#with-docker) compose or [Node](#with-node) run.
 
 ### With Docker
 
-Docker is recommended because it includes redis and supports live reloading.
+Docker includes Redis and live server reloading with the [docker-compose-dev.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-dev.yaml) file.
 
 ```shell
 docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-recreate
@@ -201,15 +206,17 @@ docker compose -f "docker-compose-dev.yaml" up --build --remove-orphans --force-
 
 Then visit: http://localhost/
 
-_Note: this mounts the `./src` directory into the container for live reloading.
-To use a different source path, set the `APP_FILES` environment variable.
-See the [docker-compose-dev.yaml](docker-compose-dev.yaml) file for more details._
+<details><summary>How Live Reloading Works in Docker</summary>
 
-To use a different port set the `PORT` environment variable.
+This mounts the `./src` directory into the container for live reloading with `nodemon`.
 
-```shell
-export PORT=8080
-```
+To use a different source path set the `APP_FILES` environment variable to your source.
+
+For more details, see the [docker-compose-dev.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-dev.yaml) file.
+
+---
+
+</details>
 
 ### With Node
 
@@ -217,19 +224,22 @@ Make sure you have a redis server running and set the `REDIS_URL` environment va
 
 ```shell
 export REDIS_URL=redis://localhost:6379
+
 npm i
 npm run dev
 ```
 
 Then visit: http://localhost:3000/
 
-To use a different port set the `PORT` environment variable.
+### With Custom Port
+
+To use a different port set the `PORT` environment variable then run the dev server.
 
 ```shell
 export PORT=8080
 ```
 
-# Deploying
+## Deploying
 
 This is ready for deployment using both [Docker](#to-docker) and [Node](#to-node).
 
@@ -245,10 +255,17 @@ To deploy to a Standalone Docker host, see [docker-compose.yaml](https://github.
 
 To deploy to a Swarm cluster using Traefik, see [docker-compose-swarm.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml).
 
-To run directly, you need to set the `REDIS_URL`.
+To run directly, you need to set the `REDIS_URL`. You can **NOT** use `localhost` in docker.
 
 ```shell
-docker run -e "REDIS_URL=redis://redis:6379" -p 80:80 ghcr.io/smashedr/node-badges:latest
+docker run -e "REDIS_URL=redis://redis:6379" -p 80:3000 ghcr.io/smashedr/node-badges:latest
+```
+
+Change `80` to the host port you want the app to listen on.  
+The container port should be `3000` unless you set the `PORT` variable.
+
+```shell
+docker run -e "REDIS_URL=redis://redis:6379" -e "PORT=80" -p 80:80 ghcr.io/smashedr/node-badges:latest
 ```
 
 ### To Node
@@ -264,6 +281,18 @@ npm start
 ```
 
 To use without redis, install `node-cache`, comment out the redis lines, and uncomment the node-cache lines.
+
+### Resources
+
+The app loads all [Simple Icon](https://simpleicons.org/) and [Lucide Icon](https://lucide.dev/icons/) into memory.
+This makes the base memory usage about `80 MB`. Therefore, you should allocate at least `100 MB` for request overhead.
+
+```text
+NAME                        CPU %  MEM USAGE
+smashedr-node-badges_app    0.00%  80.52MiB
+smashedr-node-badges_nginx  0.00%  4.984MiB
+smashedr-node-badges_redis  0.00%  4.879MiB
+```
 
 # Support
 
