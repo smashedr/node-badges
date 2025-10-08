@@ -65,6 +65,7 @@ Available Badges:
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
 - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
+- [Static Badge](#static-badge)
 
 > [!TIP]
 > Try out the new [Badge Maker](https://smashedr.github.io/node-badges-docs/guides/get-started). _This is a Work in Progress._
@@ -136,6 +137,13 @@ https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr
 ```
 
 _Note: the badge at the top is also from this [docker-compose-swarm.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml#L40) file._
+
+### Static Badge
+
+`/static/{message}/{label}?`
+
+Create a static badge with a custom `message`.
+The `label` can be optionally added after the message or in the query params.
 
 ## Query Parameters
 
