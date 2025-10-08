@@ -65,6 +65,7 @@ Available Badges:
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
 - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
+- [Static Badge](#static-badge)
 
 > [!TIP]
 > Try out the new [Badge Maker](https://smashedr.github.io/node-badges-docs/guides/get-started). _This is a Work in Progress._
