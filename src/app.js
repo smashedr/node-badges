@@ -94,7 +94,7 @@ app.get(
         if (req.params.latest) {
             const message = tags.at(-1)
             console.log('latest - message:', message)
-            return getBadge(req, message, 'latest', 'tag', res)
+            return getBadge(req.query, message, 'latest', 'tag', res)
         }
 
         if (req.query.reversed !== undefined) {
@@ -103,7 +103,7 @@ app.get(
 
         const message = tags.join(` ${req.query.sep || '|'} `)
         console.log('tags - message:', message)
-        getBadge(req, message, 'tags', 'tags', res)
+        getBadge(req.query, message, 'tags', 'tags', res)
     })
 )
 
@@ -129,11 +129,27 @@ app.get(
 
         const message = formatSize(total)
         console.log('message:', message)
-        getBadge(req, message, 'size', 'container', res)
+        getBadge(req.query, message, 'size', 'container', res)
+    })
+)
+
+app.get(
+    '/static/:message{/:label}',
+    errorBadgeHandler(async (req, res) => {
+        console.log(req.originalUrl)
+        console.log('req.params.message:', req.params.message)
+        console.log('req.params.label:', req.params.label)
+        const query = structuredClone(req.query)
+        if (!req.params.label && !query.label && !query.labelColor) {
+            query.labelColor = query.color || 'brightgreen'
+        }
+        console.log('query:', query)
+        getBadge(query, req.params.message, req.params.label, '', res)
     })
 )
 
 app.all('/:type/:url/:path', async (req, res, next) => {
+    if (!['yaml', 'json'].includes(req.params.type)) return next()
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
         return purgeKey(res, req.originalUrl)
@@ -153,7 +169,7 @@ app.get(
         // NOTE: Move backend logic to api.js
         const cached = await cacheGet(req.originalUrl)
         console.log('cached:', cached)
-        if (cached) return getBadge(req, cached, 'result', 'code', res)
+        if (cached) return getBadge(req.query, cached, 'result', 'code', res)
         console.log(`-- CACHE MISS: ${req.originalUrl}`)
 
         const url = new URL(req.params.url)
@@ -193,7 +209,7 @@ app.get(
         } else {
             result = result.toString()
             await cacheSet(req.originalUrl, result)
-            return getBadge(req, result, 'result', 'code-xml', res)
+            return getBadge(req.query, result, 'result', 'code-xml', res)
         }
     })
 )
@@ -204,7 +220,7 @@ app.get(
         console.log(req.originalUrl)
         const message = getUptime()
         console.log('message:', message)
-        getBadge(req, message, 'uptime', 'clock-arrow-up', res)
+        getBadge(req.query, message, 'uptime', 'clock-arrow-up', res)
     })
 )
 
@@ -229,27 +245,28 @@ function errorBadgeHandler(handler) {
 
 /**
  * Get Badge
- * @param {Request} req
+ * @param {Object} query req.query
  * @param {String} message Badge Message
  * @param {String} [label] Default Label
  * @param {String} [icon] Default Icon
  * @param {Response} [res] To also sendBadge
  * @return {String}
  */
-function getBadge(req, message, label = '', icon = '', res = null) {
+function getBadge(query, message, label = '', icon = '', res = null) {
+    console.log(`getBadge: ${message} - label: ${label} - icon: ${icon}`)
     const data = {
         message: message.toString(),
-        color: req.query.color || 'brightgreen',
-        style: req.query.style || 'flat',
+        color: query.color || 'brightgreen',
+        style: query.style || 'flat',
     }
-    label = req.query.label !== undefined ? req.query.label : label
+    label = query.label !== undefined ? query.label : label
     if (label) {
         data.label = label
     }
-    const logo = getLogo(req, icon)
+    const logo = getLogo(query, icon)
     if (logo) {
         data.logoBase64 = `data:image/svg+xml;base64,${logo}`
-        data.labelColor = req.query.labelColor || '#555'
+        data.labelColor = query.labelColor || '#555'
     }
     // console.log('data:', data)
     const badge = makeBadge(data)
@@ -270,19 +287,19 @@ function sendBadge(res, badge) {
 
 /**
  * Get Logo String
- * @param {Request} req
+ * @param {Object} query
  * @param {String} icon
  * @param {String} [color]
  * @return {String}
  */
-function getLogo(req, icon, color = '#fff') {
-    if (req.query.icon !== undefined && !req.query.icon) return ''
-    const iconName = req.query.icon || req.query.lucide || icon
+function getLogo(query, icon, color = '#fff') {
+    if (query.icon !== undefined && !query.icon) return ''
+    const iconName = query.icon || query.lucide || icon
     const name = camelCase(iconName, { pascalCase: true })
     // console.log('name:', name)
     let svg
     let colorType
-    if (req.query.icon) {
+    if (query.icon) {
         // console.log('Simple Icons')
         svg = icons[`si${name}`]?.svg
         colorType = 'fill'
@@ -297,7 +314,7 @@ function getLogo(req, icon, color = '#fff') {
         return ''
     }
 
-    const iconColor = req.query.iconColor || color
+    const iconColor = query.iconColor || color
     // console.log('iconColor:', iconColor)
     const result = svg.replace('<svg', `<svg ${colorType}="${iconColor}"`)
     // console.log('result:', result)
