@@ -85,11 +85,8 @@ app.get(
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
         const query = structuredClone(req.query)
-        query.icon = !query.lucide && !query.icon ? 'virustotal' : undefined
-        const color = getBadGradient(stats.malicious + stats.suspicious)
-        // const color = getBadGradient(1)
-        console.log('color:', color)
-        query.color = query.color || color
+        if (!query.lucide && !query.icon) query.icon = 'virustotal'
+        query.color = query.color || getBadGradient(stats.malicious + stats.suspicious)
         getBadge(query, message, req.params.asset, '', res)
     })
 )
@@ -323,7 +320,7 @@ function getBadGradient(bad) {
         '#e27c44',
         '#e05d44',
     ]
-    return colors[bad] || colors[colors.length - 1]
+    return colors[bad] || colors.at(-1)
 }
 
 /**
