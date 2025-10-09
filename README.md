@@ -64,6 +64,7 @@ Available Badges:
 
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
+- [VirusTotal Release Asset](#virustotal-release-asset)
 - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
 - [Static Badge](#static-badge)
 
@@ -115,6 +116,25 @@ You can also change the `sep` parameter, add `reversed` and filter by valid `sem
 ```text
 https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=activity&iconColor=black&color=paleturquoise&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver
 ```
+
+### VirusTotal Release Asset
+
+[![VT Release](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)
+
+`/vt/{owner}/{repo}/{asset}`
+
+Show VT stats for the latest release of an asset for a repository.
+
+For the repo [cssnr/zipline-android](https://github.com/cssnr/zipline-android/releases/latest)
+and the release asset `app-release.apk` the URL would be:
+
+```text
+https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk
+```
+
+> [!NOTE]  
+> This service does not upload the file to VirusTotal for analysis, it only fetches the result.  
+> You can do this automatically with the [cssnr/virustotal-action](https://github.com/cssnr/virustotal-action) GitHub action.
 
 ### JSON/YAML JSONPath
 
