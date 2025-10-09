@@ -26,23 +26,28 @@ export class GitHubApi {
     //     return response.data
     // }
 
-    // /**
-    //  * Get Release by Tag
-    //  * @param {string} tag
-    //  * @return {Promise<Object>}
-    //  */
-    // async getReleaseByTag(tag) {
-    //     console.log('getReleaseByTag:', tag)
-    //     const response = await this.octokit.rest.repos.getReleaseByTag({
-    //         ...github.context.repo,
-    //         tag,
-    //     })
-    //     console.log('response.status:', response.status)
-    //     return response.data
-    // }
+    /**
+     * Get Release by Tag
+     * @param {String} owner
+     * @param {String} repo
+     * @param {String} tag
+     * @return {Promise<Object>}
+     */
+    async getReleaseByTag(owner, repo, tag) {
+        console.log('getReleaseByTag:', tag)
+        const response = await this.octokit.rest.repos.getReleaseByTag({
+            owner,
+            repo,
+            tag,
+        })
+        console.log('response.status:', response.status)
+        return response.data
+    }
 
     /**
      * Get Latest Release
+     * @param {String} owner
+     * @param {String} repo
      * @return {Promise<Object|Undefined>}
      */
     async getLatestRelease(owner, repo) {
