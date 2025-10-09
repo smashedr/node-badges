@@ -9,7 +9,7 @@ import { parse } from 'yaml'
 import { makeBadge } from 'badge-maker'
 import * as icons from 'simple-icons'
 
-import { cacheDelete, cacheGet, cacheSet, GhcrApi } from './api.js'
+import { cacheDelete, cacheGet, cacheSet, getVTStats, GhcrApi } from './api.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -21,6 +21,9 @@ app.use(cors())
 app.set('views', '/app/src/views')
 app.set('view engine', 'pug')
 app.disable('view cache')
+
+console.log('GITHUB_TOKEN:', process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING')
+console.log('VT_API_KEY:', process.env.VT_API_KEY ? 'Loaded' : 'MISSING')
 
 app.listen(port, () => {
     console.log(`listening on PORT: ${port}`)
@@ -59,6 +62,19 @@ app.get('/', (req, res) => {
 //     }
 //     next()
 // })
+
+app.get(
+    '/vt/:owner/:repo/:asset',
+    errorBadgeHandler(async (req, res) => {
+        console.log(req.originalUrl)
+        if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
+        const stats = await getVTStats(req)
+        console.log('stats:', stats)
+        const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
+        console.log('message:', message)
+        getBadge(req.query, message, req.params.asset, 'shield-check', res)
+    })
+)
 
 app.all('/ghcr/tags/:owner/:package{/:latest}', async (req, res, next) => {
     if (req.method === 'PURGE') {
@@ -166,7 +182,7 @@ app.get(
         console.log('req.path:', req.path)
         console.log('req.params.url:', req.params.url)
 
-        // NOTE: Move backend logic to api.js
+        // TODO: Move backend logic to api.js
         const cached = await cacheGet(req.originalUrl)
         console.log('cached:', cached)
         if (cached) return getBadge(req.query, cached, 'result', 'code', res)

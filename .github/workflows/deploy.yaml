@@ -54,5 +54,7 @@ jobs:
             {
               "VERSION": "${{ env.version == 'master' && 'latest' || env.version }}",
               "STACK_NAME": "${{ env.stack-name }}",
-              "TRAEFIK_HOST": "${{ env.traefik-host }}"
+              "TRAEFIK_HOST": "${{ env.traefik-host }}",
+              "GITHUB_TOKEN": "${{ secrets.GH_PAT }}",
+              "VT_API_KEY": "${{ secrets.VT_API_KEY }}"
             }

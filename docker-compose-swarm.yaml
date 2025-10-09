@@ -38,6 +38,9 @@ services:
 
   app:
     image: ghcr.io/smashedr/node-badges:${VERSION:-latest}
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - VT_API_KEY=${VT_API_KEY}
     deploy:
       replicas: 1
       resources:
