@@ -160,11 +160,12 @@ export async function getVTReleaseStats(req) {
 
 /**
  * Get VT Stats for a File ID/SHA
- * @param sha
+ * @param {String} sha
+ * @param {Boolean} [id]
  * @return {Promise<Object>}
  */
-export async function getVTStats(sha) {
-    const key = `/vt/${sha}`
+export async function getVTStats(sha, id = false) {
+    const key = `/vt/${id ? 'id' : 'sha'}/${sha}`
     console.log('key:', key)
     // NOTE: Consider making this block a reusable function similar to cacheError
     const cached = await cacheGet(key)
@@ -174,11 +175,22 @@ export async function getVTStats(sha) {
     }
     console.log(`-- CACHE MISS: ${key}`)
     const vt = new VTApi(process.env.VT_API_KEY)
-    const report = await vt.getReport(sha)
+    let stats
+    if (id) {
+        console.log('getAnalysis')
+        const data = await vt.getAnalysis(sha)
+        // console.log('data:', JSON.stringify(data, null, 2))
+        stats = data?.data?.attributes?.stats
+    } else {
+        console.log('getReport')
+        const data = await vt.getReport(sha)
+        // console.log('data:', JSON.stringify(data, null, 2))
+        stats = data?.data?.attributes?.last_analysis_stats
+    }
     // console.log('report:', report)
-    if (!report) await cacheError(key, 'VT Report Not Found')
-    const stats = report?.data?.attributes?.last_analysis_stats
-    console.log('last_analysis_stats:', stats)
+    // if (!stats) await cacheError(key, 'VT Report Not Found')
+    // const stats = report?.data?.attributes?.last_analysis_stats
+    // console.log('stats:', stats)
     if (!stats) await cacheError(key, 'VT Stats Not Found')
     await cacheSet(key, stats)
     return stats

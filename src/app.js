@@ -71,24 +71,29 @@ app.get('/', (req, res) => {
 //     next()
 // })
 
-app.all('/vt/:sha', async (req, res, next) => {
+app.all('/vt/:type/:hash', async (req, res, next) => {
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
-        let sha = req.params.sha
-        const key = `/vt/${sha.includes(':') ? sha.split(':')[1] : sha}`
+        if (!['id', 'sha'].includes(req.params.type)) return next()
+        const type = req.params.type === 'id' ? 'id' : 'sha'
+        let hash = req.params.hash
+        const key = `/vt/${type}/${hash.includes(':') ? hash.split(':')[1] : hash}`
         return purgeKey(res, key)
     }
     next()
 })
 
 app.get(
-    '/vt/:sha',
-    errorBadgeHandler(async (req, res) => {
+    '/vt/:type/:hash',
+    errorBadgeHandler(async (req, res, next) => {
         console.log(req.originalUrl)
+        console.log('req.params.type:', req.params.type)
+        if (!['id', 'sha'].includes(req.params.type)) return next()
+
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
-        let sha = req.params.sha
-        sha = sha.includes(':') ? sha.split(':')[1] : sha
-        const stats = await getVTStats(sha)
+        let hash = req.params.hash
+        hash = hash.includes(':') ? hash.split(':')[1] : hash
+        const stats = await getVTStats(hash, req.params.type === 'id')
         // NOTE: Duplicate Code
         console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
@@ -96,7 +101,7 @@ app.get(
         const query = structuredClone(req.query)
         if (!query.lucide && !query.icon) query.icon = 'virustotal'
         query.color = query.color || getBadGradient(stats.malicious + stats.suspicious)
-        getBadge(query, message, sha.slice(0, 6), '', res)
+        getBadge(query, message, hash.slice(0, 6), '', res)
     })
 )
 
