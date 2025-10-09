@@ -229,7 +229,7 @@ app.get(
         console.log('req.params.type:', req.params.type)
         if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
 
-        const message = getJSONPath(req)
+        const message = await getJSONPath(req)
         console.log('message:', message)
         return getBadge(req.query, message, 'result', 'code-xml', res)
     })

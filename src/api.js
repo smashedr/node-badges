@@ -182,7 +182,7 @@ export async function getVTStats(sha) {
 /**
  * Get JSONPath for JSON/YAML
  * @param {Request} req
- * @return {String}
+ * @return {Promise<String>}
  */
 export async function getJSONPath(req) {
     const key = req.path
