@@ -43,15 +43,19 @@ export class GitHubApi {
 
     /**
      * Get Latest Release
-     * @return {Promise<Object>}
+     * @return {Promise<Object|Undefined>}
      */
     async getLatestRelease(owner, repo) {
         console.log('getLatestRelease:', owner, repo)
-        const response = await this.octokit.rest.repos.getLatestRelease({
-            owner,
-            repo,
-        })
-        console.log('response.status:', response.status)
-        return response.data
+        try {
+            const response = await this.octokit.rest.repos.getLatestRelease({
+                owner,
+                repo,
+            })
+            console.log('response.status:', response.status)
+            return response.data
+        } catch (error) {
+            console.log('error:', error)
+        }
     }
 }

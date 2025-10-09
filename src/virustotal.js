@@ -15,11 +15,15 @@ export class VTApi {
     /**
      * Get Release
      * @param {string} id
-     * @return {Promise<Object>}
+     * @return {Promise<Object|Undefined>}
      */
     async getReport(id) {
-        const response = await this.client.get(`/files/${id}`)
-        console.log('getReport: response.status:', response.status)
-        return response.data
+        try {
+            const response = await this.client.get(`/files/${id}`)
+            console.log('getReport: response.status:', response.status)
+            return response.data
+        } catch (error) {
+            console.log('error:', error)
+        }
     }
 }
