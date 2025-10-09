@@ -128,11 +128,14 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=a
 
 [![VT Release](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)
 
-`/vt/{sha}`  
+`/vt/id/{id}`  
+`/vt/sha/{sha}`  
 `/vt/{owner}/{repo}/{asset}`  
 `/vt/{owner}/{repo}/{asset}/{tag}`
 
-Show VT stats for the file or latest release or release tag of an asset for a repository.
+The `id` endpoint is used for VirusTotal File ID, and `sha` for a file hash/digest.
+
+The `owner/repo/asset` endpoints use the latest/tagged release asset for the repository.
 
 If the `tag` parameter is omitted, the release tagged as `latest` in GitHub is used.
 
