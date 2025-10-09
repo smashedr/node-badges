@@ -24,7 +24,7 @@
 - [Badges](#Badges)
   - [GHCR Image Size](#ghcr-image-size)
   - [GHCR Image Tags (2)](#ghcr-image-tags)
-  - [VirusTotal Release Asset](#virustotal-release-asset)
+  - [VirusTotal Release and Files](#virustotal-release-and-files)
   - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
   - [Static Badge](#static-badge)
 - [Query Parameters](#query-parameters)
@@ -69,7 +69,7 @@ Available Badges:
 
 - [GHCR Image Size](#ghcr-image-size)
 - [GHCR Image Tags (2)](#ghcr-image-tags)
-- [VirusTotal Release Asset](#virustotal-release-asset)
+- [VirusTotal Release and Files](#virustotal-release-and-files)
 - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
 - [Static Badge](#static-badge)
 
@@ -80,7 +80,8 @@ Available Badges:
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 
-`/ghcr/size/{owner}/{pacakge}/{tag}?`
+`/ghcr/size/{owner}/{pacakge}`  
+`/ghcr/size/{owner}/{pacakge}/{tag}`
 
 Without the `tag` it defaults to `latest`, these are equivalent.
 
@@ -100,7 +101,8 @@ https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lu
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
 
-`/ghcr/tags/{owner}/{pacakge}/{tag}/latest?`
+`/ghcr/tags/{owner}/{pacakge}/latest`  
+`/ghcr/tags/{owner}/{pacakge}`
 
 Without `latest` it returns the `n` most recent tags, otherwise only the latest tag.
 
@@ -122,13 +124,15 @@ You can also change the `sep` parameter, add `reversed` and filter by valid `sem
 https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=activity&iconColor=black&color=paleturquoise&style=for-the-badge&label=last%20four&n=4&sep=-&reversed&semver
 ```
 
-### VirusTotal Release Asset
+### VirusTotal Release and Files
 
 [![VT Release](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)
 
-`/vt/{owner}/{repo}/{asset}/{tag}?`
+`/vt/{sha}`  
+`/vt/{owner}/{repo}/{asset}`  
+`/vt/{owner}/{repo}/{asset}/{tag}`
 
-Show VT stats for the latest release or tag of an asset for a repository.
+Show VT stats for the file or latest release or release tag of an asset for a repository.
 
 If the `tag` parameter is omitted, the release tagged as `latest` in GitHub is used.
 
@@ -167,7 +171,8 @@ _Note: the badge at the top is also from this [docker-compose-swarm.yaml](https:
 
 ### Static Badge
 
-`/static/{message}/{label}?`
+`/static/{message}`  
+`/static/{message}/{label}`
 
 Create a static badge with a custom `message`.
 The `label` can be optionally added after the message or in the query params.
