@@ -58,3 +58,21 @@ jobs:
               "GITHUB_TOKEN": "${{ secrets.GH_PAT }}",
               "VT_API_KEY": "${{ secrets.VT_API_KEY }}"
             }
+
+      - name: "Debug Environment"
+        continue-on-error: true
+        env:
+          version: ${{ env.version == 'master' && 'latest' || env.version }}
+        run: |
+          echo "env.version: ${{ env.version }}"
+          echo "ghcr.io/${{ github.repository }}:${{ env.version }}"
+
+      # https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
+      - name: "Render Deploy"
+        continue-on-error: true
+        uses: cssnr/web-request-action@v1
+        env:
+          version: ${{ env.version == 'master' && 'latest' || env.version }}
+        with:
+          url: ${{ secrets.RENDER_HOOK }}
+          #params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
