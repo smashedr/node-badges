@@ -7,7 +7,13 @@ import camelCase from 'camelcase'
 import { makeBadge } from 'badge-maker'
 import * as icons from 'simple-icons'
 
-import { cacheDelete, getJSONPath, getVTStats, GhcrApi } from './api.js'
+import {
+    cacheDelete,
+    getJSONPath,
+    getVTReleaseStats,
+    getVTStats,
+    GhcrApi,
+} from './api.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -65,6 +71,32 @@ app.get('/', (req, res) => {
 //     next()
 // })
 
+app.all('/vt/:sha', async (req, res, next) => {
+    if (req.method === 'PURGE') {
+        console.log('PURGE:', req.originalUrl)
+        const key = `/vt/${req.params.sha}`
+        return purgeKey(res, key)
+    }
+    next()
+})
+
+app.get(
+    '/vt/:sha',
+    errorBadgeHandler(async (req, res) => {
+        console.log(req.originalUrl)
+        if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
+        const stats = await getVTStats(req.params.sha)
+        // NOTE: Duplicate Code
+        console.log('stats:', stats)
+        const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
+        console.log('message:', message)
+        const query = structuredClone(req.query)
+        if (!query.lucide && !query.icon) query.icon = 'virustotal'
+        query.color = query.color || getBadGradient(stats.malicious + stats.suspicious)
+        getBadge(query, message, req.params.sha.slice(0, 6), '', res)
+    })
+)
+
 app.all('/vt/:owner/:repo/:asset{/:tag}', async (req, res, next) => {
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
@@ -80,7 +112,8 @@ app.get(
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
-        const stats = await getVTStats(req)
+        const stats = await getVTReleaseStats(req)
+        // NOTE: Duplicate Code
         console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)

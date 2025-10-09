@@ -118,7 +118,7 @@ export class GhcrApi {
  * Get VirusTotal File Report Stats
  * @param {Request} req
  */
-export async function getVTStats(req) {
+export async function getVTReleaseStats(req) {
     const tag = req.params.tag || 'latest'
     const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}/${tag}`
     console.log('key:', key)
@@ -144,10 +144,31 @@ export async function getVTStats(req) {
     if (!asset) await cacheError(key, 'Asset Not Found')
     console.log('asset?.digest:', asset?.digest)
     if (!asset?.digest) await cacheError(key, 'Digest Not Found')
-    const id = asset.digest.split(':')[1]
-    console.log('id:', id)
+    const sha = asset.digest.split(':')[1]
+    console.log('sha:', sha)
+    // const vt = new VTApi(process.env.VT_API_KEY)
+    // const report = await vt.getReport(sha)
+    // console.log('report:', report)
+    // if (!report) await cacheError(key, 'VT Report Not Found')
+    const stats = getVTStats(sha)
+    console.log('last_analysis_stats:', stats)
+    if (!stats) await cacheError(key, 'VT Stats Not Found')
+    await cacheSet(key, stats)
+    return stats
+}
+
+export async function getVTStats(sha) {
+    const key = `/vt/${sha}`
+    console.log('key:', key)
+    // NOTE: Consider making this block a reusable function similar to cacheError
+    const cached = await cacheGet(key)
+    if (cached) {
+        if (cached.errorMessage) throw new Error(cached.errorMessage)
+        return cached
+    }
+    console.log(`-- CACHE MISS: ${key}`)
     const vt = new VTApi(process.env.VT_API_KEY)
-    const report = await vt.getReport(id)
+    const report = await vt.getReport(sha)
     // console.log('report:', report)
     if (!report) await cacheError(key, 'VT Report Not Found')
     const stats = report?.data?.attributes?.last_analysis_stats
