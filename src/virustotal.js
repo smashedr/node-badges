@@ -38,7 +38,7 @@ export class VTApi {
             console.log('getReport: response.status:', response.status)
             return response.data
         } catch (error) {
-            // console.log('error:', error)
+            console.log('error:', error)
         }
     }
 }
