@@ -86,7 +86,9 @@ app.get(
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
-        const stats = await getVTStats(req.params.sha)
+        let sha = req.params.sha
+        sha = sha.includes(':') ? sha.split(':')[1] : sha
+        const stats = await getVTStats(sha)
         // NOTE: Duplicate Code
         console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
@@ -94,7 +96,7 @@ app.get(
         const query = structuredClone(req.query)
         if (!query.lucide && !query.icon) query.icon = 'virustotal'
         query.color = query.color || getBadGradient(stats.malicious + stats.suspicious)
-        getBadge(query, message, req.params.sha.slice(0, 6), '', res)
+        getBadge(query, message, sha.slice(0, 6), '', res)
     })
 )
 
