@@ -255,8 +255,6 @@ For more details, see the [docker-compose-dev.yaml](https://github.com/smashedr/
 
 <details><summary>Set Environment Variables in Docker</summary>
 
-Do the following before running.
-
 ```docker
 cp settings.env.example settings.env
 vim settings.env
@@ -279,8 +277,6 @@ npm run dev
 Then visit: http://localhost:3000/
 
 <details><summary>Set Environment Variables for Node</summary>
-
-Do the following before running.
 
 ```docker
 cp settings.env.example settings.env
