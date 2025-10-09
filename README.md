@@ -80,7 +80,7 @@ Available Badges:
 
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)](https://badges.cssnr.com/ghcr/size/smashedr/node-badges)
 
-`/ghcr/size/{owner}/{pacakge}`
+`/ghcr/size/{owner}/{pacakge}`  
 `/ghcr/size/{owner}/{pacakge}/{tag}`
 
 Without the `tag` it defaults to `latest`, these are equivalent.
@@ -101,7 +101,7 @@ https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lu
 [![Image Latest](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest)
 [![Image Tags](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)](https://badges.cssnr.com/ghcr/tags/smashedr/node-badges)
 
-`/ghcr/tags/{owner}/{pacakge}/latest`
+`/ghcr/tags/{owner}/{pacakge}/latest`  
 `/ghcr/tags/{owner}/{pacakge}`
 
 Without `latest` it returns the `n` most recent tags, otherwise only the latest tag.
@@ -128,8 +128,8 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=a
 
 [![VT Release](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)
 
-`/vt/{sha}`
-`/vt/{owner}/{repo}/{asset}`
+`/vt/{sha}`  
+`/vt/{owner}/{repo}/{asset}`  
 `/vt/{owner}/{repo}/{asset}/{tag}`
 
 Show VT stats for the file or latest release or release tag of an asset for a repository.
