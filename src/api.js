@@ -158,6 +158,7 @@ export async function getVTReleaseStats(req) {
 }
 
 export async function getVTStats(sha) {
+    sha = sha.includes(':') ? sha.split(':')[1] : sha
     const key = `/vt/${sha}`
     console.log('key:', key)
     // NOTE: Consider making this block a reusable function similar to cacheError
