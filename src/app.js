@@ -85,10 +85,10 @@ app.all('/vt/:type/:hash', async (req, res, next) => {
 
 app.get(
     '/vt/:type/:hash',
-    errorBadgeHandler(async (req, res, next) => {
+    errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
         console.log('req.params.type:', req.params.type)
-        if (!['id', 'sha'].includes(req.params.type)) return next()
+        if (!['id', 'sha'].includes(req.params.type)) return res.sendStatus(404)
 
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
         let hash = req.params.hash
