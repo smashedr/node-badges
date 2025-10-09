@@ -75,8 +75,11 @@ app.all('/vt/:type/:hash', async (req, res, next) => {
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
         if (!['id', 'sha'].includes(req.params.type)) return next()
-        const type = req.params.type === 'id' ? 'id' : 'sha'
         let hash = req.params.hash
+        if (req.params.hash === 'id') {
+            hash = hash.includes(':') ? hash.split(':')[1] : hash
+        }
+        const type = req.params.type === 'id' ? 'id' : 'sha'
         const key = `/vt/${type}/${hash.includes(':') ? hash.split(':')[1] : hash}`
         return purgeKey(res, key)
     }
@@ -92,7 +95,9 @@ app.get(
 
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
         let hash = req.params.hash
-        hash = hash.includes(':') ? hash.split(':')[1] : hash
+        if (req.params.type === 'id') {
+            hash = hash.includes(':') ? hash.split(':')[1] : hash
+        }
         const stats = await getVTStats(hash, req.params.type === 'id')
         // NOTE: Duplicate Code
         console.log('stats:', stats)
