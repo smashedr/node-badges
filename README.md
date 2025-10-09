@@ -21,6 +21,20 @@
 
 # Node Badges
 
+- [Badges](#Badges)
+  - [GHCR Image Size](#ghcr-image-size)
+  - [GHCR Image Tags (2)](#ghcr-image-tags)
+  - [VirusTotal Release Asset](#virustotal-release-asset)
+  - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
+  - [Static Badge](#static-badge)
+- [Query Parameters](#query-parameters)
+  - [Badge Specific Parameters](#badge-specific-parameters)
+- [Troubleshooting](#Troubleshooting)
+- [Developing](#Developing)
+- [Deploying](#Deploying)
+- [Support](#Support)
+- [Contributing](#Contributing)
+
 This is a Work in Progress, but Works!
 
 Supports both [Simple Icon](https://simpleicons.org/) and [Lucide Icon](https://lucide.dev/icons/).
@@ -36,18 +50,6 @@ Visit the website for more details: https://smashedr.github.io/node-badges-docs/
 
 Please [let us know](https://github.com/smashedr/node-badges/discussions/categories/feature-requests) if you want to see a specific badge or feature....
 
-- [Badges](#Badges)
-  - [GHCR Image Size](#ghcr-image-size)
-  - [GHCR Image Tags (2)](#ghcr-image-tags)
-  - [JSON/YAML JSONPath (2)](#jsonyaml-jsonpath)
-- [Query Parameters](#query-parameters)
-  - [Badge Specific Parameters](#badge-specific-parameters)
-- [Troubleshooting](#Troubleshooting)
-- [Developing](#Developing)
-- [Deploying](#Deploying)
-- [Support](#Support)
-- [Contributing](#Contributing)
-
 Public Server Base URL:
 
 ```text
@@ -57,6 +59,9 @@ https://badges.cssnr.com/
 [![Server Status](https://img.shields.io/website?url=https%3A%2F%2Fbadges.cssnr.com%2F&up_message=online&down_message=offline&style=for-the-badge&logo=nodedotjs&logoColor=white&label=server)](https://badges.cssnr.com/)
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
 [![Deploy to Render](https://img.shields.io/badge/Deploy_to_Render-4351E8?style=for-the-badge&logo=render)](https://render.com/deploy?repo=https://github.com/smashedr/node-badges)
+
+> [!WARNING]  
+> This is currently in beta, expect breaking changes.
 
 ## Badges
 
