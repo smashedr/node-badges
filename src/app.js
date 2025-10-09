@@ -2,14 +2,12 @@ import express from 'express'
 import cors from 'cors'
 
 import lucide from 'lucide-static'
-import jp from 'jsonpath'
 import semver from 'semver'
 import camelCase from 'camelcase'
-import { parse } from 'yaml'
 import { makeBadge } from 'badge-maker'
 import * as icons from 'simple-icons'
 
-import { cacheDelete, cacheGet, cacheSet, getVTStats, GhcrApi } from './api.js'
+import { cacheDelete, getJSONPath, getVTStats, GhcrApi } from './api.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -179,54 +177,10 @@ app.get(
         console.log(req.originalUrl)
         console.log('req.params.type:', req.params.type)
         if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
-        console.log('req.path:', req.path)
-        console.log('req.params.url:', req.params.url)
 
-        // TODO: Move backend logic to api.js
-        const cached = await cacheGet(req.originalUrl)
-        console.log('cached:', cached)
-        if (cached) return getBadge(req.query, cached, 'result', 'code', res)
-        console.log(`-- CACHE MISS: ${req.originalUrl}`)
-
-        const url = new URL(req.params.url)
-        console.log('url.href:', url.href)
-
-        const response = await fetch(url)
-        // console.log('response:', response)
-        console.log('response.status:', response.status)
-
-        const length = response.headers.get('content-length')
-        console.log('content-length:', length)
-
-        const text = await response.text()
-        console.log('text.length:', text.length)
-        // const encoder = new TextEncoder().encode(text)
-        // console.log('encoder.length:', encoder.length)
-
-        let data
-        if (req.params.type === 'yaml') {
-            data = parse(text)
-        } else {
-            data = JSON.parse(text)
-        }
-        // console.log('data:', data)
-
-        let result = jp.query(data, req.params.path)[0]
-        console.log('result:', result)
-        if (req.query.split) {
-            const split = result.split(req.query.split)
-            result = split[req.query.index || 0]
-            console.log('result:', result)
-        }
-        if (!result) {
-            throw new Error('No Result for Query')
-        } else if (typeof result === 'object') {
-            throw new TypeError('Object Result')
-        } else {
-            result = result.toString()
-            await cacheSet(req.originalUrl, result)
-            return getBadge(req.query, result, 'result', 'code-xml', res)
-        }
+        const message = getJSONPath(req)
+        console.log('message:', message)
+        return getBadge(req.query, message, 'result', 'code-xml', res)
     })
 )
 
