@@ -115,8 +115,9 @@ export class GhcrApi {
 }
 
 /**
- * Get VirusTotal File Report Stats
+ * Get VirusTotal Stats for a Release Asset
  * @param {Request} req
+ * @return {Promise<Object>}
  */
 export async function getVTReleaseStats(req) {
     const tag = req.params.tag || 'latest'
@@ -157,6 +158,11 @@ export async function getVTReleaseStats(req) {
     return stats
 }
 
+/**
+ * Get VT Stats for a File ID/SHA
+ * @param sha
+ * @return {Promise<Object>}
+ */
 export async function getVTStats(sha) {
     sha = sha.includes(':') ? sha.split(':')[1] : sha
     const key = `/vt/${sha}`
