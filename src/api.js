@@ -150,7 +150,7 @@ export async function getVTReleaseStats(req) {
     // const report = await vt.getReport(sha)
     // console.log('report:', report)
     // if (!report) await cacheError(key, 'VT Report Not Found')
-    const stats = getVTStats(sha)
+    const stats = await getVTStats(sha)
     console.log('last_analysis_stats:', stats)
     if (!stats) await cacheError(key, 'VT Stats Not Found')
     await cacheSet(key, stats)

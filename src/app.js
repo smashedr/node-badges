@@ -74,7 +74,8 @@ app.get('/', (req, res) => {
 app.all('/vt/:sha', async (req, res, next) => {
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
-        const key = `/vt/${req.params.sha}`
+        let sha = req.params.sha
+        const key = `/vt/${sha.includes(':') ? sha.split(':')[1] : sha}`
         return purgeKey(res, key)
     }
     next()
