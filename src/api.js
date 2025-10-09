@@ -4,6 +4,8 @@ import { Buffer } from 'node:buffer'
 import { createClient } from 'redis'
 import { GitHubApi } from './github.js'
 import { VTApi } from './virustotal.js'
+import { parse } from 'yaml'
+import jp from 'jsonpath'
 
 // const NodeCache = require('node-cache')
 // const cache = new NodeCache({ stdTTL: 60 * 60 })
@@ -144,6 +146,60 @@ export async function getVTStats(req) {
     if (!stats) throw new Error('VT Stats Not Found')
     await cacheSet(key, stats)
     return stats
+}
+
+/**
+ * Get JSONPath for JSON/YAML
+ * @param {Request} req
+ * @return {String}
+ */
+export async function getJSONPath(req) {
+    // TODO: Move backend logic to api.js
+    const key = req.path
+    const cached = await cacheGet(key)
+    console.log('cached:', cached)
+    if (cached) return cached
+    console.log(`-- CACHE MISS: ${key}`)
+
+    const url = new URL(req.params.url)
+    console.log('url.href:', url.href)
+
+    const response = await fetch(url)
+    // console.log('response:', response)
+    console.log('response.status:', response.status)
+
+    const length = response.headers.get('content-length')
+    console.log('content-length:', length)
+
+    const text = await response.text()
+    console.log('text.length:', text.length)
+    // const encoder = new TextEncoder().encode(text)
+    // console.log('encoder.length:', encoder.length)
+
+    let data
+    if (req.params.type === 'yaml') {
+        data = parse(text)
+    } else {
+        data = JSON.parse(text)
+    }
+    // console.log('data:', data)
+
+    let result = jp.query(data, req.params.path)[0]
+    console.log('result:', result)
+    if (req.query.split) {
+        const split = result.split(req.query.split)
+        result = split[req.query.index || 0]
+        console.log('result:', result)
+    }
+    if (!result) {
+        throw new Error('No Result for Query')
+    } else if (typeof result === 'object') {
+        throw new TypeError('Object Result')
+    } else {
+        result = result.toString()
+        await cacheSet(req.originalUrl, result)
+        return result
+    }
 }
 
 export async function cacheGet(key) {

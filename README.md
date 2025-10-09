@@ -229,6 +229,8 @@ curl -X PURGE 'https://camo.githubusercontent.com/xxx'
 
 You can run the dev server with [Docker](#with-docker) compose or [Node](#with-node) run.
 
+The VirusTotal endpoint requires a `VT_API_KEY` environment variable and recommends a `GITHUB_TOKEN`.
+
 ### With Docker
 
 Docker includes Redis and live server reloading with the [docker-compose-dev.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-dev.yaml) file.
@@ -251,6 +253,18 @@ For more details, see the [docker-compose-dev.yaml](https://github.com/smashedr/
 
 </details>
 
+<details><summary>Set Environment Variables in Docker</summary>
+
+Do the following before running.
+
+```docker
+cp settings.env.example settings.env
+vim settings.env
+export SETTINGS=settings.env
+```
+
+</details>
+
 ### With Node
 
 Make sure you have a redis server running and set the `REDIS_URL` environment variable.
@@ -263,6 +277,19 @@ npm run dev
 ```
 
 Then visit: http://localhost:3000/
+
+<details><summary>Set Environment Variables for Node</summary>
+
+Do the following before running.
+
+```docker
+cp settings.env.example settings.env
+vim settings.env
+set -a
+source settings.env
+```
+
+</details>
 
 ### With Custom Port
 
