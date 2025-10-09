@@ -2,6 +2,8 @@ import axios from 'axios'
 // noinspection JSUnresolvedReference
 import { Buffer } from 'node:buffer'
 import { createClient } from 'redis'
+import { GitHubApi } from './github.js'
+import { VTApi } from './virustotal.js'
 
 // const NodeCache = require('node-cache')
 // const cache = new NodeCache({ stdTTL: 60 * 60 })
@@ -108,6 +110,40 @@ export class GhcrApi {
     // getAuth(packageOwner, packageName) {
     //     return Buffer.from(`v1:${packageOwner}/${packageName}:0`).toString('base64')
     // }
+}
+
+/**
+ * Get VirusTotal File Report Stats
+ * TODO: Add caching at applicable Errors to reduce API calls
+ * @param {Request} req
+ */
+export async function getVTStats(req) {
+    const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}`
+    console.log('key:', key)
+    const cached = await cacheGet(key)
+    if (cached) return cached
+    console.log(`-- CACHE MISS: ${key}`)
+
+    const gh = new GitHubApi(process.env.GITHUB_TOKEN)
+    const release = await gh.getLatestRelease(req.params.owner, req.params.repo)
+    // console.log('release?.assets:', release?.assets)
+    if (!release) throw new Error('Release Not Found')
+    const asset = release.assets.find((a) => a.name === req.params.asset)
+    // console.log('asset:', asset)
+    if (!asset) throw new Error('Asset Not Found')
+    console.log('asset?.digest:', asset?.digest)
+    if (!asset?.digest) throw new Error('Digest Not Found')
+    const id = asset.digest.split(':')[1]
+    console.log('id:', id)
+    const vt = new VTApi(process.env.VT_API_KEY)
+    const report = await vt.getReport(id)
+    // console.log('report:', report)
+    if (!report) throw new Error('VT Report Not Found')
+    const stats = report?.data?.attributes?.last_analysis_stats
+    console.log('last_analysis_stats:', stats)
+    if (!stats) throw new Error('VT Stats Not Found')
+    await cacheSet(key, stats)
+    return stats
 }
 
 export async function cacheGet(key) {

@@ -6,3 +6,4 @@ eslint_report.json
 .env
 .secrets
 .vars
+settings.env

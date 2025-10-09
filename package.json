@@ -12,6 +12,7 @@
     "start": "node src/app.js"
   },
   "dependencies": {
+    "@octokit/rest": "^22.0.0",
     "axios": "^1.12.2",
     "badge-maker": "^5.0.2",
     "camelcase": "^8.0.0",

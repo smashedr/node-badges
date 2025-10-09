@@ -9,7 +9,7 @@ import { parse } from 'yaml'
 import { makeBadge } from 'badge-maker'
 import * as icons from 'simple-icons'
 
-import { cacheDelete, cacheGet, cacheSet, GhcrApi } from './api.js'
+import { cacheDelete, cacheGet, cacheSet, getVTStats, GhcrApi } from './api.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -59,6 +59,18 @@ app.get('/', (req, res) => {
 //     }
 //     next()
 // })
+
+app.get(
+    '/vt/:owner/:repo/:asset',
+    errorBadgeHandler(async (req, res) => {
+        console.log(req.originalUrl)
+        if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
+        const stats = await getVTStats(req)
+        console.log('stats:', stats)
+        const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
+        getBadge(req.query, message, req.params.asset, 'shield-check', res)
+    })
+)
 
 app.all('/ghcr/tags/:owner/:package{/:latest}', async (req, res, next) => {
     if (req.method === 'PURGE') {
