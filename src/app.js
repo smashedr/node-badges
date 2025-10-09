@@ -45,6 +45,10 @@ app.get('/', (req, res) => {
     })
 })
 
+// app.get('/test', async (req, res) => {
+//     res.sendStatus(200)
+// })
+
 // app.use('/ghcr', (req, res, next) => {
 //     res.setHeader('Content-Type', 'image/svg+xml')
 //     res.setHeader('Cache-Control', 'public, max-age=3600')
@@ -60,6 +64,15 @@ app.get('/', (req, res) => {
 //     }
 //     next()
 // })
+
+app.all('/vt/:owner/:repo/:asset', async (req, res, next) => {
+    if (req.method === 'PURGE') {
+        console.log('PURGE:', req.originalUrl)
+        const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}`
+        return purgeKey(res, key)
+    }
+    next()
+})
 
 app.get(
     '/vt/:owner/:repo/:asset',

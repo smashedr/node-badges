@@ -116,34 +116,37 @@ export class GhcrApi {
 
 /**
  * Get VirusTotal File Report Stats
- * TODO: Add caching at applicable Errors to reduce API calls
  * @param {Request} req
  */
 export async function getVTStats(req) {
     const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}`
     console.log('key:', key)
+    // NOTE: Consider making this block a reusable function similar to cacheError
     const cached = await cacheGet(key)
-    if (cached) return cached
+    if (cached) {
+        if (cached.errorMessage) throw new Error(cached.errorMessage)
+        return cached
+    }
     console.log(`-- CACHE MISS: ${key}`)
 
     const gh = new GitHubApi(process.env.GITHUB_TOKEN)
     const release = await gh.getLatestRelease(req.params.owner, req.params.repo)
     // console.log('release?.assets:', release?.assets)
-    if (!release) throw new Error('Release Not Found')
+    if (!release) await cacheError('Release Not Found')
     const asset = release.assets.find((a) => a.name === req.params.asset)
     // console.log('asset:', asset)
-    if (!asset) throw new Error('Asset Not Found')
+    if (!asset) await cacheError('Asset Not Found')
     console.log('asset?.digest:', asset?.digest)
-    if (!asset?.digest) throw new Error('Digest Not Found')
+    if (!asset?.digest) await cacheError('Digest Not Found')
     const id = asset.digest.split(':')[1]
     console.log('id:', id)
     const vt = new VTApi(process.env.VT_API_KEY)
     const report = await vt.getReport(id)
     // console.log('report:', report)
-    if (!report) throw new Error('VT Report Not Found')
+    if (!report) await cacheError('VT Report Not Found')
     const stats = report?.data?.attributes?.last_analysis_stats
     console.log('last_analysis_stats:', stats)
-    if (!stats) throw new Error('VT Stats Not Found')
+    if (!stats) await cacheError('VT Stats Not Found')
     await cacheSet(key, stats)
     return stats
 }
@@ -154,7 +157,6 @@ export async function getVTStats(req) {
  * @return {String}
  */
 export async function getJSONPath(req) {
-    // TODO: Move backend logic to api.js
     const key = req.path
     const cached = await cacheGet(key)
     console.log('cached:', cached)
@@ -216,4 +218,9 @@ export async function cacheSet(key, value, EX = 60 * 60) {
 export async function cacheDelete(key) {
     // cache.del(key, totalSize)
     return await client.del(key)
+}
+
+async function cacheError(key, errorMessage, EX = 60 * 10) {
+    await cacheSet(key, { errorMessage }, EX)
+    throw new Error(errorMessage)
 }
