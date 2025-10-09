@@ -171,7 +171,8 @@ _Note: the badge at the top is also from this [docker-compose-swarm.yaml](https:
 
 ### Static Badge
 
-`/static/{message}/{label}?`
+`/static/{message}`  
+`/static/{message}/{label}`
 
 Create a static badge with a custom `message`.
 The `label` can be optionally added after the message or in the query params.
