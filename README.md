@@ -126,9 +126,11 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=a
 
 [![VT Release](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)
 
-`/vt/{owner}/{repo}/{asset}`
+`/vt/{owner}/{repo}/{asset}/{tag}?`
 
-Show VT stats for the latest release of an asset for a repository.
+Show VT stats for the latest release or tag of an asset for a repository.
+
+If the `tag` parameter is omitted, the release tagged as `latest` in GitHub is used.
 
 For the repo [cssnr/zipline-android](https://github.com/cssnr/zipline-android/releases/latest)
 and the release asset `app-release.apk` the URL would be:

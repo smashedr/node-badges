@@ -65,17 +65,18 @@ app.get('/', (req, res) => {
 //     next()
 // })
 
-app.all('/vt/:owner/:repo/:asset', async (req, res, next) => {
+app.all('/vt/:owner/:repo/:asset{/:tag}', async (req, res, next) => {
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
-        const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}`
+        const tag = req.params.tag || 'latest'
+        const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}/${tag}`
         return purgeKey(res, key)
     }
     next()
 })
 
 app.get(
-    '/vt/:owner/:repo/:asset',
+    '/vt/:owner/:repo/:asset{/:tag}',
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
@@ -83,7 +84,10 @@ app.get(
         console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
-        getBadge(req.query, message, req.params.asset, 'shield-check', res)
+        const query = structuredClone(req.query)
+        if (!query.lucide && !query.icon) query.icon = 'virustotal'
+        query.color = query.color || getBadGradient(stats.malicious + stats.suspicious)
+        getBadge(query, message, req.params.asset, '', res)
     })
 )
 
@@ -228,6 +232,7 @@ function errorBadgeHandler(handler) {
 
 /**
  * Get Badge
+ * TODO: Update to accept an Object argument
  * @param {Object} query req.query
  * @param {String} message Badge Message
  * @param {String} [label] Default Label
@@ -302,6 +307,20 @@ function getLogo(query, icon, color = '#fff') {
     const result = svg.replace('<svg', `<svg ${colorType}="${iconColor}"`)
     // console.log('result:', result)
     return Buffer.from(result).toString('base64')
+}
+
+function getBadGradient(bad) {
+    console.log('getBadGradient:', bad)
+    const colors = [
+        '#44cc11',
+        '#85c718',
+        '#b0c42d',
+        '#dfb317',
+        '#e39934',
+        '#e27c44',
+        '#e05d44',
+    ]
+    return colors[bad] || colors.at(-1)
 }
 
 /**

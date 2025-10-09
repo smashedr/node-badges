@@ -119,7 +119,8 @@ export class GhcrApi {
  * @param {Request} req
  */
 export async function getVTStats(req) {
-    const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}`
+    const tag = req.params.tag || 'latest'
+    const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}/${tag}`
     console.log('key:', key)
     // NOTE: Consider making this block a reusable function similar to cacheError
     const cached = await cacheGet(key)
@@ -130,23 +131,28 @@ export async function getVTStats(req) {
     console.log(`-- CACHE MISS: ${key}`)
 
     const gh = new GitHubApi(process.env.GITHUB_TOKEN)
-    const release = await gh.getLatestRelease(req.params.owner, req.params.repo)
+    let release
+    if (tag === 'latest') {
+        release = await gh.getLatestRelease(req.params.owner, req.params.repo)
+    } else {
+        release = await gh.getReleaseByTag(req.params.owner, req.params.repo, tag)
+    }
     // console.log('release?.assets:', release?.assets)
-    if (!release) await cacheError('Release Not Found')
+    if (!release) await cacheError(key, 'Release Not Found')
     const asset = release.assets.find((a) => a.name === req.params.asset)
     // console.log('asset:', asset)
-    if (!asset) await cacheError('Asset Not Found')
+    if (!asset) await cacheError(key, 'Asset Not Found')
     console.log('asset?.digest:', asset?.digest)
-    if (!asset?.digest) await cacheError('Digest Not Found')
+    if (!asset?.digest) await cacheError(key, 'Digest Not Found')
     const id = asset.digest.split(':')[1]
     console.log('id:', id)
     const vt = new VTApi(process.env.VT_API_KEY)
     const report = await vt.getReport(id)
     // console.log('report:', report)
-    if (!report) await cacheError('VT Report Not Found')
+    if (!report) await cacheError(key, 'VT Report Not Found')
     const stats = report?.data?.attributes?.last_analysis_stats
     console.log('last_analysis_stats:', stats)
-    if (!stats) await cacheError('VT Stats Not Found')
+    if (!stats) await cacheError(key, 'VT Stats Not Found')
     await cacheSet(key, stats)
     return stats
 }
@@ -221,6 +227,7 @@ export async function cacheDelete(key) {
 }
 
 async function cacheError(key, errorMessage, EX = 60 * 10) {
+    console.log(`cacheError: ${key}`, errorMessage)
     await cacheSet(key, { errorMessage }, EX)
     throw new Error(errorMessage)
 }
