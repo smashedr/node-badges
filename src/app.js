@@ -57,6 +57,7 @@ app.get('/', (req, res) => {
 // })
 
 app.get('/colors{/:index}', async (req, res) => {
+    console.log(req.originalUrl)
     const index = req.params.index || 0
     console.log('index:', index)
     const color = getRangedColor(req, index)
@@ -221,8 +222,8 @@ app.get(
     '/static/:message{/:label}',
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
-        console.log('req.params.message:', req.params.message)
-        console.log('req.params.label:', req.params.label)
+        console.log(`message/label: ${req.params.message} / ${req.params.label}`)
+        // TODO: Fix this query
         const query = structuredClone(req.query)
         if (!req.params.label && !query.label && !query.labelColor) {
             query.labelColor = query.color || 'brightgreen'
@@ -275,7 +276,7 @@ function errorBadgeHandler(handler) {
             console.error(error)
             console.log('error.message:', error.message)
             const data = {
-                message: error.message,
+                message: error.message || 'Unknown Error',
                 color: 'red',
                 style: req.query.style || 'flat',
             }
@@ -296,7 +297,7 @@ function errorBadgeHandler(handler) {
  */
 function getBadge(message, query = {}, options = {}, res = null) {
     const opts = { color: '', label: '', icon: '', lucide: '', ...options }
-    console.log('--- opts:', opts)
+    // console.log('--- opts:', opts)
     const data = {
         message: message.toString(),
         color: query.color || opts.color || 'brightgreen',
@@ -334,22 +335,22 @@ function sendBadge(res, badge) {
  * @return {String}
  */
 function getLogo(query, opts, color = '#fff') {
-    console.log('query.icon:', query.icon)
+    // console.log('query.icon:', query.icon)
     if (query.icon !== undefined && !query.icon) return ''
     const iconName = query.icon || query.lucide || opts.icon || opts.lucide
-    console.log('iconName:', iconName)
+    // console.log('iconName:', iconName)
 
     const name = camelCase(iconName, { pascalCase: true })
-    console.log('name:', name)
+    // console.log('name:', name)
     if (!name) return ''
 
     let svg, colorType
     if ((query.icon || opts.icon) && !query.lucide) {
-        console.log('Simple Icons')
+        // console.log('Simple Icons')
         svg = icons[`si${name}`]?.svg
         colorType = 'fill'
     } else {
-        console.log('Lucide Icon')
+        // console.log('Lucide Icon')
         svg = lucide[name]
         colorType = 'color'
     }

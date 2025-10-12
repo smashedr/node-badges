@@ -93,7 +93,7 @@ export class GhcrApi {
             // console.log('layerSize:', layerSize)
             totalSize += configSize + layerSize
         }
-        console.log('totalSize:', totalSize)
+        // console.log('totalSize:', totalSize)
         await cacheSet(key, totalSize)
         return totalSize
     }
@@ -204,7 +204,7 @@ export async function getVTStats(sha, id = false) {
 export async function getJSONPath(req) {
     const key = req.path
     const cached = await cacheGet(key)
-    console.log('cached:', cached)
+    // console.log('cached:', cached)
     if (cached) return cached
     console.log(`-- CACHE MISS: ${key}`)
 
@@ -215,11 +215,11 @@ export async function getJSONPath(req) {
     // console.log('response:', response)
     console.log('response.status:', response.status)
 
-    const length = response.headers.get('content-length')
-    console.log('content-length:', length)
+    // const length = response.headers.get('content-length')
+    // console.log('content-length:', length)
 
     const text = await response.text()
-    console.log('text.length:', text.length)
+    // console.log('text.length:', text.length)
     // const encoder = new TextEncoder().encode(text)
     // console.log('encoder.length:', encoder.length)
 
