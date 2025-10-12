@@ -422,7 +422,7 @@ function getRangedColor(req, index, options = {}) {
         .mode('lab')
         .colors(opts.total + 1)
     // console.log('colors:', colors)
-    colors.forEach((color) => console.log(color))
+    // colors.forEach((color) => console.log(color))
     const idx = Math.max(0, Math.min(opts.total, index))
     console.log(`index: ${idx} / ${colors.length - 1}`)
     return colors[idx]
