@@ -148,15 +148,15 @@ https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk
 
 The color of the badge is automatically determined based on the number of malicious+suspicious reports.
 
-The default is `44cc11` (brightgreen) to `#e05d44` (red) with `8` colors. Meaning 0 detections will be brightgreen
-and 8 or more detections will be red. `1-7` would be a color somewhere between brightgreen and red.
+The default is `#44cc11` (brightgreen) to `#e05d44` (red) with `8` colors. Meaning 0 detections will be brightgreen
+and 8+ red. But `1-7` would be a color somewhere between brightgreen and red.
 
-The `start` color, `end` color and total `n` number of colors can be specified with query parameters.
+The `start` color `end` color and total `n` number of colors can be specified with query parameters.
 
 This uses [gka/chroma.js](https://github.com/gka/chroma.js) which accepts hex codes or css colors,
-but **not** [badge-maker](https://www.npmjs.com/package/badge-maker) named colors. The `#` is optional.
+but **not** [badge-maker](https://www.npmjs.com/package/badge-maker) named colors.
 
-There is currently a color tester at this endpoint. This will produce a color between red and green.
+There is currently a color tester at `/color/N`. This will produce a color between red and green.
 
 ```text
 https://badges.cssnr.com/colors/4?start=green&end=red&n=8
