@@ -223,7 +223,8 @@ app.get(
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
         console.log(`message/label: ${req.params.message} / ${req.params.label}`)
-        // NOTE: This endpoint uses custom logic to make a "static" badge...
+        // NOTE: This endpoint uses custom logic to make a "static" badge
+        //  This needs to be fixed, the icon does not show up like shields
         const query = structuredClone(req.query)
         if (!req.params.label && !query.label && !query.labelColor) {
             query.labelColor = query.color || 'brightgreen'
