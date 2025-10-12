@@ -94,7 +94,7 @@ export class GhcrApi {
             totalSize += configSize + layerSize
         }
         // console.log('totalSize:', totalSize)
-        await cacheSet(key, totalSize)
+        await cacheSet(key, totalSize, 60 * 60 * 4)
         return totalSize
     }
 
