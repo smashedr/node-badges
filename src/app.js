@@ -108,14 +108,15 @@ app.get(
         }
         const stats = await getVTStats(hash, req.params.type === 'id')
         // NOTE: Duplicate Code
-        console.log('stats:', stats)
+        // console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
         const query = structuredClone(req.query)
         if (!query.lucide && !query.icon) query.icon = 'virustotal'
         query.color =
             query.color || getRangedColor(req, stats.malicious + stats.suspicious)
-        getBadge(query, message, hash.slice(0, 6), '', res)
+        // getBadge(query, message, hash.slice(0, 6), '', res)
+        getBadge(message, query, { label: hash.slice(0, 6) }, res)
     })
 )
 
@@ -136,14 +137,15 @@ app.get(
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
         const stats = await getVTReleaseStats(req)
         // NOTE: Duplicate Code
-        console.log('stats:', stats)
+        // console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
         const query = structuredClone(req.query)
         if (!query.lucide && !query.icon) query.icon = 'virustotal'
         query.color =
             query.color || getRangedColor(req, stats.malicious + stats.suspicious)
-        getBadge(query, message, req.params.asset, '', res)
+        // getBadge(query, message, req.params.asset, '', res)
+        getBadge(message, query, { label: req.params.asset }, res)
     })
 )
 
@@ -164,7 +166,7 @@ app.get(
             return res.sendStatus(404)
         }
         const count = Number.parseInt(req.query.n) || 3
-        console.log('count:', count)
+        // console.log('count:', count)
 
         const api = new GhcrApi(req.params.owner, req.params.package)
         let tags = await api.getImageTags()
@@ -181,7 +183,8 @@ app.get(
         if (req.params.latest) {
             const message = tags.at(-1)
             console.log('latest - message:', message)
-            return getBadge(req.query, message, 'latest', 'tag', res)
+            // return getBadge(req.query, message, 'latest', 'tag', res)
+            return getBadge(message, req.query, { label: 'latest', icon: 'tag' }, res)
         }
 
         if (req.query.reversed !== undefined) {
@@ -190,7 +193,8 @@ app.get(
 
         const message = tags.join(` ${req.query.sep || '|'} `)
         console.log('tags - message:', message)
-        getBadge(req.query, message, 'tags', 'tags', res)
+        // getBadge(req.query, message, 'tags', 'tags', res)
+        getBadge(message, req.query, { label: 'tags', icon: 'tags' }, res)
     })
 )
 
@@ -216,7 +220,8 @@ app.get(
 
         const message = formatSize(total)
         console.log('message:', message)
-        getBadge(req.query, message, 'size', 'container', res)
+        // getBadge(req.query, message, 'size', 'container', res)
+        getBadge(message, req.query, { label: 'size', icon: 'container' }, res)
     })
 )
 
@@ -231,7 +236,8 @@ app.get(
             query.labelColor = query.color || 'brightgreen'
         }
         console.log('query:', query)
-        getBadge(query, req.params.message, req.params.label, '', res)
+        // getBadge(query, req.params.message, req.params.label, '', res)
+        getBadge(req.params.message, query, { label: req.params.label }, res)
     })
 )
 
@@ -253,7 +259,8 @@ app.get(
 
         const message = await getJSONPath(req)
         console.log('message:', message)
-        return getBadge(req.query, message, 'result', 'code-xml', res)
+        // return getBadge(req.query, message, 'result', 'code-xml', res)
+        getBadge(message, req.query, { label: 'result', icon: 'code-xml' }, res)
     })
 )
 
@@ -263,7 +270,8 @@ app.get(
         console.log(req.originalUrl)
         const message = getUptime()
         console.log('message:', message)
-        getBadge(req.query, message, 'uptime', 'clock-arrow-up', res)
+        // getBadge(req.query, message, 'uptime', 'clock-arrow-up', res)
+        getBadge(message, req.query, { label: 'uptime', icon: 'clock-arrow-up' }, res)
     })
 )
 
@@ -288,26 +296,23 @@ function errorBadgeHandler(handler) {
 
 /**
  * Get Badge
- * TODO: Update to accept an Object argument
- * @param {Object} query req.query
  * @param {String} message Badge Message
- * @param {String} [label] Default Label
- * @param {String} [icon] Default Icon
+ * @param {Object} [query] req.query Object
+ * @param {Object} [options] Badge Options
  * @param {Response} [res] To also sendBadge
  * @return {String}
  */
-function getBadge(query, message, label = '', icon = '', res = null) {
-    console.log(`getBadge: ${message} - label: ${label} - icon: ${icon}`)
+function getBadge(message, query = {}, options = {}, res = null) {
+    const opts = { color: '', label: '', icon: '', lucide: '', ...options }
+    // console.log('--- opts:', opts)
     const data = {
         message: message.toString(),
-        color: query.color || 'brightgreen',
+        color: query.color || opts.color || 'brightgreen',
         style: query.style || 'flat',
     }
-    label = query.label !== undefined ? query.label : label
-    if (label) {
-        data.label = label
-    }
-    const logo = getLogo(query, icon)
+    const label = query.label !== undefined ? query.label : opts.label
+    if (label) data.label = label
+    const logo = getLogo(query, opts.icon)
     if (logo) {
         data.logoBase64 = `data:image/svg+xml;base64,${logo}`
         data.labelColor = query.labelColor || '#555'
@@ -424,6 +429,6 @@ function getRangedColor(req, index, options = {}) {
     // console.log('colors:', colors)
     // colors.forEach((color) => console.log(color))
     const idx = Math.max(0, Math.min(opts.total, index))
-    console.log(`index: ${idx} / ${colors.length - 1}`)
+    // console.log(`index: ${idx} / ${colors.length - 1}`)
     return colors[idx]
 }
