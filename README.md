@@ -106,8 +106,8 @@ https://badges.cssnr.com/ghcr/size/smashedr/node-badges?labelColor=blueviolet&lu
 
 Without `latest` it returns the `n` most recent tags, otherwise only the latest tag.
 
-- https://badges.cssnr.com/ghcr/tags/smashedr/node-badges
 - https://badges.cssnr.com/ghcr/tags/smashedr/node-badges/latest
+- https://badges.cssnr.com/ghcr/tags/smashedr/node-badges
 
 The `n` [parameter](#badge-specific-parameters) defaults to `3`, these are equivalent.
 
@@ -126,6 +126,7 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=a
 
 ### VirusTotal Release and Files
 
+[![VT Hash](https://badges.cssnr.com/vt/sha/sha256:d54fd9a93f2aa25b5c95128f84de1a624783ded6e66554c12a5ffd07546146e4)](https://badges.cssnr.com/vt/sha/sha256:d54fd9a93f2aa25b5c95128f84de1a624783ded6e66554c12a5ffd07546146e4)
 [![VT Release](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)
 
 `/vt/id/{id}`  
@@ -134,6 +135,11 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=a
 `/vt/{owner}/{repo}/{asset}/{tag}`
 
 The `id` endpoint is used for VirusTotal File ID, and `sha` for a file hash/digest.
+
+- https://badges.cssnr.com/vt/id/YjJmYTllMDdlMjFlMGUyOWEwMGVlMTM3MTM0ZGUzNGI6MTc1OTk2MDE4MQ==
+- https://badges.cssnr.com/vt/sha/sha256:d54fd9a93f2aa25b5c95128f84de1a624783ded6e66554c12a5ffd07546146e4
+- https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk
+- https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk/1.0.29
 
 The `owner/repo/asset` endpoints use the latest/tagged release asset for the repository.
 
@@ -145,6 +151,41 @@ and the release asset `app-release.apk` the URL would be:
 ```text
 https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk
 ```
+
+The color of the badge is automatically determined based on the number of malicious+suspicious reports.
+
+The default is `#44cc11` (brightgreen) to `#e05d44` (red) with `8` colors. Meaning 0 detections will be brightgreen
+and 8+ red. But `1-7` would be a color somewhere between brightgreen and red.
+
+The `start` color `end` color and total `n` number of colors can be specified with query parameters.
+
+This uses [gka/chroma.js](https://github.com/gka/chroma.js) which accepts hex codes or css colors,
+but **not** [badge-maker](https://www.npmjs.com/package/badge-maker) named colors.
+
+There is currently a color tester at `/color/N`. This will produce a color between red and green.
+
+```text
+https://badges.cssnr.com/colors/4?start=green&end=red&n=8
+```
+
+<details><summary>View Color Generation Code</summary>
+
+```javascript
+function getRangedColor(req, index, options = {}) {
+  const opts = { total: 8, start: '#44cc11', end: '#e05d44', ...options }
+  opts.total = Number.parseInt(req.query.n || opts.total)
+  opts.start = req.query.start || opts.start
+  opts.end = req.query.end || opts.end
+  const colors = chroma
+    .scale([opts.start, opts.end])
+    .mode('lab')
+    .colors(opts.total + 1)
+  const idx = Math.max(0, Math.min(opts.total, index))
+  return colors[idx]
+}
+```
+
+</details>
 
 > [!NOTE]  
 > This service does not upload the file to VirusTotal for analysis, it only fetches the result.  
@@ -212,6 +253,8 @@ These are specific to certain badges. Refer to the [Badges](#badges) for more de
 | `reversed` |    -    | Reverse the order of returned items.                                             |
 | `split`    |    -    | Split the item at the delimiter.                                                 |
 | `index`    |   `0`   | Index of item after splitting.                                                   |
+| `start`    |   `0`   | Starting item.                                                                   |
+| `end`      |   `0`   | Ending Item.                                                                     |
 
 ## Troubleshooting
 
