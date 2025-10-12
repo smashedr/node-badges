@@ -414,7 +414,7 @@ function getUptime() {
  */
 function getRangedColor(req, index, options = {}) {
     const opts = { total: 8, start: '#44cc11', end: '#e05d44', ...options }
-    opts.total = parseInt(req.query.n || opts.total)
+    opts.total = Number.parseInt(req.query.n || opts.total)
     opts.start = req.query.start || opts.start
     opts.end = req.query.end || opts.end
     const colors = chroma
@@ -422,7 +422,7 @@ function getRangedColor(req, index, options = {}) {
         .mode('lab')
         .colors(opts.total + 1)
     // console.log('colors:', colors)
-    // colors.forEach((color) => console.log(color))
+    colors.forEach((color) => console.log(color))
     const idx = Math.max(0, Math.min(opts.total, index))
     console.log(`index: ${idx} / ${colors.length - 1}`)
     return colors[idx]
