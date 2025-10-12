@@ -414,7 +414,7 @@ function getUptime() {
  */
 function getRangedColor(req, index, options = {}) {
     const opts = { total: 8, start: '#44cc11', end: '#e05d44', ...options }
-    opts.total = req.query.n || opts.total
+    opts.total = parseInt(req.query.n || opts.total)
     opts.start = req.query.start || opts.start
     opts.end = req.query.end || opts.end
     const colors = chroma
