@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 
+import chroma from 'chroma-js'
 import lucide from 'lucide-static'
 import semver from 'semver'
 import camelCase from 'camelcase'
@@ -55,6 +56,14 @@ app.get('/', (req, res) => {
 //     res.sendStatus(200)
 // })
 
+app.get('/colors{/:index}', async (req, res) => {
+    const index = req.params.index || 0
+    console.log('index:', index)
+    const color = getRangedColor(req, index)
+    console.log('color:', color)
+    res.send(`<html><body style="margin:0;background:${color}"></body></html>`)
+})
+
 // app.use('/ghcr', (req, res, next) => {
 //     res.setHeader('Content-Type', 'image/svg+xml')
 //     res.setHeader('Cache-Control', 'public, max-age=3600')
@@ -104,7 +113,8 @@ app.get(
         console.log('message:', message)
         const query = structuredClone(req.query)
         if (!query.lucide && !query.icon) query.icon = 'virustotal'
-        query.color = query.color || getBadGradient(stats.malicious + stats.suspicious)
+        query.color =
+            query.color || getRangedColor(req, stats.malicious + stats.suspicious)
         getBadge(query, message, hash.slice(0, 6), '', res)
     })
 )
@@ -131,7 +141,8 @@ app.get(
         console.log('message:', message)
         const query = structuredClone(req.query)
         if (!query.lucide && !query.icon) query.icon = 'virustotal'
-        query.color = query.color || getBadGradient(stats.malicious + stats.suspicious)
+        query.color =
+            query.color || getRangedColor(req, stats.malicious + stats.suspicious)
         getBadge(query, message, req.params.asset, '', res)
     })
 )
@@ -354,18 +365,17 @@ function getLogo(query, icon, color = '#fff') {
     return Buffer.from(result).toString('base64')
 }
 
-function getBadGradient(bad) {
-    console.log('getBadGradient:', bad)
-    const colors = [
-        '#44cc11',
-        '#85c718',
-        '#b0c42d',
-        '#dfb317',
-        '#e39934',
-        '#e27c44',
-        '#e05d44',
-    ]
-    return colors[bad] || colors.at(-1)
+/**
+ * Purge Key Response
+ * @param {Response} res
+ * @param {String} key
+ * @return {Promise<void>}
+ */
+async function purgeKey(res, key) {
+    console.log(`purgeKey: ${key}`)
+    const result = await cacheDelete(key)
+    console.log('result:', result)
+    res.send(result.toString())
 }
 
 /**
@@ -396,14 +406,24 @@ function getUptime() {
 }
 
 /**
- * Purge Key Response
- * @param {Response} res
- * @param {String} key
- * @return {Promise<void>}
+ * Get Ranged Color w/ Options
+ * @param {Request} req
+ * @param {Number} index
+ * @param {Object} [options]
+ * @return {String}
  */
-async function purgeKey(res, key) {
-    console.log(`purgeKey: ${key}`)
-    const result = await cacheDelete(key)
-    console.log('result:', result)
-    res.send(result.toString())
+function getRangedColor(req, index, options = {}) {
+    const opts = { total: 8, start: '#44cc11', end: '#e05d44', ...options }
+    opts.total = req.query.n || opts.total
+    opts.start = req.query.start || opts.start
+    opts.end = req.query.end || opts.end
+    const colors = chroma
+        .scale([opts.start, opts.end])
+        .mode('lab')
+        .colors(opts.total + 1)
+    // console.log('colors:', colors)
+    colors.forEach((color) => console.log(color))
+    const idx = index <= opts.total ? index : opts.total
+    console.log(`index: ${idx} / ${colors.length - 1}`)
+    return colors[idx]
 }
