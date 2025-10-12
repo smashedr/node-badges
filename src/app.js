@@ -223,7 +223,7 @@ app.get(
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
         console.log(`message/label: ${req.params.message} / ${req.params.label}`)
-        // TODO: Fix this query
+        // NOTE: This endpoint uses custom logic to make a "static" badge...
         const query = structuredClone(req.query)
         if (!req.params.label && !query.label && !query.labelColor) {
             query.labelColor = query.color || 'brightgreen'
