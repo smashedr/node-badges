@@ -1,11 +1,11 @@
 import axios from 'axios'
+import jp from 'jsonpath'
 // noinspection JSUnresolvedReference
 import { Buffer } from 'node:buffer'
 import { createClient } from 'redis'
 import { GitHubApi } from './github.js'
-import { VTApi } from './virustotal.js'
 import { parse } from 'yaml'
-import jp from 'jsonpath'
+import { VTApi } from './virustotal.js'
 
 // const NodeCache = require('node-cache')
 // const cache = new NodeCache({ stdTTL: 60 * 60 })

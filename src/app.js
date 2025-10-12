@@ -21,7 +21,7 @@ const port = process.env.PORT || 3000
 
 app.use(express.static('src/public'))
 app.use(express.json())
-app.use(cors())
+app.use(cors({ methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'PURGE'] }))
 
 app.set('views', '/app/src/views')
 app.set('view engine', 'pug')
