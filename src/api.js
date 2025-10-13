@@ -10,10 +10,8 @@ import { VTApi } from './virustotal.js'
 // const NodeCache = require('node-cache')
 // const cache = new NodeCache({ stdTTL: 60 * 60 })
 
-console.log(`App Version: ${process.env.APP_VERSION}`)
-
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
-console.log('Connecting to Redis:', redisUrl)
+console.log(`REDIS_URL: ${redisUrl}`)
 const client = createClient({ url: redisUrl })
 await client.connect()
 
