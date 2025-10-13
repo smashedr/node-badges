@@ -77,4 +77,4 @@ jobs:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
         with:
           url: ${{ secrets.RENDER_HOOK }}
-          #params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
+          params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
