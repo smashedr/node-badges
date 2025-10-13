@@ -246,8 +246,8 @@ app.get(
 app.all('/:type/:url/:path', async (req, res, next) => {
     if (!['yaml', 'json'].includes(req.params.type)) return next()
     if (req.method === 'PURGE') {
-        console.log('PURGE:', req.originalUrl)
-        return purgeKey(res, req.originalUrl)
+        console.log('PURGE:', req.path)
+        return purgeKey(res, req.path)
     }
     next()
 })
