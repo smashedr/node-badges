@@ -56,7 +56,9 @@ jobs:
               "STACK_NAME": "${{ env.stack-name }}",
               "TRAEFIK_HOST": "${{ env.traefik-host }}",
               "GITHUB_TOKEN": "${{ secrets.GH_PAT }}",
-              "VT_API_KEY": "${{ secrets.VT_API_KEY }}"
+              "VT_API_KEY": "${{ secrets.VT_API_KEY }}",
+              "SENTRY_URL": "${{ secrets.SENTRY_URL }}",
+              "SENTRY_ENVIRONMENT": "prod"
             }
 
       - name: "Debug Environment"
@@ -75,4 +77,4 @@ jobs:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
         with:
           url: ${{ secrets.RENDER_HOOK }}
-          #params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
+          params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'

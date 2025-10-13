@@ -41,6 +41,8 @@ services:
     environment:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - VT_API_KEY=${VT_API_KEY}
+      - SENTRY_URL=${SENTRY_URL}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT}
     deploy:
       replicas: 1
       resources:
@@ -66,7 +68,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: 128M
+          memory: 64M
     volumes:
       - redis_data:/data
     networks:

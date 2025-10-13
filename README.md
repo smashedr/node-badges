@@ -258,12 +258,12 @@ These are specific to certain badges. Refer to the [Badges](#badges) for more de
 
 ## Troubleshooting
 
-This application caches API responses for 1 hour.
+This application caches most API responses for 1 hour.
+Some endpoints, that don't change frequently, like VirusTotal, cache for 24 hours.
 Only API responses are cached, not the badge.
 All query parameters changes will instantly update.
 
 Your browser is also instructed to cache the response for 1 hour.
-
 To purge the server API cache, send a PURGE request to the badge URL.
 
 ```shell
@@ -271,6 +271,8 @@ curl -X PURGE 'https://badges.cssnr.com/ghcr/tags/smashedr/node-badges'
 ```
 
 This returns a 200 with the number of keys purged in the response.
+
+This tool is recommended: https://hoppscotch.io/
 
 GitHub's media proxy also caches images for 1 hour. This is purged the same way.
 

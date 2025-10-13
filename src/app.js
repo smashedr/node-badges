@@ -1,3 +1,5 @@
+import './instrument.js'
+
 import express from 'express'
 import cors from 'cors'
 
@@ -16,6 +18,11 @@ import {
     GhcrApi,
 } from './api.js'
 
+let Sentry
+if (process.env.SENTRY_URL) {
+    Sentry = await import('@sentry/node')
+}
+
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -23,15 +30,16 @@ app.use(express.static('src/public'))
 app.use(express.json())
 app.use(cors({ methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'PURGE'] }))
 
-app.set('views', '/app/src/views')
+app.set('views', 'src/views')
 app.set('view engine', 'pug')
 app.disable('view cache')
 
-console.log('GITHUB_TOKEN:', process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING')
-console.log('VT_API_KEY:', process.env.VT_API_KEY ? 'Loaded' : 'MISSING')
+console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
+console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
+console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
 
 app.listen(port, () => {
-    console.log(`listening on PORT: ${port}`)
+    console.log(`Listening on PORT: ${port}`)
 })
 
 app.get('/app-health-check', (req, res) => {
@@ -99,7 +107,7 @@ app.get(
     '/vt/:type/:hash',
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
-        console.log('req.params.type:', req.params.type)
+        // console.log('req.params.type:', req.params.type)
         if (!['id', 'sha'].includes(req.params.type)) return res.sendStatus(404)
 
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
@@ -239,7 +247,7 @@ app.all('/:type/:url/:path', async (req, res, next) => {
     if (!['yaml', 'json'].includes(req.params.type)) return next()
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
-        return purgeKey(res, req.originalUrl)
+        return purgeKey(res, req.path)
     }
     next()
 })
@@ -268,6 +276,8 @@ app.get(
         getBadge(message, req.query, { label: 'uptime', lucide: 'clock-arrow-up' }, res)
     })
 )
+
+if (Sentry) Sentry.setupExpressErrorHandler(app)
 
 function errorBadgeHandler(handler) {
     return async (req, res) => {
