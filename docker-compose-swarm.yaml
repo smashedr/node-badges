@@ -6,6 +6,7 @@ services:
     environment:
       - SERVICE_NAME=app
       - SERVICE_PORT=3000
+      - GZIP_TYPES=text/html image/svg+xml
     deploy:
       replicas: 1
       resources:

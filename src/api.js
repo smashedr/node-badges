@@ -160,7 +160,7 @@ export async function getVTReleaseStats(req) {
 export async function getVTStats(hash) {
     const key = `/vt/id/${hash}`
     console.log('key:', key)
-    // NOTE: Duplicate Code - 6 lines
+    // NOTE: Duplicate Code - 5 lines
     const cached = await cacheGet(key)
     if (cached) {
         if (cached.errorMessage) throw new Error(cached.errorMessage)
