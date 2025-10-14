@@ -38,8 +38,15 @@ console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
 console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
 console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Listening on PORT: ${port}`)
+})
+
+process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server')
+    server.close(() => {
+        console.log('HTTP server closed')
+    })
 })
 
 app.get('/app-health-check', (req, res) => {
@@ -93,11 +100,11 @@ app.all('/vt/:type/:hash', async (req, res, next) => {
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
         if (!['id', 'sha'].includes(req.params.type)) return next()
-        let hash = req.params.hash
-        if (req.params.hash === 'sha') {
-            hash = hash.includes(':') ? hash.split(':')[1] : hash
-        }
-        const key = `/vt/${req.params.type === 'id' ? 'id' : 'sha'}/${hash}`
+        const hash = req.params.hash.includes(':')
+            ? req.params.hash.split(':')[1]
+            : req.params.hash
+        console.log('hash:', hash)
+        const key = `/vt/id/${hash}`
         return purgeKey(res, key)
     }
     next()
@@ -109,13 +116,14 @@ app.get(
         console.log(req.originalUrl)
         // console.log('req.params.type:', req.params.type)
         if (!['id', 'sha'].includes(req.params.type)) return res.sendStatus(404)
-
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
-        let hash = req.params.hash
-        if (req.params.type === 'sha') {
-            hash = hash.includes(':') ? hash.split(':')[1] : hash
-        }
-        const stats = await getVTStats(hash, req.params.type === 'id')
+
+        const hash = req.params.hash.includes(':')
+            ? req.params.hash.split(':')[1]
+            : req.params.hash
+        console.log('hash:', hash)
+
+        const stats = await getVTStats(hash)
         // console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)

@@ -114,14 +114,14 @@ export class GhcrApi {
 
 /**
  * Get VirusTotal Stats for a Release Asset
- * @param {Request} req
+ * @param {import('express').Request} req
  * @return {Promise<Object>}
  */
 export async function getVTReleaseStats(req) {
     const tag = req.params.tag || 'latest'
     const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}/${tag}`
     console.log('key:', key)
-    // NOTE: Consider making this block a reusable function similar to cacheError
+    // NOTE: Duplicate Code - 5 lines
     const cached = await cacheGet(key)
     if (cached) {
         if (cached.errorMessage) throw new Error(cached.errorMessage)
@@ -143,13 +143,9 @@ export async function getVTReleaseStats(req) {
     if (!asset) await cacheError(key, 'Asset Not Found')
     console.log('asset?.digest:', asset?.digest)
     if (!asset?.digest) await cacheError(key, 'Digest Not Found')
-    const sha = asset.digest.split(':')[1]
-    console.log('sha:', sha)
-    // const vt = new VTApi(process.env.VT_API_KEY)
-    // const report = await vt.getReport(sha)
-    // console.log('report:', report)
-    // if (!report) await cacheError(key, 'VT Report Not Found')
-    const stats = await getVTStats(sha)
+    const hash = asset.digest.split(':')[1]
+    console.log('hash:', hash)
+    const stats = await getVTStats(hash)
     console.log('last_analysis_stats:', stats)
     if (!stats) await cacheError(key, 'VT Stats Not Found')
     await cacheSet(key, stats)
@@ -157,15 +153,14 @@ export async function getVTReleaseStats(req) {
 }
 
 /**
- * Get VT Stats for a File ID/SHA
- * @param {String} sha
- * @param {Boolean} [id]
+ * Get VT Stats for a File ID/Hash
+ * @param {String} hash
  * @return {Promise<Object>}
  */
-export async function getVTStats(sha, id = false) {
-    const key = `/vt/${id ? 'id' : 'sha'}/${sha}`
+export async function getVTStats(hash) {
+    const key = `/vt/id/${hash}`
     console.log('key:', key)
-    // NOTE: Consider making this block a reusable function similar to cacheError
+    // NOTE: Duplicate Code - 6 lines
     const cached = await cacheGet(key)
     if (cached) {
         if (cached.errorMessage) throw new Error(cached.errorMessage)
@@ -174,21 +169,19 @@ export async function getVTStats(sha, id = false) {
     console.log(`-- CACHE MISS: ${key}`)
     const vt = new VTApi(process.env.VT_API_KEY)
     let stats
-    if (id) {
-        console.log('getAnalysis')
-        const data = await vt.getAnalysis(sha)
+    if (hash.endsWith('==')) {
+        console.log('getAnalysis - DEPRECATED') // TODO: Deprecated
+        const data = await vt.getAnalysis(hash)
         // console.log('data:', JSON.stringify(data, null, 2))
+        // noinspection JSUnresolvedReference
         stats = data?.data?.attributes?.stats
     } else {
         console.log('getReport')
-        const data = await vt.getReport(sha)
+        const data = await vt.getReport(hash)
         // console.log('data:', JSON.stringify(data, null, 2))
+        // noinspection JSUnresolvedReference
         stats = data?.data?.attributes?.last_analysis_stats
     }
-    // console.log('report:', report)
-    // if (!stats) await cacheError(key, 'VT Report Not Found')
-    // const stats = report?.data?.attributes?.last_analysis_stats
-    // console.log('stats:', stats)
     if (!stats) await cacheError(key, 'VT Stats Not Found')
     await cacheSet(key, stats, 60 * 60 * 48)
     return stats
@@ -196,7 +189,7 @@ export async function getVTStats(sha, id = false) {
 
 /**
  * Get JSONPath for JSON/YAML
- * @param {Request} req
+ * @param {import('express').Request} req
  * @return {Promise<String>}
  */
 export async function getJSONPath(req) {
