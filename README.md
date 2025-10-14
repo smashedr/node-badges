@@ -60,7 +60,7 @@ https://badges.cssnr.com/
 [![Uptime](https://badges.cssnr.com/uptime?style=for-the-badge)](https://badges.cssnr.com/uptime?style=for-the-badge)
 [![Deploy to Render](https://img.shields.io/badge/Deploy_to_Render-4351E8?style=for-the-badge&logo=render)](https://render.com/deploy?repo=https://github.com/smashedr/node-badges)
 
-> [!WARNING]  
+> [!IMPORTANT]  
 > This is currently in beta, expect breaking changes.
 
 ## Badges
@@ -136,7 +136,8 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=a
 > [!WARNING]  
 > Going forward you **need** to use the file hash: `SHA-256`, `SHA-1` or `MD5`.  
 > File ID's (which end with `==`) consume API calls where hashes do not.  
-> You must also update the endpoint to: `/vt/id/{hash}`
+> You **MUST** also update the endpoint to: `/vt/id/{hash}`  
+> File ID's will continue to work for existing badges; however, DO NOT ADD MORE!
 
 - https://badges.cssnr.com/vt/id/sha256:d54fd9a93f2aa25b5c95128f84de1a624783ded6e66554c12a5ffd07546146e4
 - https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk
@@ -217,6 +218,8 @@ https://badges.cssnr.com/yaml/https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr
 _Note: the badge at the top is also from this [docker-compose-swarm.yaml](https://github.com/smashedr/node-badges/blob/master/docker-compose-swarm.yaml#L40) file._
 
 ### Static Badge
+
+[![Alt Text](https://badges.cssnr.com/static/is%20cool/node-badges)](https://badges.cssnr.com/static/is%20cool/node-badges)
 
 `/static/{message}`  
 `/static/{message}/{label}`
