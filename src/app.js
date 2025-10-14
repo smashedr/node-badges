@@ -278,7 +278,7 @@ app.get(
 )
 
 // Handler 404
-app.use((req, res, next) => {
+app.use((req, res) => {
     // res.status(404).send("Sorry can't find that!")
     const data = {
         message: '404 - URL Not Found',
