@@ -27,19 +27,26 @@ const app = express()
 const port = process.env.PORT || 3000
 
 app.use(express.static('src/public'))
-app.use(express.json())
 app.use(cors({ methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'PURGE'] }))
 
 app.set('views', 'src/views')
 app.set('view engine', 'pug')
 app.disable('view cache')
+app.disable('x-powered-by')
 
 console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
 console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
 console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Listening on PORT: ${port}`)
+})
+
+process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server')
+    server.close(() => {
+        console.log('HTTP server closed')
+    })
 })
 
 app.get('/app-health-check', (req, res) => {
@@ -93,11 +100,11 @@ app.all('/vt/:type/:hash', async (req, res, next) => {
     if (req.method === 'PURGE') {
         console.log('PURGE:', req.originalUrl)
         if (!['id', 'sha'].includes(req.params.type)) return next()
-        let hash = req.params.hash
-        if (req.params.hash === 'sha') {
-            hash = hash.includes(':') ? hash.split(':')[1] : hash
-        }
-        const key = `/vt/${req.params.type === 'id' ? 'id' : 'sha'}/${hash}`
+        const hash = req.params.hash.includes(':')
+            ? req.params.hash.split(':')[1]
+            : req.params.hash
+        console.log('hash:', hash)
+        const key = `/vt/id/${hash}`
         return purgeKey(res, key)
     }
     next()
@@ -109,13 +116,14 @@ app.get(
         console.log(req.originalUrl)
         // console.log('req.params.type:', req.params.type)
         if (!['id', 'sha'].includes(req.params.type)) return res.sendStatus(404)
-
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
-        let hash = req.params.hash
-        if (req.params.type === 'sha') {
-            hash = hash.includes(':') ? hash.split(':')[1] : hash
-        }
-        const stats = await getVTStats(hash, req.params.type === 'id')
+
+        const hash = req.params.hash.includes(':')
+            ? req.params.hash.split(':')[1]
+            : req.params.hash
+        console.log('hash:', hash)
+
+        const stats = await getVTStats(hash)
         // console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
@@ -277,6 +285,20 @@ app.get(
     })
 )
 
+// Handler 404
+app.use((req, res) => {
+    // res.status(404).send("Sorry can't find that!")
+    const data = {
+        message: '404 - URL Not Found',
+        color: 'red',
+        style: req.query.style || 'flat',
+    }
+    console.log('data:', data)
+    // noinspection JSCheckFunctionSignatures
+    const badge = makeBadge(data)
+    sendBadge(res, badge, 404)
+})
+
 if (Sentry) Sentry.setupExpressErrorHandler(app)
 
 function errorBadgeHandler(handler) {
@@ -299,11 +321,31 @@ function errorBadgeHandler(handler) {
 }
 
 /**
+ * Set SVG Headers
+ * @param {express.Response} res
+ */
+function setHeaders(res) {
+    res.setHeader('Content-Type', 'image/svg+xml')
+    res.setHeader('Cache-Control', 'public, max-age=3600')
+}
+
+/**
+ * Send Badge
+ * @param {express.Response} res
+ * @param {String} badge
+ * @param {Number} [status]
+ */
+function sendBadge(res, badge, status = 200) {
+    setHeaders(res)
+    res.status(status).send(badge)
+}
+
+/**
  * Get Badge
  * @param {String} message Badge Message
  * @param {Object} [query] req.query Object
  * @param {Object} [options] Badge Options
- * @param {Response} [res] To also sendBadge
+ * @param {express.Response} [res] To sendBadge
  * @return {String}
  */
 function getBadge(message, query = {}, options = {}, res = null) {
@@ -325,17 +367,6 @@ function getBadge(message, query = {}, options = {}, res = null) {
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
     return badge
-}
-
-/**
- * Send Badge
- * @param {Response} res
- * @param {String} badge
- */
-function sendBadge(res, badge) {
-    res.setHeader('Content-Type', 'image/svg+xml')
-    res.setHeader('Cache-Control', 'public, max-age=3600')
-    res.send(badge)
 }
 
 /**
@@ -380,7 +411,7 @@ function getLogo(query, opts, color = '#fff') {
 
 /**
  * Purge Key Response
- * @param {Response} res
+ * @param {express.Response} res
  * @param {String} key
  * @return {Promise<void>}
  */
@@ -420,7 +451,7 @@ function getUptime() {
 
 /**
  * Get Ranged Color w/ Options
- * @param {Request} req
+ * @param {express.Request} req
  * @param {Number} index
  * @param {Object} [options]
  * @return {String}

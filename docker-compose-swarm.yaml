@@ -4,8 +4,9 @@ services:
   nginx:
     image: ghcr.io/cssnr/docker-nginx-proxy:latest
     environment:
-      - SERVICE_NAME=app
-      - SERVICE_PORT=3000
+      SERVICE_NAME: "app"
+      SERVICE_PORT: "3000"
+      GZIP_TYPES: "text/html image/svg+xml"
     deploy:
       replicas: 1
       resources:
@@ -39,10 +40,10 @@ services:
   app:
     image: ghcr.io/smashedr/node-badges:${VERSION:-latest}
     environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - VT_API_KEY=${VT_API_KEY}
-      - SENTRY_URL=${SENTRY_URL}
-      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      VT_API_KEY: ${VT_API_KEY}
+      SENTRY_URL: ${SENTRY_URL}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
     deploy:
       replicas: 1
       resources:
