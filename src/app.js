@@ -27,12 +27,12 @@ const app = express()
 const port = process.env.PORT || 3000
 
 app.use(express.static('src/public'))
-app.use(express.json())
 app.use(cors({ methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'PURGE'] }))
 
 app.set('views', 'src/views')
 app.set('view engine', 'pug')
 app.disable('view cache')
+app.disable('x-powered-by')
 
 console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
 console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
@@ -277,6 +277,20 @@ app.get(
     })
 )
 
+// Handler 404
+app.use((req, res, next) => {
+    // res.status(404).send("Sorry can't find that!")
+    const data = {
+        message: '404 - URL Not Found',
+        color: 'red',
+        style: req.query.style || 'flat',
+    }
+    console.log('data:', data)
+    // noinspection JSCheckFunctionSignatures
+    const badge = makeBadge(data)
+    sendBadge(res, badge, 404)
+})
+
 if (Sentry) Sentry.setupExpressErrorHandler(app)
 
 function errorBadgeHandler(handler) {
@@ -299,11 +313,31 @@ function errorBadgeHandler(handler) {
 }
 
 /**
+ * Set SVG Headers
+ * @param {express.Response} res
+ */
+function setHeaders(res) {
+    res.setHeader('Content-Type', 'image/svg+xml')
+    res.setHeader('Cache-Control', 'public, max-age=3600')
+}
+
+/**
+ * Send Badge
+ * @param {express.Response} res
+ * @param {String} badge
+ * @param {Number} [status]
+ */
+function sendBadge(res, badge, status = 200) {
+    setHeaders(res)
+    res.status(status).send(badge)
+}
+
+/**
  * Get Badge
  * @param {String} message Badge Message
  * @param {Object} [query] req.query Object
  * @param {Object} [options] Badge Options
- * @param {Response} [res] To also sendBadge
+ * @param {express.Response} [res] To sendBadge
  * @return {String}
  */
 function getBadge(message, query = {}, options = {}, res = null) {
@@ -325,17 +359,6 @@ function getBadge(message, query = {}, options = {}, res = null) {
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
     return badge
-}
-
-/**
- * Send Badge
- * @param {Response} res
- * @param {String} badge
- */
-function sendBadge(res, badge) {
-    res.setHeader('Content-Type', 'image/svg+xml')
-    res.setHeader('Cache-Control', 'public, max-age=3600')
-    res.send(badge)
 }
 
 /**
@@ -380,7 +403,7 @@ function getLogo(query, opts, color = '#fff') {
 
 /**
  * Purge Key Response
- * @param {Response} res
+ * @param {express.Response} res
  * @param {String} key
  * @return {Promise<void>}
  */
@@ -420,7 +443,7 @@ function getUptime() {
 
 /**
  * Get Ranged Color w/ Options
- * @param {Request} req
+ * @param {express.Request} req
  * @param {Number} index
  * @param {Object} [options]
  * @return {String}
