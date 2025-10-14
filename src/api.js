@@ -190,7 +190,7 @@ export async function getVTStats(sha, id = false) {
     // const stats = report?.data?.attributes?.last_analysis_stats
     // console.log('stats:', stats)
     if (!stats) await cacheError(key, 'VT Stats Not Found')
-    await cacheSet(key, stats, 60 * 60 * 24)
+    await cacheSet(key, stats, 60 * 60 * 48)
     return stats
 }
 
