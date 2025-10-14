@@ -129,17 +129,20 @@ https://badges.cssnr.com/ghcr/tags/smashedr/node-badges?labelColor=plum&lucide=a
 [![VT Hash](https://badges.cssnr.com/vt/sha/sha256:d54fd9a93f2aa25b5c95128f84de1a624783ded6e66554c12a5ffd07546146e4)](https://badges.cssnr.com/vt/sha/sha256:d54fd9a93f2aa25b5c95128f84de1a624783ded6e66554c12a5ffd07546146e4)
 [![VT Release](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)](https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk)
 
-`/vt/id/{id}`  
-`/vt/sha/{sha}`  
+`/vt/id/{hash}`  
 `/vt/{owner}/{repo}/{asset}`  
 `/vt/{owner}/{repo}/{asset}/{tag}`
 
-The `id` endpoint is used for VirusTotal File ID, and `sha` for a file hash/digest.
+> [!WARNING]  
+> Going forward you **need** to use the file hash: `SHA-256`, `SHA-1` or `MD5`.  
+> File ID's (which end with `==`) consume API calls where hashes do not.  
+> You must also update the endpoint to: `/vt/id/{hash}`
 
-- https://badges.cssnr.com/vt/id/YjJmYTllMDdlMjFlMGUyOWEwMGVlMTM3MTM0ZGUzNGI6MTc1OTk2MDE4MQ==
-- https://badges.cssnr.com/vt/sha/sha256:d54fd9a93f2aa25b5c95128f84de1a624783ded6e66554c12a5ffd07546146e4
+- https://badges.cssnr.com/vt/id/sha256:d54fd9a93f2aa25b5c95128f84de1a624783ded6e66554c12a5ffd07546146e4
 - https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk
 - https://badges.cssnr.com/vt/cssnr/zipline-android/app-release.apk/1.0.29
+
+The `hash` is the file's `SHA-256`, `SHA-1` or `MD5`. The prefix is optional and can be `sha256:xxxx` or just `xxxx`.
 
 The `owner/repo/asset` endpoints use the latest/tagged release asset for the repository.
 
