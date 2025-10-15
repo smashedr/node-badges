@@ -60,7 +60,9 @@ jobs:
               "SENTRY_URL": "${{ secrets.SENTRY_URL }}",
               "SENTRY_ENVIRONMENT": "prod",
               "INFLUX_URL": "${{ secrets.INFLUX_URL }}",
-              "INFLUX_TOKEN": "${{ secrets.INFLUX_TOKEN }}"
+              "INFLUX_TOKEN": "${{ secrets.INFLUX_TOKEN }}",
+              "INFLUX_ORG": "${{ vars.INFLUX_ORG }}",
+              "INFLUX_BUCKET": "${{ vars.INFLUX_BUCKET }}"
             }
 
       - name: "Debug Environment"

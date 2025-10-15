@@ -274,14 +274,14 @@ async function cacheError(key, errorMessage, EX = 60 * 10) {
 
 export async function incrBadge() {
     if (!influxClient) return
-    await client.incr('badges')
+    await client.incr('badges_total')
 }
 
 export async function sendInflux() {
     if (!influxClient) return console.log('InfluxDB Not Configured.')
     console.log(`Processing Influx: ${new Date().toLocaleString()}`)
     // NOTE: this logic can be split up...
-    const data = await client.getDel('badges')
+    const data = await client.getDel('badges_total')
     console.log('client.getDel: data:', data)
     const value = JSON.parse(data) || 0
     console.log('JSON.parse: value:', value)
