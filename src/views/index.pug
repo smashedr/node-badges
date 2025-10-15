@@ -12,8 +12,7 @@ html
   body
     h1 #{title}
     p Version: #{version}
-    p Uptime: #{uptime} (#{seconds} s) Badge: #[a(href="/uptime") uptime]
-    if source
-      p Source: #[a(href=source) #{source}]
-    if docs
-      p Docs: #[a(href=docs) #{docs}]
+    p Badges Generated: #[b #{badges}]
+    p Uptime: #{days}:#{hours}:#{minutes}m - Total: #{uptime}s - #[a(href="/uptime" target="_blank") uptime badge]
+    each url, label in links
+      p #{label}: #[a(href=url target="_blank") #{url}]

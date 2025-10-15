@@ -3,10 +3,11 @@ import './instrument.js'
 import express from 'express'
 import cors from 'cors'
 
+import camelCase from 'camelcase'
 import chroma from 'chroma-js'
 import lucide from 'lucide-static'
+import schedule from 'node-schedule'
 import semver from 'semver'
-import camelCase from 'camelcase'
 import { makeBadge } from 'badge-maker'
 import * as icons from 'simple-icons'
 
@@ -16,12 +17,16 @@ import {
     getVTReleaseStats,
     getVTStats,
     GhcrApi,
+    incrBadge,
+    sendInflux,
 } from './api.js'
 
 let Sentry
 if (process.env.SENTRY_URL) {
     Sentry = await import('@sentry/node')
 }
+
+let badgeCount = 0
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -38,14 +43,23 @@ console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
 console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
 console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
 
+schedule.scheduleJob('0 * * * *', async function () {
+    await sendInflux()
+})
+
 const server = app.listen(port, () => {
     console.log(`Listening on PORT: ${port}`)
 })
 
 process.on('SIGTERM', () => {
-    console.log('SIGTERM signal received: closing HTTP server')
-    server.close(() => {
-        console.log('HTTP server closed')
+    console.log('SIGTERM signal received: closing server')
+    server.close(async (err) => {
+        console.log('server closed')
+        if (err) console.error(err)
+        // NOTE: Determine if this location is correct
+        await schedule.gracefulShutdown()
+        // NOTE: Determine if we should sendInflux on close
+        // await sendInflux()
     })
 })
 
@@ -54,21 +68,28 @@ app.get('/app-health-check', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-    const uptime = getUptime()
-    const seconds = Math.floor(process.uptime())
-    // res.send(`Version: ${process.env.APP_VERSION} - Uptime: ${uptime} (${seconds} s)`)
+    const uptime = Math.floor(process.uptime())
+    const fmt = (n) => Math.floor(n).toString().padStart(2, '0')
     res.render('index', {
+        uptime,
+        seconds: uptime % 60,
+        minutes: fmt((uptime % 3600) / 60),
+        hours: fmt((uptime % 86400) / 3600),
+        days: Math.floor(uptime / 86400),
+        badges: badgeCount.toLocaleString(),
         version: process.env.APP_VERSION,
-        uptime: uptime,
-        seconds: seconds,
         title: 'Node Badges',
-        source: 'https://github.com/smashedr/node-badges',
-        docs: 'https://smashedr.github.io/node-badges-docs',
+        links: {
+            Source: 'https://github.com/smashedr/node-badges',
+            Docs: 'https://smashedr.github.io/node-badges-docs',
+            Status: 'https://stats.uptimerobot.com/FNLsoJaKUf/801549868',
+        },
     })
 })
 
 // app.get('/test', async (req, res) => {
 //     res.sendStatus(200)
+//     // sendInflux()
 // })
 
 app.get('/colors{/:index}', async (req, res) => {
@@ -128,8 +149,8 @@ app.get(
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
         const color = getRangedColor(req, stats.malicious + stats.suspicious)
-        const opts = { label: hash.slice(0, 6), icon: 'virustotal', color }
-        getBadge(message, req.query, opts, res)
+        const options = { label: hash.slice(0, 6), icon: 'virustotal', color }
+        getBadge(message, req.query, options, res)
     })
 )
 
@@ -153,8 +174,8 @@ app.get(
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
         const color = getRangedColor(req, stats.malicious + stats.suspicious)
-        const opts = { label: req.params.asset, icon: 'virustotal', color }
-        getBadge(message, req.query, opts, res)
+        const options = { label: req.params.asset, icon: 'virustotal', color }
+        getBadge(message, req.query, options, res)
     })
 )
 
@@ -192,7 +213,6 @@ app.get(
         if (req.params.latest) {
             const message = tags.at(-1)
             console.log('latest - message:', message)
-            // return getBadge(req.query, message, 'latest', 'tag', res)
             return getBadge(message, req.query, { label: 'latest', lucide: 'tag' }, res)
         }
 
@@ -202,7 +222,6 @@ app.get(
 
         const message = tags.join(` ${req.query.sep || '|'} `)
         console.log('tags - message:', message)
-        // getBadge(req.query, message, 'tags', 'tags', res)
         getBadge(message, req.query, { label: 'tags', lucide: 'tags' }, res)
     })
 )
@@ -229,7 +248,6 @@ app.get(
 
         const message = formatSize(total)
         console.log('message:', message)
-        // getBadge(req.query, message, 'size', 'container', res)
         getBadge(message, req.query, { label: 'size', lucide: 'container' }, res)
     })
 )
@@ -246,7 +264,6 @@ app.get(
             query.labelColor = query.color || 'brightgreen'
         }
         console.log('query:', query)
-        // getBadge(query, req.params.message, req.params.label, '', res)
         getBadge(req.params.message, query, { label: req.params.label }, res)
     })
 )
@@ -269,7 +286,6 @@ app.get(
 
         const message = await getJSONPath(req)
         console.log('message:', message)
-        // return getBadge(req.query, message, 'result', 'code-xml', res)
         getBadge(message, req.query, { label: 'result', lucide: 'code-xml' }, res)
     })
 )
@@ -280,7 +296,6 @@ app.get(
         console.log(req.originalUrl)
         const message = getUptime()
         console.log('message:', message)
-        // getBadge(req.query, message, 'uptime', 'clock-arrow-up', res)
         getBadge(message, req.query, { label: 'uptime', lucide: 'clock-arrow-up' }, res)
     })
 )
@@ -366,6 +381,8 @@ function getBadge(message, query = {}, options = {}, res = null) {
     // console.log('data:', data)
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
+    badgeCount++
+    incrBadge().catch((e) => console.error(e))
     return badge
 }
 

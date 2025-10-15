@@ -58,7 +58,9 @@ jobs:
               "GITHUB_TOKEN": "${{ secrets.GH_PAT }}",
               "VT_API_KEY": "${{ secrets.VT_API_KEY }}",
               "SENTRY_URL": "${{ secrets.SENTRY_URL }}",
-              "SENTRY_ENVIRONMENT": "prod"
+              "SENTRY_ENVIRONMENT": "prod",
+              "INFLUX_URL": "${{ secrets.INFLUX_URL }}",
+              "INFLUX_TOKEN": "${{ secrets.INFLUX_TOKEN }}"
             }
 
       - name: "Debug Environment"

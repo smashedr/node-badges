@@ -6,6 +6,7 @@ import { createClient } from 'redis'
 import { GitHubApi } from './github.js'
 import { parse } from 'yaml'
 import { VTApi } from './virustotal.js'
+import { InfluxDB, Point } from '@influxdata/influxdb-client'
 
 // const NodeCache = require('node-cache')
 // const cache = new NodeCache({ stdTTL: 60 * 60 })
@@ -14,6 +15,15 @@ const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 console.log(`REDIS_URL: ${redisUrl}`)
 const client = createClient({ url: redisUrl })
 await client.connect()
+
+let influxClient
+if (process.env.INFLUX_URL && process.env.INFLUX_TOKEN) {
+    console.log(`INFLUX_URL: ${process.env.INFLUX_URL}`)
+    influxClient = new InfluxDB({
+        url: process.env.INFLUX_URL,
+        token: process.env.INFLUX_TOKEN,
+    })
+}
 
 export class GhcrApi {
     /**
@@ -240,13 +250,13 @@ export async function getJSONPath(req) {
     }
 }
 
-export async function cacheGet(key) {
+async function cacheGet(key) {
     // return cache.get(key)
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
 }
 
-export async function cacheSet(key, value, EX = 60 * 60) {
+async function cacheSet(key, value, EX = 60 * 60) {
     // cache.set(key, totalSize)
     await client.set(key, JSON.stringify(value), { EX })
 }
@@ -260,4 +270,32 @@ async function cacheError(key, errorMessage, EX = 60 * 10) {
     console.log(`cacheError: ${key}`, errorMessage)
     await cacheSet(key, { errorMessage }, EX)
     throw new Error(errorMessage)
+}
+
+export async function incrBadge() {
+    if (!influxClient) return
+    await client.incr('badges')
+}
+
+export async function sendInflux() {
+    if (!influxClient) return console.log('InfluxDB Not Configured.')
+    console.log(`Processing Influx: ${new Date().toLocaleString()}`)
+    // NOTE: this logic can be split up...
+    const data = await client.getDel('badges')
+    console.log('client.getDel: data:', data)
+    const value = JSON.parse(data) || 0
+    console.log('JSON.parse: value:', value)
+
+    const org = process.env.INFLUX_ORG || 'cssnr'
+    const bucket = process.env.INFLUX_BUCKET || 'node-badges'
+    const writeApi = influxClient.getWriteApi(org, bucket)
+    // writeApi.useDefaultTags({ host: hostname() })
+
+    const point = new Point('badges_total').intField('value', value)
+    console.log('point:', point)
+    writeApi.writePoint(point)
+    writeApi
+        .close()
+        .then(() => console.log('writePoint successful.'))
+        .catch((e) => console.error('writePoint error:', e))
 }
