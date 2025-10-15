@@ -91,8 +91,6 @@ app.get('/test{/:extra}', async (req, res) => {
 
     const total = await cacheGet('badges_total')
     console.log('badges_total:', total)
-    // const current = await cacheGet('badges_current')
-    // console.log('badges_current:', current)
 
     if (req.params.extra) {
         console.log('req.params.extra:', req.params.extra)

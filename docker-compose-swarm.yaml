@@ -46,6 +46,8 @@ services:
       SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
       INFLUX_URL: ${INFLUX_URL}
       INFLUX_TOKEN: ${INFLUX_TOKEN}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
     deploy:
       replicas: 1
       resources:

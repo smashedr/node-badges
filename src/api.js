@@ -268,10 +268,6 @@ async function cacheError(key, errorMessage, EX = 60 * 10) {
 
 export async function incrBadge() {
     await client.incr('badges_total')
-    // const multi = client.multi()
-    // multi.incr('badges_total')
-    // if (influxClient) multi.incr('badges_current')
-    // await multi.exec()
 }
 
 export async function sendInflux() {
