@@ -8,9 +8,6 @@ import { parse } from 'yaml'
 import { VTApi } from './virustotal.js'
 import { InfluxDB, Point } from '@influxdata/influxdb-client'
 
-// const NodeCache = require('node-cache')
-// const cache = new NodeCache({ stdTTL: 60 * 60 })
-
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 console.log(`REDIS_URL: ${redisUrl}`)
 const client = createClient({ url: redisUrl })
@@ -250,19 +247,16 @@ export async function getJSONPath(req) {
     }
 }
 
-async function cacheGet(key) {
-    // return cache.get(key)
+export async function cacheGet(key, fallback = null) {
     const cached = await client.get(key)
-    return cached ? JSON.parse(cached) : null
+    return cached ? JSON.parse(cached) : fallback
 }
 
 async function cacheSet(key, value, EX = 60 * 60) {
-    // cache.set(key, totalSize)
     await client.set(key, JSON.stringify(value), { EX })
 }
 
 export async function cacheDelete(key) {
-    // cache.del(key, totalSize)
     return await client.del(key)
 }
 
@@ -273,29 +267,26 @@ async function cacheError(key, errorMessage, EX = 60 * 10) {
 }
 
 export async function incrBadge() {
-    if (!influxClient) return
     await client.incr('badges_total')
+    // const multi = client.multi()
+    // multi.incr('badges_total')
+    // if (influxClient) multi.incr('badges_current')
+    // await multi.exec()
 }
 
 export async function sendInflux() {
     if (!influxClient) return console.log('InfluxDB Not Configured.')
     console.log(`Processing Influx: ${new Date().toLocaleString()}`)
-    // NOTE: this logic can be split up...
-    const data = await client.getDel('badges_total')
-    console.log('client.getDel: data:', data)
-    const value = JSON.parse(data) || 0
-    console.log('JSON.parse: value:', value)
+
+    const value = await cacheGet('badges_total', 0)
+    console.log('badges_total: value:', value)
 
     const org = process.env.INFLUX_ORG || 'cssnr'
     const bucket = process.env.INFLUX_BUCKET || 'general'
     const writeApi = influxClient.getWriteApi(org, bucket)
-    // writeApi.useDefaultTags({ host: hostname() })
 
     const point = new Point('node_badges').intField('badges_total', value)
     console.log('point:', point)
     writeApi.writePoint(point)
-    writeApi
-        .close()
-        .then(() => console.log('writePoint successful.'))
-        .catch((e) => console.error('writePoint error:', e))
+    await writeApi.close()
 }

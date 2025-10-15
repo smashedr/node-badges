@@ -13,6 +13,7 @@ import * as icons from 'simple-icons'
 
 import {
     cacheDelete,
+    cacheGet,
     getJSONPath,
     getVTReleaseStats,
     getVTStats,
@@ -25,8 +26,6 @@ let Sentry
 if (process.env.SENTRY_URL) {
     Sentry = await import('@sentry/node')
 }
-
-let badgeCount = 0
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -43,8 +42,8 @@ console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
 console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
 console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
 
-schedule.scheduleJob('0 * * * *', async function () {
-    await sendInflux()
+schedule.scheduleJob('0 * * * *', function () {
+    sendInflux().catch((e) => console.error(e))
 })
 
 const server = app.listen(port, () => {
@@ -67,7 +66,7 @@ app.get('/app-health-check', (req, res) => {
     res.sendStatus(200)
 })
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     const uptime = Math.floor(process.uptime())
     const fmt = (n) => Math.floor(n).toString().padStart(2, '0')
     res.render('index', {
@@ -76,7 +75,7 @@ app.get('/', (req, res) => {
         minutes: fmt((uptime % 3600) / 60),
         hours: fmt((uptime % 86400) / 3600),
         days: Math.floor(uptime / 86400),
-        count: badgeCount.toLocaleString(),
+        count: await cacheGet('badges_total', 0),
         version: process.env.APP_VERSION,
         title: 'Node Badges',
         links: {
@@ -87,10 +86,19 @@ app.get('/', (req, res) => {
     })
 })
 
-// app.get('/test', async (req, res) => {
-//     res.sendStatus(200)
-//     // sendInflux()
-// })
+app.get('/test{/:extra}', async (req, res) => {
+    res.sendStatus(200)
+
+    const total = await cacheGet('badges_total')
+    console.log('badges_total:', total)
+    // const current = await cacheGet('badges_current')
+    // console.log('badges_current:', current)
+
+    if (req.params.extra) {
+        console.log('req.params.extra:', req.params.extra)
+        sendInflux().catch((e) => console.error(e))
+    }
+})
 
 app.get('/colors{/:index}', async (req, res) => {
     console.log(req.originalUrl)
@@ -381,7 +389,6 @@ function getBadge(message, query = {}, options = {}, res = null) {
     // console.log('data:', data)
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
-    badgeCount++
     incrBadge().catch((e) => console.error(e))
     return badge
 }
