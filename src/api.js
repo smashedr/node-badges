@@ -287,11 +287,11 @@ export async function sendInflux() {
     console.log('JSON.parse: value:', value)
 
     const org = process.env.INFLUX_ORG || 'cssnr'
-    const bucket = process.env.INFLUX_BUCKET || 'node-badges'
+    const bucket = process.env.INFLUX_BUCKET || 'general'
     const writeApi = influxClient.getWriteApi(org, bucket)
     // writeApi.useDefaultTags({ host: hostname() })
 
-    const point = new Point('badges_total').intField('value', value)
+    const point = new Point('node_badges').intField('badges_total', value)
     console.log('point:', point)
     writeApi.writePoint(point)
     writeApi
