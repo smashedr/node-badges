@@ -82,10 +82,10 @@ export class GhcrApi {
             !indexManifest.mediaType.includes('list') &&
             !indexManifest.mediaType.includes('index')
         ) {
-            console.log('indexManifest - !list + !index:', indexManifest)
+            // console.log('indexManifest - !list + !index:', indexManifest)
             const size = indexManifest.layers.reduce((sum, layer) => sum + layer.size, 0)
             totalSize = size + (indexManifest.config.size || 0)
-            console.log('totalSize:', totalSize)
+            // console.log('totalSize:', totalSize)
             await cacheSet(key, totalSize)
             return totalSize
         }
@@ -112,7 +112,7 @@ export class GhcrApi {
      */
     async getManifest(tag = 'latest') {
         const url = `${this.packageOwner}/${this.packageName}/manifests/${tag}`
-        console.log('url:', url)
+        // console.log('url:', url)
         const response = await this.client.get(url)
         return response.data
     }
@@ -151,12 +151,12 @@ export async function getVTReleaseStats(req) {
     const asset = release.assets.find((a) => a.name === req.params.asset)
     // console.log('asset:', asset)
     if (!asset) await cacheError(key, 'Asset Not Found')
-    console.log('asset?.digest:', asset?.digest)
+    // console.log('asset?.digest:', asset?.digest)
     if (!asset?.digest) await cacheError(key, 'Digest Not Found')
     const hash = asset.digest.split(':')[1]
-    console.log('hash:', hash)
+    // console.log('hash:', hash)
     const stats = await getVTStats(hash)
-    console.log('last_analysis_stats:', stats)
+    // console.log('last_analysis_stats:', stats)
     if (!stats) await cacheError(key, 'VT Stats Not Found')
     await cacheSet(key, stats)
     return stats
@@ -180,13 +180,13 @@ export async function getVTStats(hash) {
     const vt = new VTApi(process.env.VT_API_KEY)
     let stats
     if (hash.endsWith('==')) {
-        console.log('getAnalysis - DEPRECATED') // TODO: Deprecated
+        console.log('DEPRECATED - getAnalysis') // TODO: Deprecated
         const data = await vt.getAnalysis(hash)
         // console.log('data:', JSON.stringify(data, null, 2))
         // noinspection JSUnresolvedReference
         stats = data?.data?.attributes?.stats
     } else {
-        console.log('getReport')
+        // console.log('getReport')
         const data = await vt.getReport(hash)
         // console.log('data:', JSON.stringify(data, null, 2))
         // noinspection JSUnresolvedReference
@@ -214,7 +214,7 @@ export async function getJSONPath(req) {
 
     const response = await fetch(url)
     // console.log('response:', response)
-    console.log('response.status:', response.status)
+    // console.log('response.status:', response.status)
 
     // const length = response.headers.get('content-length')
     // console.log('content-length:', length)

@@ -76,14 +76,14 @@ app.get('/', (req, res) => {
         minutes: fmt((uptime % 3600) / 60),
         hours: fmt((uptime % 86400) / 3600),
         days: Math.floor(uptime / 86400),
-        badges: badgeCount.toLocaleString(),
+        count: badgeCount.toLocaleString(),
         version: process.env.APP_VERSION,
         title: 'Node Badges',
         links: {
             Source: 'https://github.com/smashedr/node-badges',
             Docs: 'https://smashedr.github.io/node-badges-docs',
-            Status: 'https://stats.uptimerobot.com/FNLsoJaKUf/801549868',
         },
+        // badges: [{ src: '', href: '' }],
     })
 })
 
@@ -124,7 +124,7 @@ app.all('/vt/:type/:hash', async (req, res, next) => {
         const hash = req.params.hash.includes(':')
             ? req.params.hash.split(':')[1]
             : req.params.hash
-        console.log('hash:', hash)
+        // console.log('hash:', hash)
         const key = `/vt/id/${hash}`
         return purgeKey(res, key)
     }
@@ -142,7 +142,7 @@ app.get(
         const hash = req.params.hash.includes(':')
             ? req.params.hash.split(':')[1]
             : req.params.hash
-        console.log('hash:', hash)
+        // console.log('hash:', hash)
 
         const stats = await getVTStats(hash)
         // console.log('stats:', stats)
@@ -244,7 +244,7 @@ app.get(
         const api = new GhcrApi(req.params.owner, req.params.package)
         const tag = req.params.tag || 'latest'
         const total = await api.getImageSize(tag)
-        console.log('getImageSize - total:', total)
+        // console.log('getImageSize - total:', total)
 
         const message = formatSize(total)
         console.log('message:', message)
@@ -263,7 +263,7 @@ app.get(
         if (!req.params.label && !query.label && !query.labelColor) {
             query.labelColor = query.color || 'brightgreen'
         }
-        console.log('query:', query)
+        // console.log('query:', query)
         getBadge(req.params.message, query, { label: req.params.label }, res)
     })
 )
@@ -281,7 +281,7 @@ app.get(
     '/:type/:url/:path',
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
-        console.log('req.params.type:', req.params.type)
+        // console.log('req.params.type:', req.params.type)
         if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
 
         const message = await getJSONPath(req)
@@ -322,13 +322,13 @@ function errorBadgeHandler(handler) {
             await handler(req, res)
         } catch (error) {
             console.error(error)
-            console.log('error.message:', error.message)
+            console.log('errorBadgeHandler - error.message:', error.message)
             const data = {
                 message: error.message || 'Unknown Error',
                 color: 'red',
                 style: req.query.style || 'flat',
             }
-            console.log('data:', data)
+            // console.log('data:', data)
             const badge = makeBadge(data)
             if (res) sendBadge(res, badge)
         }

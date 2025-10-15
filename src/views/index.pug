@@ -10,10 +10,20 @@ html
       body { background-color: #313131; color: #e8e8e8; }
       a { color: white; }
       a:hover { text-decoration: none; }
+      img { margin-right: 10px; }
   body
     h1 #{title}
     p Version: #{version}
-    p Badges Generated: #[b #{badges}]
-    p Uptime: #{days}:#{hours}:#{minutes}m - Total: #{uptime}s - #[a(href="/uptime" target="_blank") uptime badge]
+    p Badges Generated: #[b #{count}]
+    p Uptime: #{days}:#{hours}:#{minutes}m - Total: #{uptime}s
     each url, label in links
-      p #{label}: #[a(href=url target="_blank") #{url}]
+      p #{label}: #[a(href=url target="_blank" rel="noopener") #{url}]
+    //- each badge in badges
+    //-   a(href=badge.href target="_blank" rel="noopener")
+    //-     img(src=badge.src)
+    a(href="/uptime?style=for-the-badge" target="_blank")
+      img(src="/uptime?style=for-the-badge")
+    a(href="https://stats.uptimerobot.com/FNLsoJaKUf/801549868" target="_blank" rel="noopener")
+      img(src="https://shields.cssnr.com/uptimerobot/ratio/7/m801549868-4eaa810d55bbf4039711a48a?style=for-the-badge&label=Uptime%20Robot%20%287d%29")
+    a(href="https://uptime-nj.hosted-domains.com/status/node-badges" target="_blank" rel="noopener")
+      img(src="https://uptime-nj.hosted-domains.com/api/badge/30/uptime?style=for-the-badge&label=Uptime%20Kuma%20%2824H%29")
