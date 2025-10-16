@@ -6,6 +6,10 @@ on:
       tags:
         description: "Extra Tags: comma,separated"
         required: false
+      dev:
+        description: "Development Build"
+        type: boolean
+        default: true
   release:
     types: [published]
 
@@ -20,6 +24,20 @@ jobs:
       packages: write
 
     steps:
+      - name: "Debug CTX github"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        env:
+          GITHUB_CTX: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CTX"
+
+      - name: "Debug"
+        continue-on-error: true
+        run: |
+          echo "inputs.dev: ${{ inputs.dev }}"
+          echo "inputs.tags: ${{ inputs.tags }}"
+          echo "github.ref_name: ${{ github.ref_name }}"
+
       - name: "Checkout"
         uses: actions/checkout@v5
 
@@ -36,6 +54,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       - name: "Update Version Tags"
+        if: ${{ inputs.dev != true }}
         id: version
         uses: cssnr/update-version-tags-action@v1
         with:
@@ -47,13 +66,17 @@ jobs:
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"
           echo "steps.version.outputs.tags: ${{ steps.version.outputs.tags }}"
+          echo "tags1: ${{ inputs.dev != true && steps.version.outputs.tags || 'dev' }}"
+          echo "tags2: ${{ inputs.tags }}"
 
       - name: "Generate Docker Tags"
         id: tags
         uses: cssnr/docker-tags-action@v1
         with:
           images: "ghcr.io/${{ github.repository }}"
-          tags: ${{ steps.version.outputs.tags }}
+          tags: |
+            ${{ inputs.dev != true && steps.version.outputs.tags || 'dev' }}
+            ${{ inputs.tags }}
 
       - name: "Debug Docker Tags"
         continue-on-error: true
