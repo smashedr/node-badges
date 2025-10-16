@@ -58,8 +58,9 @@ jobs:
         id: version
         uses: cssnr/update-version-tags-action@v1
         with:
-          tags: ${{ inputs.tags }}
           prefix: ""
+          tags: |
+            ${{ inputs.tags }}
 
       - name: "Debug Version Tags"
         continue-on-error: true
@@ -75,7 +76,8 @@ jobs:
         with:
           images: "ghcr.io/${{ github.repository }}"
           tags: |
-            ${{ inputs.dev != true && steps.version.outputs.tags || 'dev' }}
+            ${{ inputs.dev == true && 'dev' || '' }}
+            ${{ steps.version.outputs.tags }}
             ${{ inputs.tags }}
 
       - name: "Debug Docker Tags"
