@@ -3,19 +3,23 @@ import './instrument.js'
 import express from 'express'
 import cors from 'cors'
 
+import camelCase from 'camelcase'
 import chroma from 'chroma-js'
 import lucide from 'lucide-static'
+import schedule from 'node-schedule'
 import semver from 'semver'
-import camelCase from 'camelcase'
 import { makeBadge } from 'badge-maker'
 import * as icons from 'simple-icons'
 
 import {
     cacheDelete,
+    cacheGet,
     getJSONPath,
     getVTReleaseStats,
     getVTStats,
     GhcrApi,
+    incrBadge,
+    sendInflux,
 } from './api.js'
 
 let Sentry
@@ -38,14 +42,23 @@ console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
 console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
 console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
 
+schedule.scheduleJob('0 * * * *', function () {
+    sendInflux().catch((e) => console.error(e))
+})
+
 const server = app.listen(port, () => {
     console.log(`Listening on PORT: ${port}`)
 })
 
 process.on('SIGTERM', () => {
-    console.log('SIGTERM signal received: closing HTTP server')
-    server.close(() => {
-        console.log('HTTP server closed')
+    console.log('SIGTERM signal received: closing server')
+    server.close(async (err) => {
+        console.log('server closed')
+        if (err) console.error(err)
+        // NOTE: Determine if this location is correct
+        await schedule.gracefulShutdown()
+        // NOTE: Determine if we should sendInflux on close
+        // await sendInflux()
     })
 })
 
@@ -53,22 +66,36 @@ app.get('/app-health-check', (req, res) => {
     res.sendStatus(200)
 })
 
-app.get('/', (req, res) => {
-    const uptime = getUptime()
-    const seconds = Math.floor(process.uptime())
-    // res.send(`Version: ${process.env.APP_VERSION} - Uptime: ${uptime} (${seconds} s)`)
+app.get('/', async (req, res) => {
+    const uptime = Math.floor(process.uptime())
+    const fmt = (n) => Math.floor(n).toString().padStart(2, '0')
     res.render('index', {
+        uptime,
+        seconds: uptime % 60,
+        minutes: fmt((uptime % 3600) / 60),
+        hours: fmt((uptime % 86400) / 3600),
+        days: Math.floor(uptime / 86400),
+        count: await cacheGet('badges_total', 0),
         version: process.env.APP_VERSION,
-        uptime: uptime,
-        seconds: seconds,
         title: 'Node Badges',
-        source: 'https://github.com/smashedr/node-badges',
-        docs: 'https://smashedr.github.io/node-badges-docs',
+        links: {
+            Source: 'https://github.com/smashedr/node-badges',
+            Docs: 'https://smashedr.github.io/node-badges-docs',
+        },
+        // badges: [{ src: '', href: '' }],
     })
 })
 
-// app.get('/test', async (req, res) => {
+// app.get('/test{/:extra}', async (req, res) => {
 //     res.sendStatus(200)
+//
+//     const total = await cacheGet('badges_total')
+//     console.log('badges_total:', total)
+//
+//     if (req.params.extra) {
+//         console.log('req.params.extra:', req.params.extra)
+//         sendInflux().catch((e) => console.error(e))
+//     }
 // })
 
 app.get('/colors{/:index}', async (req, res) => {
@@ -103,7 +130,7 @@ app.all('/vt/:type/:hash', async (req, res, next) => {
         const hash = req.params.hash.includes(':')
             ? req.params.hash.split(':')[1]
             : req.params.hash
-        console.log('hash:', hash)
+        // console.log('hash:', hash)
         const key = `/vt/id/${hash}`
         return purgeKey(res, key)
     }
@@ -121,15 +148,15 @@ app.get(
         const hash = req.params.hash.includes(':')
             ? req.params.hash.split(':')[1]
             : req.params.hash
-        console.log('hash:', hash)
+        // console.log('hash:', hash)
 
         const stats = await getVTStats(hash)
         // console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
         const color = getRangedColor(req, stats.malicious + stats.suspicious)
-        const opts = { label: hash.slice(0, 6), icon: 'virustotal', color }
-        getBadge(message, req.query, opts, res)
+        const options = { label: hash.slice(0, 6), icon: 'virustotal', color }
+        getBadge(message, req.query, options, res)
     })
 )
 
@@ -153,8 +180,8 @@ app.get(
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
         console.log('message:', message)
         const color = getRangedColor(req, stats.malicious + stats.suspicious)
-        const opts = { label: req.params.asset, icon: 'virustotal', color }
-        getBadge(message, req.query, opts, res)
+        const options = { label: req.params.asset, icon: 'virustotal', color }
+        getBadge(message, req.query, options, res)
     })
 )
 
@@ -192,7 +219,6 @@ app.get(
         if (req.params.latest) {
             const message = tags.at(-1)
             console.log('latest - message:', message)
-            // return getBadge(req.query, message, 'latest', 'tag', res)
             return getBadge(message, req.query, { label: 'latest', lucide: 'tag' }, res)
         }
 
@@ -202,7 +228,6 @@ app.get(
 
         const message = tags.join(` ${req.query.sep || '|'} `)
         console.log('tags - message:', message)
-        // getBadge(req.query, message, 'tags', 'tags', res)
         getBadge(message, req.query, { label: 'tags', lucide: 'tags' }, res)
     })
 )
@@ -225,11 +250,10 @@ app.get(
         const api = new GhcrApi(req.params.owner, req.params.package)
         const tag = req.params.tag || 'latest'
         const total = await api.getImageSize(tag)
-        console.log('getImageSize - total:', total)
+        // console.log('getImageSize - total:', total)
 
         const message = formatSize(total)
         console.log('message:', message)
-        // getBadge(req.query, message, 'size', 'container', res)
         getBadge(message, req.query, { label: 'size', lucide: 'container' }, res)
     })
 )
@@ -245,8 +269,7 @@ app.get(
         if (!req.params.label && !query.label && !query.labelColor) {
             query.labelColor = query.color || 'brightgreen'
         }
-        console.log('query:', query)
-        // getBadge(query, req.params.message, req.params.label, '', res)
+        // console.log('query:', query)
         getBadge(req.params.message, query, { label: req.params.label }, res)
     })
 )
@@ -264,12 +287,11 @@ app.get(
     '/:type/:url/:path',
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
-        console.log('req.params.type:', req.params.type)
+        // console.log('req.params.type:', req.params.type)
         if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
 
         const message = await getJSONPath(req)
         console.log('message:', message)
-        // return getBadge(req.query, message, 'result', 'code-xml', res)
         getBadge(message, req.query, { label: 'result', lucide: 'code-xml' }, res)
     })
 )
@@ -280,7 +302,6 @@ app.get(
         console.log(req.originalUrl)
         const message = getUptime()
         console.log('message:', message)
-        // getBadge(req.query, message, 'uptime', 'clock-arrow-up', res)
         getBadge(message, req.query, { label: 'uptime', lucide: 'clock-arrow-up' }, res)
     })
 )
@@ -307,13 +328,13 @@ function errorBadgeHandler(handler) {
             await handler(req, res)
         } catch (error) {
             console.error(error)
-            console.log('error.message:', error.message)
+            console.log('errorBadgeHandler - error.message:', error.message)
             const data = {
                 message: error.message || 'Unknown Error',
                 color: 'red',
                 style: req.query.style || 'flat',
             }
-            console.log('data:', data)
+            // console.log('data:', data)
             const badge = makeBadge(data)
             if (res) sendBadge(res, badge)
         }
@@ -366,6 +387,7 @@ function getBadge(message, query = {}, options = {}, res = null) {
     // console.log('data:', data)
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
+    incrBadge().catch((e) => console.error(e))
     return badge
 }
 

@@ -12,8 +12,9 @@
     "start": "node src/app.js"
   },
   "dependencies": {
+    "@influxdata/influxdb-client": "^1.35.0",
     "@octokit/rest": "^22.0.0",
-    "@sentry/node": "^10.19.0",
+    "@sentry/node": "^10.20.0",
     "axios": "^1.12.2",
     "badge-maker": "^5.0.2",
     "camelcase": "^8.0.0",
@@ -22,6 +23,7 @@
     "express": "^5.1.0",
     "jsonpath": "^1.1.1",
     "lucide-static": "^0.545.0",
+    "node-schedule": "^2.1.1",
     "nodemon": "^3.1.10",
     "pug": "^3.0.3",
     "redis": "^5.8.3",
