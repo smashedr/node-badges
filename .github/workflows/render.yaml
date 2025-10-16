@@ -1,0 +1,44 @@
+name: "Render"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version Tag"
+        default: "latest"
+        required: true
+
+env:
+  version: ${{ inputs.version || 'latest' }}
+
+jobs:
+  render:
+    name: "Render"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    #environment:
+    #  name: render
+    #  url: https://node-badges.onrender.com/
+
+    steps:
+      - name: "Debug CTX github"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        env:
+          GITHUB_CTX: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CTX"
+
+      - name: "Debug Variables"
+        continue-on-error: true
+        run: |
+          echo "inputs.version: ${{ inputs.version }}"
+          echo "env.version: ${{ env.version }}"
+          echo "imgURL: ghcr.io/${{ github.repository }}:${{ env.version }}"
+
+      # https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
+      - name: "Render Deploy"
+        uses: cssnr/web-request-action@v1
+        with:
+          url: ${{ secrets.RENDER_HOOK }}
+          params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'

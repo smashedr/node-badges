@@ -66,9 +66,9 @@ jobs:
         continue-on-error: true
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"
-          echo "steps.version.outputs.tags: ${{ steps.version.outputs.tags }}"
-          echo "tags1: ${{ inputs.dev != true && steps.version.outputs.tags || 'dev' }}"
-          echo "tags2: ${{ inputs.tags }}"
+          echo "tags1: ${{ inputs.dev == true && 'dev' || '' }}"
+          echo "tags2: ${{ steps.version.outputs.tags }}"
+          echo "tags3: ${{ inputs.tags }}"
 
       - name: "Generate Docker Tags"
         id: tags
