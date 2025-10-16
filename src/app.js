@@ -86,17 +86,17 @@ app.get('/', async (req, res) => {
     })
 })
 
-app.get('/test{/:extra}', async (req, res) => {
-    res.sendStatus(200)
-
-    const total = await cacheGet('badges_total')
-    console.log('badges_total:', total)
-
-    if (req.params.extra) {
-        console.log('req.params.extra:', req.params.extra)
-        sendInflux().catch((e) => console.error(e))
-    }
-})
+// app.get('/test{/:extra}', async (req, res) => {
+//     res.sendStatus(200)
+//
+//     const total = await cacheGet('badges_total')
+//     console.log('badges_total:', total)
+//
+//     if (req.params.extra) {
+//         console.log('req.params.extra:', req.params.extra)
+//         sendInflux().catch((e) => console.error(e))
+//     }
+// })
 
 app.get('/colors{/:index}', async (req, res) => {
     console.log(req.originalUrl)
