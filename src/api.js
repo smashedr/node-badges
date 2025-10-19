@@ -10,7 +10,8 @@ import { InfluxDB, Point } from '@influxdata/influxdb-client'
 
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 console.log(`REDIS_URL: ${redisUrl}`)
-const client = createClient({ url: redisUrl })
+// NOTE: Increase connectTimeout for Render, consider using reconnectStrategy...
+const client = createClient({ url: redisUrl, socket: { connectTimeout: 10000 } })
 await client.connect()
 
 let influxClient
