@@ -10,7 +10,8 @@ import { InfluxDB, Point } from '@influxdata/influxdb-client'
 
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 console.log(`REDIS_URL: ${redisUrl}`)
-const client = createClient({ url: redisUrl })
+// NOTE: Increase connectTimeout for Render, consider using reconnectStrategy...
+const client = createClient({ url: redisUrl, socket: { connectTimeout: 10000 } })
 await client.connect()
 
 let influxClient
@@ -274,15 +275,23 @@ export async function sendInflux() {
     if (!influxClient) return console.log('InfluxDB Not Configured.')
     console.log(`Processing Influx: ${new Date().toLocaleString()}`)
 
-    const value = await cacheGet('badges_total', 0)
-    console.log('badges_total: value:', value)
-
     const org = process.env.INFLUX_ORG || 'cssnr'
     const bucket = process.env.INFLUX_BUCKET || 'general'
     const writeApi = influxClient.getWriteApi(org, bucket)
 
-    const point = new Point('node_badges').intField('badges_total', value)
-    console.log('point:', point)
-    writeApi.writePoint(point)
+    const measurementName = 'node_badges'
+
+    const badgesTotal = await cacheGet('badges_total', 0)
+    // console.log('badgesTotal:', badgesTotal, typeof badgesTotal)
+    writeApi.writePoint(new Point(measurementName).intField('badges_total', badgesTotal))
+
+    const appUptime = Math.floor(process.uptime())
+    // console.log('appUptime:', appUptime, typeof appUptime)
+    writeApi.writePoint(new Point(measurementName).intField('app_uptime', appUptime))
+
+    const redisKeys = await client.dbSize()
+    // console.log('redisKeys:', redisKeys, typeof redisKeys)
+    writeApi.writePoint(new Point(measurementName).intField('redis_keys', redisKeys))
+
     await writeApi.close()
 }
