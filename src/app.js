@@ -43,7 +43,7 @@ console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
 console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
 
 schedule.scheduleJob('*/5 * * * *', function () {
-    sendInflux().catch((e) => console.error(e))
+    sendInflux().catch(console.error)
 })
 
 const server = app.listen(port, () => {
@@ -94,7 +94,7 @@ app.get('/', async (req, res) => {
 //
 //     if (req.params.extra) {
 //         console.log('req.params.extra:', req.params.extra)
-//         sendInflux().catch((e) => console.error(e))
+//         sendInflux().catch(console.error)
 //     }
 // })
 
@@ -388,7 +388,7 @@ function getBadge(message, query = {}, options = {}, res = null) {
     // console.log('data:', data)
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
-    incrBadge().catch((e) => console.error(e))
+    incrBadge().catch(console.error)
     return badge
 }
 
