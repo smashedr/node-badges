@@ -42,7 +42,7 @@ console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
 console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
 console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
 
-schedule.scheduleJob('0 * * * *', function () {
+schedule.scheduleJob('*/5 * * * *', function () {
     sendInflux().catch((e) => console.error(e))
 })
 

@@ -274,15 +274,20 @@ export async function sendInflux() {
     if (!influxClient) return console.log('InfluxDB Not Configured.')
     console.log(`Processing Influx: ${new Date().toLocaleString()}`)
 
-    const value = await cacheGet('badges_total', 0)
-    console.log('badges_total: value:', value)
-
     const org = process.env.INFLUX_ORG || 'cssnr'
     const bucket = process.env.INFLUX_BUCKET || 'general'
     const writeApi = influxClient.getWriteApi(org, bucket)
 
-    const point = new Point('node_badges').intField('badges_total', value)
-    console.log('point:', point)
-    writeApi.writePoint(point)
+    const measurementName = 'node_badges'
+
+    const badgesTotal = await cacheGet('badges_total', 0)
+    writeApi.writePoint(new Point(measurementName).intField('badges_total', badgesTotal))
+
+    const appUptime = Math.floor(process.uptime())
+    writeApi.writePoint(new Point(measurementName).intField('app_uptime', appUptime))
+
+    const redisKeys = await client.dbSize()
+    writeApi.writePoint(new Point(measurementName).intField('redis_keys', redisKeys))
+
     await writeApi.close()
 }
