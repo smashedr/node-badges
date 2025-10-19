@@ -281,12 +281,15 @@ export async function sendInflux() {
     const measurementName = 'node_badges'
 
     const badgesTotal = await cacheGet('badges_total', 0)
+    // console.log('badgesTotal:', badgesTotal, typeof badgesTotal)
     writeApi.writePoint(new Point(measurementName).intField('badges_total', badgesTotal))
 
     const appUptime = Math.floor(process.uptime())
+    // console.log('appUptime:', appUptime, typeof appUptime)
     writeApi.writePoint(new Point(measurementName).intField('app_uptime', appUptime))
 
     const redisKeys = await client.dbSize()
+    // console.log('redisKeys:', redisKeys, typeof redisKeys)
     writeApi.writePoint(new Point(measurementName).intField('redis_keys', redisKeys))
 
     await writeApi.close()

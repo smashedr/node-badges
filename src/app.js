@@ -153,7 +153,7 @@ app.get(
         const stats = await getVTStats(hash)
         // console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
-        console.log('message:', message)
+        // console.log('message:', message)
         const color = getRangedColor(req, stats.malicious + stats.suspicious)
         const options = { label: hash.slice(0, 6), icon: 'virustotal', color }
         getBadge(message, req.query, options, res)
@@ -178,7 +178,7 @@ app.get(
         const stats = await getVTReleaseStats(req)
         // console.log('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
-        console.log('message:', message)
+        // console.log('message:', message)
         const color = getRangedColor(req, stats.malicious + stats.suspicious)
         const options = { label: req.params.asset, icon: 'virustotal', color }
         getBadge(message, req.query, options, res)
@@ -218,7 +218,7 @@ app.get(
 
         if (req.params.latest) {
             const message = tags.at(-1)
-            console.log('latest - message:', message)
+            // console.log('latest - message:', message)
             return getBadge(message, req.query, { label: 'latest', lucide: 'tag' }, res)
         }
 
@@ -227,7 +227,7 @@ app.get(
         }
 
         const message = tags.join(` ${req.query.sep || '|'} `)
-        console.log('tags - message:', message)
+        // console.log('tags - message:', message)
         getBadge(message, req.query, { label: 'tags', lucide: 'tags' }, res)
     })
 )
@@ -253,7 +253,7 @@ app.get(
         // console.log('getImageSize - total:', total)
 
         const message = formatSize(total)
-        console.log('message:', message)
+        // console.log('message:', message)
         getBadge(message, req.query, { label: 'size', lucide: 'container' }, res)
     })
 )
@@ -262,7 +262,7 @@ app.get(
     '/static/:message{/:label}',
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
-        console.log(`message/label: ${req.params.message} / ${req.params.label}`)
+        // console.log(`message/label: ${req.params.message} / ${req.params.label}`)
         // NOTE: This endpoint uses custom logic to make a "static" badge
         //  This needs to be fixed, the icon does not show up like shields
         const query = structuredClone(req.query)
@@ -291,7 +291,7 @@ app.get(
         if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
 
         const message = await getJSONPath(req)
-        console.log('message:', message)
+        // console.log('message:', message)
         getBadge(message, req.query, { label: 'result', lucide: 'code-xml' }, res)
     })
 )
@@ -301,20 +301,20 @@ app.get(
     errorBadgeHandler(async (req, res) => {
         console.log(req.originalUrl)
         const message = getUptime()
-        console.log('message:', message)
+        // console.log('message:', message)
         getBadge(message, req.query, { label: 'uptime', lucide: 'clock-arrow-up' }, res)
     })
 )
 
 // Handler 404
 app.use((req, res) => {
-    // res.status(404).send("Sorry can't find that!")
+    console.log('404:', req.originalUrl)
     const data = {
         message: '404 - URL Not Found',
         color: 'red',
         style: req.query.style || 'flat',
     }
-    console.log('data:', data)
+    // console.log('404 data:', data)
     // noinspection JSCheckFunctionSignatures
     const badge = makeBadge(data)
     sendBadge(res, badge, 404)
@@ -322,13 +322,14 @@ app.use((req, res) => {
 
 if (Sentry) Sentry.setupExpressErrorHandler(app)
 
+// TODO: Move to express error handler...
 function errorBadgeHandler(handler) {
     return async (req, res) => {
         try {
             await handler(req, res)
         } catch (error) {
             console.error(error)
-            console.log('errorBadgeHandler - error.message:', error.message)
+            console.log('errorBadgeHandler:', error.message)
             const data = {
                 message: error.message || 'Unknown Error',
                 color: 'red',
