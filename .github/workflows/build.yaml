@@ -13,6 +13,9 @@ on:
   #release:
   #  types: [published]
 
+env:
+  dev: ${{ inputs.dev || github.event.release.prerelease }}
+
 jobs:
   build:
     name: "Build"
@@ -34,9 +37,10 @@ jobs:
       - name: "Debug"
         continue-on-error: true
         run: |
-          echo "inputs.dev: ${{ inputs.dev }}"
-          echo "inputs.tags: ${{ inputs.tags }}"
           echo "github.ref_name: ${{ github.ref_name }}"
+          echo "inputs.tags: ${{ inputs.tags }}"
+          echo "inputs.dev: ${{ inputs.dev }}"
+          echo "env.dev: ${{ env.dev }}"
 
       - name: "Checkout"
         uses: actions/checkout@v5
@@ -54,7 +58,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       - name: "Update Version Tags"
-        if: ${{ inputs.dev != true }}
+        if: ${{ !env.dev }}
         id: version
         uses: cssnr/update-version-tags-action@v1
         with:
@@ -66,7 +70,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"
-          echo "tags1: ${{ inputs.dev == true && 'dev' || '' }}"
+          echo "tags1: ${{ env.dev && 'dev' || '' }}"
           echo "tags2: ${{ steps.version.outputs.tags }}"
           echo "tags3: ${{ inputs.tags }}"
 
@@ -76,7 +80,7 @@ jobs:
         with:
           images: "ghcr.io/${{ github.repository }}"
           tags: |
-            ${{ inputs.dev == true && 'dev' || '' }}
+            ${{ env.dev && 'dev' || '' }}
             ${{ steps.version.outputs.tags }}
             ${{ inputs.tags }}
 
