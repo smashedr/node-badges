@@ -10,7 +10,6 @@ on:
   #workflow_run:
   #  workflows: ["Build"]
   #  types: [completed]
-  # sonar qube retarded
 
 env:
   traefik-host: badges.cssnr.com
