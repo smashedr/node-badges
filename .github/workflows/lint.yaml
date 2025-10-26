@@ -24,8 +24,8 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v5
 
-      - name: "Setup Node 24"
-        uses: actions/setup-node@v5
+      - name: "Setup Node"
+        uses: actions/setup-node@v6
         with:
           node-version: 24
 
@@ -38,7 +38,8 @@ jobs:
         id: eslint
         if: ${{ !cancelled() }}
         run: |
-          npm run lint:report
+          #npm run lint:report
+          npm run lint
 
       - name: "Prettier"
         if: ${{ !cancelled() }}
@@ -78,7 +79,7 @@ jobs:
           dockerfile: Dockerfile
           ignore: "DL3018"
 
-      - name: "ESLint Annotate"
-        if: ${{ !cancelled() && steps.eslint.outcome != 'success' }}
-        continue-on-error: true
-        uses: ataylorme/eslint-annotate-action@v3
+      #- name: "ESLint Annotate"
+      #  if: ${{ !cancelled() && steps.eslint.outcome != 'success' }}
+      #  continue-on-error: true
+      #  uses: ataylorme/eslint-annotate-action@v3

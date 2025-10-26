@@ -13,7 +13,6 @@ jobs:
     permissions:
       contents: write
 
-    # NOTE: Look into running build.yaml and deploy.yaml inline here
     steps:
       - name: "Update Release Notes Action"
         continue-on-error: true
@@ -25,8 +24,17 @@ jobs:
         continue-on-error: true
         uses: cssnr/package-changelog-action@v1
 
-      - name: "Send Failure Notification"
-        if: ${{ failure() }}
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+  build:
+    name: "Build"
+    uses: ./.github/workflows/build.yaml
+    needs: release
+    secrets: inherit
+    permissions:
+      contents: write
+      packages: write
+
+  deploy:
+    name: "Deploy"
+    uses: ./.github/workflows/render.yaml
+    needs: build
+    secrets: inherit

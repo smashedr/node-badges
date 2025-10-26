@@ -1,17 +1,17 @@
 name: "Build"
 
 on:
+  workflow_call:
   workflow_dispatch:
     inputs:
       tags:
         description: "Extra Tags: comma,separated"
-        required: false
       dev:
         description: "Development Build"
         type: boolean
         default: true
-  release:
-    types: [published]
+  #release:
+  #  types: [published]
 
 jobs:
   build:

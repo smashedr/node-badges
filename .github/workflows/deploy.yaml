@@ -1,11 +1,11 @@
 name: "Deploy"
 
 on:
+  workflow_call:
   workflow_dispatch:
     inputs:
       version:
         description: "Version Tag"
-        default: "latest"
         required: false
   #workflow_run:
   #  workflows: ["Build"]
@@ -36,15 +36,18 @@ jobs:
           GITHUB_CTX: ${{ toJSON(github) }}
         run: echo "$GITHUB_CTX"
 
-      - name: "Debug Variables"
+      - name: "Debug 1"
         continue-on-error: true
         run: |
-          echo "VERSION: ${{ env.version == 'master' && 'latest' || env.version }}"
-          echo "STACK_NAME: ${{ env.stack-name }}"
-          echo "TRAEFIK_HOST: ${{ env.traefik-host }}"
+          echo "inputs.version: ${{ inputs.version }}"
+          echo "github.event.workflow_run.head_branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "github.ref_name: ${{ github.ref_name }}"
+          echo "env.version: ${{ env.version }}"
 
       - name: "Portainer Deploy"
         uses: cssnr/portainer-stack-deploy-action@v1
+        env:
+          version: ${{ env.version == 'master' && 'latest' || env.version }}
         with:
           url: ${{ secrets.PORTAINER_URL }}
           token: ${{ secrets.PORTAINER_TOKEN }}
@@ -54,7 +57,7 @@ jobs:
           password: ${{ secrets.GHCR_PASS }}
           env_json: |
             {
-              "VERSION": "${{ env.version == 'master' && 'latest' || env.version }}",
+              "VERSION": "${{ env.version }}",
               "STACK_NAME": "${{ env.stack-name }}",
               "TRAEFIK_HOST": "${{ env.traefik-host }}",
               "GITHUB_TOKEN": "${{ secrets.GH_PAT }}",
@@ -67,20 +70,20 @@ jobs:
               "INFLUX_BUCKET": "${{ vars.INFLUX_BUCKET }}"
             }
 
-      - name: "Debug Environment"
-        continue-on-error: true
-        env:
-          version: ${{ env.version == 'master' && 'latest' || env.version }}
-        run: |
-          echo "env.version: ${{ env.version }}"
-          echo "ghcr.io/${{ github.repository }}:${{ env.version }}"
-
-      # https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
-      - name: "Render Deploy"
-        continue-on-error: true
-        uses: cssnr/web-request-action@v1
-        env:
-          version: ${{ env.version == 'master' && 'latest' || env.version }}
-        with:
-          url: ${{ secrets.RENDER_HOOK }}
-          params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
+      #- name: "Debug 2"
+      #  continue-on-error: true
+      #  env:
+      #    version: ${{ env.version == 'master' && 'latest' || env.version }}
+      #  run: |
+      #    echo "env.version: ${{ env.version }}"
+      #    echo "ghcr.io/${{ github.repository }}:${{ env.version }}"
+      #
+      ## https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
+      #- name: "Render Deploy"
+      #  continue-on-error: true
+      #  uses: cssnr/web-request-action@v1
+      #  env:
+      #    version: ${{ env.version == 'master' && 'latest' || env.version }}
+      #  with:
+      #    url: ${{ secrets.RENDER_HOOK }}
+      #    params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'

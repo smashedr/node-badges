@@ -14,7 +14,7 @@
   "dependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
     "@octokit/rest": "^22.0.0",
-    "@sentry/node": "^10.20.0",
+    "@sentry/node": "^10.22.0",
     "axios": "^1.12.2",
     "badge-maker": "^5.0.2",
     "camelcase": "^8.0.0",
@@ -22,13 +22,13 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonpath": "^1.1.1",
-    "lucide-static": "^0.546.0",
+    "lucide-static": "^0.548.0",
     "node-schedule": "^2.1.1",
     "nodemon": "^3.1.10",
     "pug": "^3.0.3",
-    "redis": "^5.8.3",
+    "redis": "^5.9.0",
     "semver": "^7.7.3",
-    "simple-icons": "^15.16.1",
+    "simple-icons": "^15.18.0",
     "yaml": "^2.8.1"
   },
   "devDependencies": {
