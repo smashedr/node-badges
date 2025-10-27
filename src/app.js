@@ -4,6 +4,7 @@ import express from 'express'
 import cors from 'cors'
 
 import camelCase from 'camelcase'
+import createDebug from 'debug'
 import chroma from 'chroma-js'
 import lucide from 'lucide-static'
 import schedule from 'node-schedule'
@@ -17,7 +18,7 @@ import {
     getJSONPath,
     getVTReleaseStats,
     getVTStats,
-    GhcrApi,
+    GHCRApi,
     incrBadge,
     sendInflux,
 } from './api.js'
@@ -26,6 +27,8 @@ let Sentry
 if (process.env.SENTRY_URL) {
     Sentry = await import('@sentry/node')
 }
+
+const debug = createDebug('app:app')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -41,6 +44,7 @@ app.disable('x-powered-by')
 console.log(`APP_VERSION: ${process.env.APP_VERSION}`)
 console.log(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? 'Loaded' : 'MISSING'}`)
 console.log(`VT_API_KEY: ${process.env.VT_API_KEY ? 'Loaded' : 'MISSING'}`)
+console.log(`DEBUG: ${process.env.DEBUG || 'LOGGING OFF'}`)
 
 schedule.scheduleJob('*/5 * * * *', function () {
     sendInflux().catch(console.error)
@@ -90,20 +94,20 @@ app.get('/', async (req, res) => {
 //     res.sendStatus(200)
 //
 //     const total = await cacheGet('badges_total')
-//     console.log('badges_total:', total)
+//     debug('badges_total:', total)
 //
 //     if (req.params.extra) {
-//         console.log('req.params.extra:', req.params.extra)
+//         debug('req.params.extra:', req.params.extra)
 //         sendInflux().catch(console.error)
 //     }
 // })
 
 app.get('/colors{/:index}', async (req, res) => {
-    console.log(req.originalUrl)
+    debug(req.originalUrl)
     const index = req.params.index || 0
-    console.log('index:', index)
+    debug('index:', index)
     const color = getRangedColor(req, index)
-    console.log('color:', color)
+    debug('color:', color)
     res.send(`<html><body style="margin:0;background:${color}"></body></html>`)
 })
 
@@ -115,8 +119,8 @@ app.get('/colors{/:index}', async (req, res) => {
 
 // app.use((req, res, next) => {
 //     if (req.method === 'PURGE') {
-//         console.log('PURGE request for URL:', req.originalUrl)
-//         console.log('req:', req)
+//         debug('PURGE request for URL:', req.originalUrl)
+//         debug('req:', req)
 //         res.status(200).send('PURGE received')
 //         return
 //     }
@@ -125,12 +129,12 @@ app.get('/colors{/:index}', async (req, res) => {
 
 app.all('/vt/:type/:hash', async (req, res, next) => {
     if (req.method === 'PURGE') {
-        console.log('PURGE:', req.originalUrl)
+        debug('PURGE:', req.originalUrl)
         if (!['id', 'sha'].includes(req.params.type)) return next()
         const hash = req.params.hash.includes(':')
             ? req.params.hash.split(':')[1]
             : req.params.hash
-        // console.log('hash:', hash)
+        // debug('hash:', hash)
         const key = `/vt/id/${hash}`
         return purgeKey(res, key)
     }
@@ -140,20 +144,20 @@ app.all('/vt/:type/:hash', async (req, res, next) => {
 app.get(
     '/vt/:type/:hash',
     errorBadgeHandler(async (req, res) => {
-        console.log(req.originalUrl)
-        // console.log('req.params.type:', req.params.type)
+        debug(req.originalUrl)
+        // debug('req.params.type:', req.params.type)
         if (!['id', 'sha'].includes(req.params.type)) return res.sendStatus(404)
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
 
         const hash = req.params.hash.includes(':')
             ? req.params.hash.split(':')[1]
             : req.params.hash
-        // console.log('hash:', hash)
+        // debug('hash:', hash)
 
         const stats = await getVTStats(hash)
-        // console.log('stats:', stats)
+        // debug('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
-        // console.log('message:', message)
+        // debug('message:', message)
         const color = getRangedColor(req, stats.malicious + stats.suspicious)
         const options = { label: hash.slice(0, 6), icon: 'virustotal', color }
         getBadge(message, req.query, options, res)
@@ -162,7 +166,7 @@ app.get(
 
 app.all('/vt/:owner/:repo/:asset{/:tag}', async (req, res, next) => {
     if (req.method === 'PURGE') {
-        console.log('PURGE:', req.originalUrl)
+        debug('PURGE:', req.originalUrl)
         const tag = req.params.tag || 'latest'
         const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}/${tag}`
         return purgeKey(res, key)
@@ -173,12 +177,12 @@ app.all('/vt/:owner/:repo/:asset{/:tag}', async (req, res, next) => {
 app.get(
     '/vt/:owner/:repo/:asset{/:tag}',
     errorBadgeHandler(async (req, res) => {
-        console.log(req.originalUrl)
+        debug(req.originalUrl)
         if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
         const stats = await getVTReleaseStats(req)
-        // console.log('stats:', stats)
+        // debug('stats:', stats)
         const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
-        // console.log('message:', message)
+        // debug('message:', message)
         const color = getRangedColor(req, stats.malicious + stats.suspicious)
         const options = { label: req.params.asset, icon: 'virustotal', color }
         getBadge(message, req.query, options, res)
@@ -187,7 +191,7 @@ app.get(
 
 app.all('/ghcr/tags/:owner/:package{/:latest}', async (req, res, next) => {
     if (req.method === 'PURGE') {
-        console.log('PURGE:', req.originalUrl)
+        debug('PURGE:', req.originalUrl)
         const key = `ghcr/tags/${req.params.owner}/${req.params.package}/tags/list`
         return purgeKey(res, key)
     }
@@ -197,14 +201,14 @@ app.all('/ghcr/tags/:owner/:package{/:latest}', async (req, res, next) => {
 app.get(
     '/ghcr/tags/:owner/:package{/:latest}',
     errorBadgeHandler(async (req, res) => {
-        console.log(req.originalUrl)
+        debug(req.originalUrl)
         if (req.params.latest && req.params.latest !== 'latest') {
             return res.sendStatus(404)
         }
         const count = Number.parseInt(req.query.n) || 3
-        // console.log('count:', count)
+        // debug('count:', count)
 
-        const api = new GhcrApi(req.params.owner, req.params.package)
+        const api = new GHCRApi(req.params.owner, req.params.package)
         let tags = await api.getImageTags()
         tags = tags.filter((tag) => tag !== 'latest')
         tags = tags.toReversed()
@@ -218,7 +222,7 @@ app.get(
 
         if (req.params.latest) {
             const message = tags.at(-1)
-            // console.log('latest - message:', message)
+            // debug('latest - message:', message)
             return getBadge(message, req.query, { label: 'latest', lucide: 'tag' }, res)
         }
 
@@ -227,14 +231,14 @@ app.get(
         }
 
         const message = tags.join(` ${req.query.sep || '|'} `)
-        // console.log('tags - message:', message)
+        // debug('tags - message:', message)
         getBadge(message, req.query, { label: 'tags', lucide: 'tags' }, res)
     })
 )
 
 app.all('/ghcr/size/:owner/:package{/:tag}', async (req, res, next) => {
     if (req.method === 'PURGE') {
-        console.log('PURGE:', req.originalUrl)
+        debug('PURGE:', req.originalUrl)
         const tag = req.params.tag ? req.params.tag : 'latest'
         const key = `ghcr/size/${req.params.owner}/${req.params.package}/${tag}`
         return purgeKey(res, key)
@@ -245,15 +249,15 @@ app.all('/ghcr/size/:owner/:package{/:tag}', async (req, res, next) => {
 app.get(
     '/ghcr/size/:owner/:package{/:tag}',
     errorBadgeHandler(async (req, res) => {
-        console.log(req.originalUrl)
+        debug(req.originalUrl)
 
-        const api = new GhcrApi(req.params.owner, req.params.package)
+        const api = new GHCRApi(req.params.owner, req.params.package)
         const tag = req.params.tag || 'latest'
         const total = await api.getImageSize(tag)
-        // console.log('getImageSize - total:', total)
+        // debug('getImageSize - total:', total)
 
         const message = formatSize(total)
-        // console.log('message:', message)
+        // debug('message:', message)
         getBadge(message, req.query, { label: 'size', lucide: 'container' }, res)
     })
 )
@@ -261,15 +265,15 @@ app.get(
 app.get(
     '/static/:message{/:label}',
     errorBadgeHandler(async (req, res) => {
-        console.log(req.originalUrl)
-        // console.log(`message/label: ${req.params.message} / ${req.params.label}`)
+        debug(req.originalUrl)
+        // debug(`message/label: ${req.params.message} / ${req.params.label}`)
         // NOTE: This endpoint uses custom logic to make a "static" badge
         //  This needs to be fixed, the icon does not show up like shields
         const query = structuredClone(req.query)
         if (!req.params.label && !query.label && !query.labelColor) {
             query.labelColor = query.color || 'brightgreen'
         }
-        // console.log('query:', query)
+        // debug('query:', query)
         getBadge(req.params.message, query, { label: req.params.label }, res)
     })
 )
@@ -277,7 +281,7 @@ app.get(
 app.all('/:type/:url/:path', async (req, res, next) => {
     if (!['yaml', 'json'].includes(req.params.type)) return next()
     if (req.method === 'PURGE') {
-        console.log('PURGE:', req.originalUrl)
+        debug('PURGE:', req.originalUrl)
         return purgeKey(res, req.path)
     }
     next()
@@ -286,12 +290,12 @@ app.all('/:type/:url/:path', async (req, res, next) => {
 app.get(
     '/:type/:url/:path',
     errorBadgeHandler(async (req, res) => {
-        console.log(req.originalUrl)
-        // console.log('req.params.type:', req.params.type)
+        debug(req.originalUrl)
+        // debug('req.params.type:', req.params.type)
         if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
 
         const message = await getJSONPath(req)
-        // console.log('message:', message)
+        // debug('message:', message)
         getBadge(message, req.query, { label: 'result', lucide: 'code-xml' }, res)
     })
 )
@@ -299,22 +303,22 @@ app.get(
 app.get(
     '/uptime',
     errorBadgeHandler(async (req, res) => {
-        console.log(req.originalUrl)
+        debug(req.originalUrl)
         const message = getUptime()
-        // console.log('message:', message)
+        // debug('message:', message)
         getBadge(message, req.query, { label: 'uptime', lucide: 'clock-arrow-up' }, res)
     })
 )
 
 // Handler 404
 app.use((req, res) => {
-    console.log('404:', req.originalUrl)
+    debug('404:', req.originalUrl)
     const data = {
         message: '404 - URL Not Found',
         color: 'red',
         style: req.query.style || 'flat',
     }
-    // console.log('404 data:', data)
+    debug('404 data:', data)
     // noinspection JSCheckFunctionSignatures
     const badge = makeBadge(data)
     sendBadge(res, badge, 404)
@@ -329,13 +333,13 @@ function errorBadgeHandler(handler) {
             await handler(req, res)
         } catch (error) {
             console.error(error)
-            console.log('errorBadgeHandler:', error.message)
+            debug('errorBadgeHandler:', error.message)
             const data = {
                 message: error.message || 'Unknown Error',
                 color: 'red',
                 style: req.query.style || 'flat',
             }
-            // console.log('data:', data)
+            debug('data:', data)
             const badge = makeBadge(data)
             if (res) sendBadge(res, badge)
         }
@@ -372,7 +376,7 @@ function sendBadge(res, badge, status = 200) {
  */
 function getBadge(message, query = {}, options = {}, res = null) {
     const opts = { color: '', label: '', icon: '', lucide: '', ...options }
-    // console.log('--- opts:', opts)
+    // debug('--- opts:', opts)
     const data = {
         message: message.toString(),
         color: query.color || opts.color || 'brightgreen',
@@ -385,7 +389,7 @@ function getBadge(message, query = {}, options = {}, res = null) {
         data.logoBase64 = `data:image/svg+xml;base64,${logo}`
         data.labelColor = query.labelColor || '#555'
     }
-    // console.log('data:', data)
+    // debug('data:', data)
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
     incrBadge().catch(console.error)
@@ -400,22 +404,22 @@ function getBadge(message, query = {}, options = {}, res = null) {
  * @return {String}
  */
 function getLogo(query, opts, color = '#fff') {
-    // console.log('query.icon:', query.icon)
+    // debug('query.icon:', query.icon)
     if (query.icon !== undefined && !query.icon) return ''
     const iconName = query.icon || query.lucide || opts.icon || opts.lucide
-    // console.log('iconName:', iconName)
+    // debug('iconName:', iconName)
 
     const name = camelCase(iconName, { pascalCase: true })
-    // console.log('name:', name)
+    // debug('name:', name)
     if (!name) return ''
 
     let svg, colorType
     if ((query.icon || opts.icon) && !query.lucide) {
-        // console.log('Simple Icons')
+        // debug('Simple Icons')
         svg = icons[`si${name}`]?.svg
         colorType = 'fill'
     } else {
-        // console.log('Lucide Icon')
+        // debug('Lucide Icon')
         svg = lucide[name]
         colorType = 'color'
     }
@@ -426,9 +430,9 @@ function getLogo(query, opts, color = '#fff') {
     }
 
     const iconColor = query.iconColor || color
-    // console.log('iconColor:', iconColor)
+    // debug('iconColor:', iconColor)
     const result = svg.replace('<svg', `<svg ${colorType}="${iconColor}"`)
-    // console.log('result:', result)
+    // debug('result:', result)
     return Buffer.from(result).toString('base64')
 }
 
@@ -439,9 +443,9 @@ function getLogo(query, opts, color = '#fff') {
  * @return {Promise<void>}
  */
 async function purgeKey(res, key) {
-    console.log(`purgeKey: ${key}`)
+    debug(`purgeKey: ${key}`)
     const result = await cacheDelete(key)
-    console.log('result:', result)
+    debug('result:', result)
     res.send(result.toString())
 }
 
@@ -488,9 +492,9 @@ function getRangedColor(req, index, options = {}) {
         .scale([opts.start, opts.end])
         .mode('lab')
         .colors(opts.total + 1)
-    // console.log('colors:', colors)
-    // colors.forEach((color) => console.log(color))
+    // debug('colors:', colors)
+    // colors.forEach((color) => debug(color))
     const idx = Math.max(0, Math.min(opts.total, index))
-    // console.log(`index: ${idx} / ${colors.length - 1}`)
+    // debug(`index: ${idx} / ${colors.length - 1}`)
     return colors[idx]
 }

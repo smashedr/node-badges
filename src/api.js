@@ -1,5 +1,7 @@
 import axios from 'axios'
+import createDebug from 'debug'
 import jp from 'jsonpath'
+
 // noinspection JSUnresolvedReference
 import { Buffer } from 'node:buffer'
 import { createClient } from 'redis'
@@ -7,6 +9,8 @@ import { GitHubApi } from './github.js'
 import { parse } from 'yaml'
 import { VTApi } from './virustotal.js'
 import { InfluxDB, Point } from '@influxdata/influxdb-client'
+
+const debug = createDebug('app:api')
 
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 console.log(`REDIS_URL: ${redisUrl}`)
@@ -23,7 +27,7 @@ if (process.env.INFLUX_URL && process.env.INFLUX_TOKEN) {
     })
 }
 
-export class GhcrApi {
+export class GHCRApi {
     /**
      * GHCR API
      * @param {String} packageOwner
@@ -54,7 +58,7 @@ export class GhcrApi {
         const key = `ghcr/tags/${url}`
         const cached = await cacheGet(key)
         if (cached) return cached
-        console.log(`-- CACHE MISS: ${key}`)
+        debug(`-- CACHE MISS: ${key}`)
 
         const response = await this.client.get(url)
         await cacheSet(key, response.data.tags)
@@ -69,10 +73,10 @@ export class GhcrApi {
         const key = `ghcr/size/${this.packageOwner}/${this.packageName}/${tag}`
         const cached = await cacheGet(key)
         if (cached) return cached
-        console.log(`-- CACHE MISS: ${key}`)
+        debug(`-- CACHE MISS: ${key}`)
 
         const indexManifest = await this.getManifest(tag)
-        console.log('mediaType:', indexManifest.mediaType)
+        debug('mediaType:', indexManifest.mediaType)
 
         let totalSize = 0
 
@@ -80,26 +84,26 @@ export class GhcrApi {
             !indexManifest.mediaType.includes('list') &&
             !indexManifest.mediaType.includes('index')
         ) {
-            // console.log('indexManifest - !list + !index:', indexManifest)
+            // debug('indexManifest - !list + !index:', indexManifest)
             const size = indexManifest.layers.reduce((sum, layer) => sum + layer.size, 0)
             totalSize = size + (indexManifest.config.size || 0)
-            // console.log('totalSize:', totalSize)
+            // debug('totalSize:', totalSize)
             await cacheSet(key, totalSize)
             return totalSize
         }
 
-        console.log('indexManifest.manifests?.length:', indexManifest.manifests?.length)
+        debug('indexManifest.manifests?.length:', indexManifest.manifests?.length)
         for (const m of indexManifest.manifests) {
             await new Promise((resolve) => setTimeout(resolve, 50))
             const manifest = await this.getManifest(m.digest)
             const configSize = manifest.config?.size || 0
-            // console.log('configSize:', configSize)
+            // debug('configSize:', configSize)
             // noinspection JSUnresolvedReference
             const layerSize = manifest.layers?.reduce((a, l) => a + (l.size || 0), 0) || 0
-            // console.log('layerSize:', layerSize)
+            // debug('layerSize:', layerSize)
             totalSize += configSize + layerSize
         }
-        // console.log('totalSize:', totalSize)
+        // debug('totalSize:', totalSize)
         await cacheSet(key, totalSize, 60 * 60 * 4)
         return totalSize
     }
@@ -110,7 +114,7 @@ export class GhcrApi {
      */
     async getManifest(tag = 'latest') {
         const url = `${this.packageOwner}/${this.packageName}/manifests/${tag}`
-        // console.log('url:', url)
+        // debug('url:', url)
         const response = await this.client.get(url)
         return response.data
     }
@@ -128,14 +132,14 @@ export class GhcrApi {
 export async function getVTReleaseStats(req) {
     const tag = req.params.tag || 'latest'
     const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}/${tag}`
-    console.log('key:', key)
+    debug('key:', key)
     // NOTE: Duplicate Code - 5 lines
     const cached = await cacheGet(key)
     if (cached) {
         if (cached.errorMessage) throw new Error(cached.errorMessage)
         return cached
     }
-    console.log(`-- CACHE MISS: ${key}`)
+    debug(`-- CACHE MISS: ${key}`)
 
     const gh = new GitHubApi(process.env.GITHUB_TOKEN)
     let release
@@ -144,17 +148,17 @@ export async function getVTReleaseStats(req) {
     } else {
         release = await gh.getReleaseByTag(req.params.owner, req.params.repo, tag)
     }
-    // console.log('release?.assets:', release?.assets)
+    // debug('release?.assets:', release?.assets)
     if (!release) await cacheError(key, 'Release Not Found')
     const asset = release.assets.find((a) => a.name === req.params.asset)
-    // console.log('asset:', asset)
+    // debug('asset:', asset)
     if (!asset) await cacheError(key, 'Asset Not Found')
-    // console.log('asset?.digest:', asset?.digest)
+    // debug('asset?.digest:', asset?.digest)
     if (!asset?.digest) await cacheError(key, 'Digest Not Found')
     const hash = asset.digest.split(':')[1]
-    // console.log('hash:', hash)
+    // debug('hash:', hash)
     const stats = await getVTStats(hash)
-    // console.log('last_analysis_stats:', stats)
+    // debug('last_analysis_stats:', stats)
     if (!stats) await cacheError(key, 'VT Stats Not Found')
     await cacheSet(key, stats)
     return stats
@@ -167,26 +171,26 @@ export async function getVTReleaseStats(req) {
  */
 export async function getVTStats(hash) {
     const key = `/vt/id/${hash}`
-    console.log('key:', key)
+    debug('key:', key)
     // NOTE: Duplicate Code - 5 lines
     const cached = await cacheGet(key)
     if (cached) {
         if (cached.errorMessage) throw new Error(cached.errorMessage)
         return cached
     }
-    console.log(`-- CACHE MISS: ${key}`)
+    debug(`-- CACHE MISS: ${key}`)
     const vt = new VTApi(process.env.VT_API_KEY)
     let stats
     if (hash.endsWith('==')) {
-        console.log('DEPRECATED - getAnalysis') // TODO: Deprecated
+        debug('DEPRECATED - getAnalysis') // TODO: Deprecated
         const data = await vt.getAnalysis(hash)
-        // console.log('data:', JSON.stringify(data, null, 2))
+        // debug('data:', JSON.stringify(data, null, 2))
         // noinspection JSUnresolvedReference
         stats = data?.data?.attributes?.stats
     } else {
-        // console.log('getReport')
+        // debug('getReport')
         const data = await vt.getReport(hash)
-        // console.log('data:', JSON.stringify(data, null, 2))
+        // debug('data:', JSON.stringify(data, null, 2))
         // noinspection JSUnresolvedReference
         stats = data?.data?.attributes?.last_analysis_stats
     }
@@ -203,24 +207,24 @@ export async function getVTStats(hash) {
 export async function getJSONPath(req) {
     const key = req.path
     const cached = await cacheGet(key)
-    // console.log('cached:', cached)
+    // debug('cached:', cached)
     if (cached) return cached
-    console.log(`-- CACHE MISS: ${key}`)
+    debug(`-- CACHE MISS: ${key}`)
 
     const url = new URL(req.params.url)
-    console.log('url.href:', url.href)
+    debug('url.href:', url.href)
 
     const response = await fetch(url)
-    // console.log('response:', response)
-    // console.log('response.status:', response.status)
+    // debug('response:', response)
+    // debug('response.status:', response.status)
 
     // const length = response.headers.get('content-length')
-    // console.log('content-length:', length)
+    // debug('content-length:', length)
 
     const text = await response.text()
-    // console.log('text.length:', text.length)
+    // debug('text.length:', text.length)
     // const encoder = new TextEncoder().encode(text)
-    // console.log('encoder.length:', encoder.length)
+    // debug('encoder.length:', encoder.length)
 
     let data
     if (req.params.type === 'yaml') {
@@ -228,14 +232,14 @@ export async function getJSONPath(req) {
     } else {
         data = JSON.parse(text)
     }
-    // console.log('data:', data)
+    // debug('data:', data)
 
     let result = jp.query(data, req.params.path)[0]
-    console.log('result:', result)
+    debug('result:', result)
     if (req.query.split) {
         const split = result.split(req.query.split)
         result = split[req.query.index || 0]
-        console.log('result:', result)
+        debug('result:', result)
     }
     if (!result) {
         throw new Error('No Result for Query')
@@ -262,7 +266,7 @@ export async function cacheDelete(key) {
 }
 
 async function cacheError(key, errorMessage, EX = 60 * 10) {
-    console.log(`cacheError: ${key}`, errorMessage)
+    debug(`cacheError: ${key}`, errorMessage)
     await cacheSet(key, { errorMessage }, EX)
     throw new Error(errorMessage)
 }
@@ -272,8 +276,8 @@ export async function incrBadge() {
 }
 
 export async function sendInflux() {
-    if (!influxClient) return console.log('InfluxDB Not Configured.')
-    console.log(`Processing Influx: ${new Date().toLocaleString()}`)
+    if (!influxClient) return debug('InfluxDB Not Configured.')
+    debug(`Processing Influx: ${new Date().toLocaleString()}`)
 
     const org = process.env.INFLUX_ORG || 'cssnr'
     const bucket = process.env.INFLUX_BUCKET || 'general'
@@ -282,15 +286,15 @@ export async function sendInflux() {
     const measurementName = 'node_badges'
 
     const badgesTotal = await cacheGet('badges_total', 0)
-    // console.log('badgesTotal:', badgesTotal, typeof badgesTotal)
+    // debug('badgesTotal:', badgesTotal, typeof badgesTotal)
     writeApi.writePoint(new Point(measurementName).intField('badges_total', badgesTotal))
 
     const appUptime = Math.floor(process.uptime())
-    // console.log('appUptime:', appUptime, typeof appUptime)
+    // debug('appUptime:', appUptime, typeof appUptime)
     writeApi.writePoint(new Point(measurementName).intField('app_uptime', appUptime))
 
     const redisKeys = await client.dbSize()
-    // console.log('redisKeys:', redisKeys, typeof redisKeys)
+    // debug('redisKeys:', redisKeys, typeof redisKeys)
     writeApi.writePoint(new Point(measurementName).intField('redis_keys', redisKeys))
 
     await writeApi.close()

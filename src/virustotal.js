@@ -1,4 +1,7 @@
 import axios from 'axios'
+import createDebug from 'debug'
+
+const debug = createDebug('app:api')
 
 export class VTApi {
     /**
@@ -20,10 +23,10 @@ export class VTApi {
     async getReport(id) {
         try {
             const response = await this.client.get(`/files/${id}`)
-            console.log('getReport: response.status:', response.status)
+            debug('getReport: response.status:', response.status)
             return response.data
         } catch (error) {
-            console.log('error:', error)
+            console.error('error:', error)
         }
     }
 
@@ -35,10 +38,10 @@ export class VTApi {
     async getAnalysis(id) {
         try {
             const response = await this.client.get(`/analyses/${id}`)
-            console.log('getReport: response.status:', response.status)
+            debug('getReport: response.status:', response.status)
             return response.data
         } catch (error) {
-            console.log('error:', error)
+            console.error('error:', error)
         }
     }
 }

@@ -24,8 +24,8 @@ services:
     image: node-badges:latest
     command: "npm run dev"
     env_file: ${SETTINGS:-settings.env.example}
-    #environment:
-    #  DEBUG: "express:*"
+    environment:
+      DEBUG: "app:*"
     deploy:
       replicas: 1
       resources:
