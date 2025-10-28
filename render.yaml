@@ -4,7 +4,7 @@ services:
     plan: free
     runtime: docker
     repo: https://github.com/smashedr/node-badges
-    autoDeployTrigger: off
+    autoDeployTrigger: commit
     dockerCommand: npm start
     healthCheckPath: /app-health-check
     envVars:

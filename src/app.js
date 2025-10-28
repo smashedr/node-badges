@@ -51,7 +51,7 @@ schedule.scheduleJob('*/5 * * * *', function () {
 })
 
 const server = app.listen(port, () => {
-    console.log(`Listening on RENDER PORT: ${port}`) // TODO: DEBUGGING ONLY
+    console.log(`Listening on PORT: ${port}`)
 })
 
 process.on('SIGTERM', () => {
