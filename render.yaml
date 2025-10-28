@@ -2,8 +2,6 @@ services:
   - type: web
     name: node-badges
     plan: free
-    previews:
-      generation: automatic
     runtime: docker
     repo: https://github.com/smashedr/node-badges
     autoDeployTrigger: off

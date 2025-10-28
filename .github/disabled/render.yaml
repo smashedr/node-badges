@@ -2,7 +2,6 @@ name: "Render"
 
 on:
   push:
-    branches-ignore: [master]
   workflow_call:
     #inputs:
     #  version:
@@ -21,16 +20,15 @@ env:
 
 jobs:
   render:
-    if: ${{ !contains(github.event.head_commit.message, '#norender') }}
     #if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     #if: ${{ github.event.workflow_run.conclusion != '' && github.event.workflow_run.conclusion == 'success' || true }}
     name: "Render"
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
-    environment:
-      name: render
-      url: https://node-badges.onrender.com/
+    #environment:
+    #  name: render
+    #  url: https://node-badges.onrender.com/
 
     steps:
       - name: "Debug CTX github"
@@ -40,42 +38,36 @@ jobs:
           GITHUB_CTX: ${{ toJSON(github) }}
         run: echo "$GITHUB_CTX"
 
-      - name: "Debug Branch ref"
+      - name: "Debug 1"
         continue-on-error: true
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"
           echo "inputs.version: ${{ inputs.version }}"
           echo "env.version: ${{ env.version }}"
-          echo "--------------------"
-          echo "ref: ${{ github.ref_name }}"
 
-      - name: "Debug Image version"
+      - name: "Debug 2"
         continue-on-error: true
         env:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
         run: |
-          echo "github.ref_name: ${{ github.ref_name }}"
-          echo "inputs.version: ${{ inputs.version }}"
           echo "env.version: ${{ env.version }}"
-          echo "--------------------"
           echo "imgURL: ghcr.io/${{ github.repository }}:${{ env.version }}"
+          echo "ref: ${{ env.version }}"
 
-      # https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
-      # NOTE: Confirm we can do image and dockerfile deployments simultaneously...
-      - name: "Deploy Image"
-        if: ${{ inputs.version }}
+      ## https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
+      #- name: "Render Deploy"
+      #  uses: cssnr/web-request-action@v1
+      #  env:
+      #    version: ${{ env.version == 'master' && 'latest' || env.version }}
+      #  with:
+      #    url: ${{ secrets.RENDER_HOOK }}
+      #    params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
+
+      - name: "Render Deploy"
         uses: cssnr/web-request-action@v1
         env:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
         with:
           url: ${{ secrets.RENDER_HOOK }}
           params: |
-            imgURL: ghcr.io/${{ github.repository }}:${{ env.version }}
-
-      - name: "Deploy Branch"
-        if: ${{ !inputs.version }}
-        uses: cssnr/web-request-action@v1
-        with:
-          url: ${{ secrets.RENDER_HOOK }}
-          params: |
-            ref: ${{ github.ref_name }}
+            ref: ${{ env.version }}
