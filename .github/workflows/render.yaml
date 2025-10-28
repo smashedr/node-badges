@@ -61,6 +61,7 @@ jobs:
           echo "imgURL: ghcr.io/${{ github.repository }}:${{ env.version }}"
 
       # https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
+      # NOTE: Confirm we can do image and dockerfile deployments simultaneously...
       - name: "Deploy Image"
         if: ${{ inputs.version }}
         uses: cssnr/web-request-action@v1
