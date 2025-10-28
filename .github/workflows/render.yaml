@@ -1,6 +1,7 @@
 name: "Render"
 
 on:
+  push:
   workflow_call:
     #inputs:
     #  version:
@@ -51,12 +52,22 @@ jobs:
         run: |
           echo "env.version: ${{ env.version }}"
           echo "imgURL: ghcr.io/${{ github.repository }}:${{ env.version }}"
+          echo "ref: ${{ env.version }}"
 
-      # https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
+      ## https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
+      #- name: "Render Deploy"
+      #  uses: cssnr/web-request-action@v1
+      #  env:
+      #    version: ${{ env.version == 'master' && 'latest' || env.version }}
+      #  with:
+      #    url: ${{ secrets.RENDER_HOOK }}
+      #    params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
+
       - name: "Render Deploy"
         uses: cssnr/web-request-action@v1
         env:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
         with:
           url: ${{ secrets.RENDER_HOOK }}
-          params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
+          params: |
+            ref: ${{ env.version }}
