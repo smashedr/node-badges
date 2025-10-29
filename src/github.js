@@ -6,7 +6,7 @@ export const debug = createDebug('app:api')
 export class GitHubApi {
     /**
      * GitHub Api
-     * @param {String} [token]
+     * @param {string} [token]
      */
     constructor(token) {
         const data = {}
@@ -17,7 +17,7 @@ export class GitHubApi {
     // /**
     //  * Get Release
     //  * @param {string} release_id
-    //  * @return {Promise<Object>}
+    //  * @return {Promise<object>}
     //  */
     // async getRelease(release_id) {
     //     debug('getRelease:', release_id)
@@ -31,10 +31,10 @@ export class GitHubApi {
 
     /**
      * Get Release by Tag
-     * @param {String} owner
-     * @param {String} repo
-     * @param {String} tag
-     * @return {Promise<Object>}
+     * @param {string} owner
+     * @param {string} repo
+     * @param {string} tag
+     * @return {Promise<object>}
      */
     async getReleaseByTag(owner, repo, tag) {
         debug('getReleaseByTag:', tag)
@@ -49,9 +49,9 @@ export class GitHubApi {
 
     /**
      * Get Latest Release
-     * @param {String} owner
-     * @param {String} repo
-     * @return {Promise<Object|Undefined>}
+     * @param {string} owner
+     * @param {string} repo
+     * @return {Promise<object|undefined>}
      */
     async getLatestRelease(owner, repo) {
         debug('getLatestRelease:', owner, repo)

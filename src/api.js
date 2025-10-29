@@ -30,8 +30,8 @@ if (process.env.INFLUX_URL && process.env.INFLUX_TOKEN) {
 export class GHCRApi {
     /**
      * GHCR API
-     * @param {String} packageOwner
-     * @param {String} packageName
+     * @param {string} packageOwner
+     * @param {string} packageName
      */
     constructor(packageOwner, packageName) {
         if (!packageOwner || !packageName) throw new Error('Invalid Arguments')
@@ -51,7 +51,7 @@ export class GHCRApi {
 
     /**
      * Get Image Tags
-     * @return {Promise<Array>}
+     * @return {Promise<string[]>}
      */
     async getImageTags() {
         const url = `${this.packageOwner}/${this.packageName}/tags/list`
@@ -67,7 +67,7 @@ export class GHCRApi {
 
     /**
      * Get Image Size
-     * @return {Promise<Number>}
+     * @return {Promise<number>}
      */
     async getImageSize(tag = 'latest') {
         const key = `ghcr/size/${this.packageOwner}/${this.packageName}/${tag}`
@@ -110,7 +110,7 @@ export class GHCRApi {
 
     /**
      * Get Image Manifest
-     * @return {Promise<Object>}
+     * @return {Promise<object>}
      */
     async getManifest(tag = 'latest') {
         const url = `${this.packageOwner}/${this.packageName}/manifests/${tag}`
@@ -127,7 +127,7 @@ export class GHCRApi {
 /**
  * Get VirusTotal Stats for a Release Asset
  * @param {import('express').Request} req
- * @return {Promise<Object>}
+ * @return {Promise<object>}
  */
 export async function getVTReleaseStats(req) {
     const tag = req.params.tag || 'latest'
@@ -166,8 +166,8 @@ export async function getVTReleaseStats(req) {
 
 /**
  * Get VT Stats for a File ID/Hash
- * @param {String} hash
- * @return {Promise<Object>}
+ * @param {string} hash
+ * @return {Promise<object>}
  */
 export async function getVTStats(hash) {
     const key = `/vt/id/${hash}`
