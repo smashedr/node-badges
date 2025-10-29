@@ -285,25 +285,17 @@ export async function sendInflux() {
 
     const measurementName = 'node_badges'
 
-    const badgesTotal = await cacheGet('badges_total', 0)
-    // debug('badgesTotal:', badgesTotal, typeof badgesTotal)
-    writeApi.writePoint(new Point(measurementName).intField('badges_total', badgesTotal))
+    const write = (name, data) => {
+        const point = new Point(measurementName).intField(name, data)
+        debug('writePoint:', point)
+        writeApi.writePoint(point)
+    }
 
-    const badges404 = await cacheGet('badges_404', 0)
-    // debug('badges404:', badges404, typeof badges404)
-    writeApi.writePoint(new Point(measurementName).intField('badges_404', badges404))
-
-    const badgesError = await cacheGet('badges_error', 0)
-    // debug('badgesError:', badgesError, typeof badgesError)
-    writeApi.writePoint(new Point(measurementName).intField('badges_error', badgesError))
-
-    const appUptime = Math.floor(process.uptime())
-    // debug('appUptime:', appUptime, typeof appUptime)
-    writeApi.writePoint(new Point(measurementName).intField('app_uptime', appUptime))
-
-    const redisKeys = await client.dbSize()
-    // debug('redisKeys:', redisKeys, typeof redisKeys)
-    writeApi.writePoint(new Point(measurementName).intField('redis_keys', redisKeys))
+    write('badges_total', await cacheGet('badges_total', 0))
+    write('badges_404', await cacheGet('badges_404', 0))
+    write('badges_error', await cacheGet('badges_error', 0))
+    write('app_uptime', Math.floor(process.uptime()))
+    write('redis_keys', await client.dbSize())
 
     await writeApi.close()
 }
