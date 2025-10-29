@@ -86,6 +86,8 @@ app.get('/', async (req, res) => {
         links: {
             Source: 'https://github.com/smashedr/node-badges',
             Docs: 'https://smashedr.github.io/node-badges-docs',
+            Grafana:
+                'https://cssnr.grafana.net/public-dashboards/8a24a95171fe4127ada92afb071b9331',
         },
         // badges: [{ src: '', href: '' }],
     })
@@ -110,6 +112,7 @@ app.get('/colors{/:index}', async (req, res) => {
     debug('index:', index)
     const color = getRangedColor(req, index)
     debug('color:', color)
+    // noinspection HtmlRequiredLangAttribute
     res.send(`<html><body style="margin:0;background:${color}"></body></html>`)
 })
 

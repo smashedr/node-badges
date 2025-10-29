@@ -167,7 +167,11 @@ export async function getVTReleaseStats(req) {
 /**
  * Get VT Stats for a File ID/Hash
  * @param {string} hash
- * @return {Promise<object>}
+ * @typedef {object} Stats
+ * @property {number} malicious
+ * @property {number} suspicious
+ * @property {number} undetected
+ * @return {Promise<Stats>}
  */
 export async function getVTStats(hash) {
     const key = `/vt/id/${hash}`
