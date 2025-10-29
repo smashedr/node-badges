@@ -19,7 +19,7 @@ import {
     getVTReleaseStats,
     getVTStats,
     GHCRApi,
-    incrBadge,
+    incrKey,
     sendInflux,
 } from './api.js'
 
@@ -291,9 +291,9 @@ app.get('/uptime', async (req, res) => {
     getBadge(message, req.query, { label: 'uptime', lucide: 'clock-arrow-up' }, res)
 })
 
-// Handler 404
+// Handler - 404
 app.use((req, res) => {
-    debug('404:', req.originalUrl)
+    debug('404 - originalUrl:', req.originalUrl)
     const data = {
         message: '404 - URL Not Found',
         color: 'red',
@@ -303,17 +303,19 @@ app.use((req, res) => {
     // noinspection JSCheckFunctionSignatures
     const badge = makeBadge(data)
     sendBadge(res, badge, 404)
+    incrKey('badges_404').catch(console.error)
 })
 
+// Handler - Error
 app.use(errorHandler)
 
-// NOTE: Must determine which errors to pass to sentry.
-//  Defining it after the error handler only catches errors in the handler...
+// Handler - Sentry Error - NOTE: This only catches errorHandler errors currently...
 if (Sentry) Sentry.setupExpressErrorHandler(app)
 
 function errorHandler(err, req, res) {
     // console.log('errorHandler:', err)
-    debug('errorHandler:', err.message)
+    debug('errorHandler - originalUrl:', req.originalUrl)
+    debug('err.message:', err.message)
     const data = {
         message: err.message || 'Unknown Error',
         color: 'red',
@@ -321,7 +323,8 @@ function errorHandler(err, req, res) {
     }
     debug('data:', data)
     const badge = makeBadge(data)
-    if (res) sendBadge(res, badge)
+    sendBadge(res, badge)
+    incrKey('badges_error').catch(console.error)
 }
 
 /**
@@ -370,7 +373,7 @@ function getBadge(message, query = {}, options = {}, res = null) {
     // debug('data:', data)
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
-    incrBadge().catch(console.error)
+    incrKey('badges_total').catch(console.error)
     return badge
 }
 

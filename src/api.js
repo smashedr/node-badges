@@ -271,8 +271,8 @@ async function cacheError(key, errorMessage, EX = 60 * 10) {
     throw new Error(errorMessage)
 }
 
-export async function incrBadge() {
-    await client.incr('badges_total')
+export async function incrKey(key) {
+    await client.incr(key)
 }
 
 export async function sendInflux() {
@@ -288,6 +288,14 @@ export async function sendInflux() {
     const badgesTotal = await cacheGet('badges_total', 0)
     // debug('badgesTotal:', badgesTotal, typeof badgesTotal)
     writeApi.writePoint(new Point(measurementName).intField('badges_total', badgesTotal))
+
+    const badges404 = await cacheGet('badges_404', 0)
+    // debug('badges404:', badges404, typeof badges404)
+    writeApi.writePoint(new Point(measurementName).intField('badges_404', badges404))
+
+    const badgesError = await cacheGet('badges_error', 0)
+    // debug('badgesError:', badgesError, typeof badgesError)
+    writeApi.writePoint(new Point(measurementName).intField('badges_error', badgesError))
 
     const appUptime = Math.floor(process.uptime())
     // debug('appUptime:', appUptime, typeof appUptime)
