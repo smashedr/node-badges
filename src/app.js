@@ -311,7 +311,7 @@ app.use(errorHandler)
 //  Defining it after the error handler only catches errors in the handler...
 if (Sentry) Sentry.setupExpressErrorHandler(app)
 
-function errorHandler(err, req, res, next) {
+function errorHandler(err, req, res) {
     // console.log('errorHandler:', err)
     debug('errorHandler:', err.message)
     const data = {
