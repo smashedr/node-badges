@@ -15,7 +15,7 @@
     "@influxdata/influxdb-client": "^1.35.0",
     "@octokit/rest": "^22.0.0",
     "@sentry/node": "^10.22.0",
-    "axios": "^1.12.2",
+    "axios": "^1.13.1",
     "badge-maker": "^5.0.2",
     "camelcase": "^8.0.0",
     "chroma-js": "^3.1.2",

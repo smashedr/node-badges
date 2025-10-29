@@ -6,7 +6,7 @@ const debug = createDebug('app:api')
 export class VTApi {
     /**
      * GitHub Api
-     * @param {String} token
+     * @param {string} token
      */
     constructor(token) {
         this.client = axios.create({
@@ -17,8 +17,8 @@ export class VTApi {
 
     /**
      * Get Release
-     * @param {String} id
-     * @return {Promise<Object|Undefined>}
+     * @param {string} id
+     * @return {Promise<object|undefined>}
      */
     async getReport(id) {
         try {
@@ -32,8 +32,8 @@ export class VTApi {
 
     /**
      * Get Release
-     * @param {String} id
-     * @return {Promise<Object|Undefined>}
+     * @param {string} id
+     * @return {Promise<object|undefined>}
      */
     async getAnalysis(id) {
         try {

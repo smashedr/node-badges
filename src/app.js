@@ -19,7 +19,7 @@ import {
     getVTReleaseStats,
     getVTStats,
     GHCRApi,
-    incrBadge,
+    incrKey,
     sendInflux,
 } from './api.js'
 
@@ -63,6 +63,7 @@ process.on('SIGTERM', () => {
         await schedule.gracefulShutdown()
         // NOTE: Determine if we should sendInflux on close
         // await sendInflux()
+        process.exit(0)
     })
 })
 
@@ -91,15 +92,16 @@ app.get('/', async (req, res) => {
 })
 
 // app.get('/test{/:extra}', async (req, res) => {
-//     res.sendStatus(200)
+//     throw new Error('ralf brok ei t')
+//     // res.sendStatus(200)
 //
-//     const total = await cacheGet('badges_total')
-//     debug('badges_total:', total)
-//
-//     if (req.params.extra) {
-//         debug('req.params.extra:', req.params.extra)
-//         sendInflux().catch(console.error)
-//     }
+//     // const total = await cacheGet('badges_total')
+//     // debug('badges_total:', total)
+//     //
+//     // if (req.params.extra) {
+//     //     debug('req.params.extra:', req.params.extra)
+//     //     sendInflux().catch(console.error)
+//     // }
 // })
 
 app.get('/colors{/:index}', async (req, res) => {
@@ -141,28 +143,25 @@ app.all('/vt/:type/:hash', async (req, res, next) => {
     next()
 })
 
-app.get(
-    '/vt/:type/:hash',
-    errorBadgeHandler(async (req, res) => {
-        debug(req.originalUrl)
-        // debug('req.params.type:', req.params.type)
-        if (!['id', 'sha'].includes(req.params.type)) return res.sendStatus(404)
-        if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
+app.get('/vt/:type/:hash', async (req, res) => {
+    debug(req.originalUrl)
+    // debug('req.params.type:', req.params.type)
+    if (!['id', 'sha'].includes(req.params.type)) return res.sendStatus(404)
+    if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
 
-        const hash = req.params.hash.includes(':')
-            ? req.params.hash.split(':')[1]
-            : req.params.hash
-        // debug('hash:', hash)
+    const hash = req.params.hash.includes(':')
+        ? req.params.hash.split(':')[1]
+        : req.params.hash
+    // debug('hash:', hash)
 
-        const stats = await getVTStats(hash)
-        // debug('stats:', stats)
-        const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
-        // debug('message:', message)
-        const color = getRangedColor(req, stats.malicious + stats.suspicious)
-        const options = { label: hash.slice(0, 6), icon: 'virustotal', color }
-        getBadge(message, req.query, options, res)
-    })
-)
+    const stats = await getVTStats(hash)
+    // debug('stats:', stats)
+    const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
+    // debug('message:', message)
+    const color = getRangedColor(req, stats.malicious + stats.suspicious)
+    const options = { label: hash.slice(0, 6), icon: 'virustotal', color }
+    getBadge(message, req.query, options, res)
+})
 
 app.all('/vt/:owner/:repo/:asset{/:tag}', async (req, res, next) => {
     if (req.method === 'PURGE') {
@@ -174,20 +173,17 @@ app.all('/vt/:owner/:repo/:asset{/:tag}', async (req, res, next) => {
     next()
 })
 
-app.get(
-    '/vt/:owner/:repo/:asset{/:tag}',
-    errorBadgeHandler(async (req, res) => {
-        debug(req.originalUrl)
-        if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
-        const stats = await getVTReleaseStats(req)
-        // debug('stats:', stats)
-        const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
-        // debug('message:', message)
-        const color = getRangedColor(req, stats.malicious + stats.suspicious)
-        const options = { label: req.params.asset, icon: 'virustotal', color }
-        getBadge(message, req.query, options, res)
-    })
-)
+app.get('/vt/:owner/:repo/:asset{/:tag}', async (req, res) => {
+    debug(req.originalUrl)
+    if (!process.env.VT_API_KEY) throw new Error('Missing VT API Key')
+    const stats = await getVTReleaseStats(req)
+    // debug('stats:', stats)
+    const message = `${stats.malicious}/${stats.suspicious}/${stats.undetected}`
+    // debug('message:', message)
+    const color = getRangedColor(req, stats.malicious + stats.suspicious)
+    const options = { label: req.params.asset, icon: 'virustotal', color }
+    getBadge(message, req.query, options, res)
+})
 
 app.all('/ghcr/tags/:owner/:package{/:latest}', async (req, res, next) => {
     if (req.method === 'PURGE') {
@@ -198,43 +194,40 @@ app.all('/ghcr/tags/:owner/:package{/:latest}', async (req, res, next) => {
     next()
 })
 
-app.get(
-    '/ghcr/tags/:owner/:package{/:latest}',
-    errorBadgeHandler(async (req, res) => {
-        debug(req.originalUrl)
-        if (req.params.latest && req.params.latest !== 'latest') {
-            return res.sendStatus(404)
-        }
-        const count = Number.parseInt(req.query.n) || 3
-        // debug('count:', count)
+app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
+    debug(req.originalUrl)
+    if (req.params.latest && req.params.latest !== 'latest') {
+        return res.sendStatus(404)
+    }
+    const count = Number.parseInt(req.query.n) || 3
+    // debug('count:', count)
 
-        const api = new GHCRApi(req.params.owner, req.params.package)
-        let tags = await api.getImageTags()
-        tags = tags.filter((tag) => tag !== 'latest')
-        tags = tags.toReversed()
+    const api = new GHCRApi(req.params.owner, req.params.package)
+    let tags = await api.getImageTags()
+    tags = tags.filter((tag) => tag !== 'latest')
+    tags = tags.toReversed()
 
-        if (req.query.semver !== undefined) {
-            tags = tags.filter((str) => semver.valid(str))
-        }
+    if (req.query.semver !== undefined) {
+        tags = tags.filter((str) => semver.valid(str))
+    }
 
-        tags = tags.slice(0, count)
-        tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    tags = tags.slice(0, count)
+    tags = tags.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
 
-        if (req.params.latest) {
-            const message = tags.at(-1)
-            // debug('latest - message:', message)
-            return getBadge(message, req.query, { label: 'latest', lucide: 'tag' }, res)
-        }
+    if (req.params.latest) {
+        const message = tags.at(-1)
+        // debug('latest - message:', message)
+        return getBadge(message, req.query, { label: 'latest', lucide: 'tag' }, res)
+    }
 
-        if (req.query.reversed !== undefined) {
-            tags.reverse()
-        }
+    if (req.query.reversed !== undefined) {
+        tags.reverse()
+    }
 
-        const message = tags.join(` ${req.query.sep || '|'} `)
-        // debug('tags - message:', message)
-        getBadge(message, req.query, { label: 'tags', lucide: 'tags' }, res)
-    })
-)
+    const message = tags.join(` ${req.query.sep || '|'} `)
+    // debug('tags - message:', message)
+    getBadge(message, req.query, { label: 'tags', lucide: 'tags' }, res)
+})
 
 app.all('/ghcr/size/:owner/:package{/:tag}', async (req, res, next) => {
     if (req.method === 'PURGE') {
@@ -246,37 +239,31 @@ app.all('/ghcr/size/:owner/:package{/:tag}', async (req, res, next) => {
     next()
 })
 
-app.get(
-    '/ghcr/size/:owner/:package{/:tag}',
-    errorBadgeHandler(async (req, res) => {
-        debug(req.originalUrl)
+app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
+    debug(req.originalUrl)
 
-        const api = new GHCRApi(req.params.owner, req.params.package)
-        const tag = req.params.tag || 'latest'
-        const total = await api.getImageSize(tag)
-        // debug('getImageSize - total:', total)
+    const api = new GHCRApi(req.params.owner, req.params.package)
+    const tag = req.params.tag || 'latest'
+    const total = await api.getImageSize(tag)
+    // debug('getImageSize - total:', total)
 
-        const message = formatSize(total)
-        // debug('message:', message)
-        getBadge(message, req.query, { label: 'size', lucide: 'container' }, res)
-    })
-)
+    const message = formatSize(total)
+    // debug('message:', message)
+    getBadge(message, req.query, { label: 'size', lucide: 'container' }, res)
+})
 
-app.get(
-    '/static/:message{/:label}',
-    errorBadgeHandler(async (req, res) => {
-        debug(req.originalUrl)
-        // debug(`message/label: ${req.params.message} / ${req.params.label}`)
-        // NOTE: This endpoint uses custom logic to make a "static" badge
-        //  This needs to be fixed, the icon does not show up like shields
-        const query = structuredClone(req.query)
-        if (!req.params.label && !query.label && !query.labelColor) {
-            query.labelColor = query.color || 'brightgreen'
-        }
-        // debug('query:', query)
-        getBadge(req.params.message, query, { label: req.params.label }, res)
-    })
-)
+app.get('/static/:message{/:label}', async (req, res) => {
+    debug(req.originalUrl)
+    // debug(`message/label: ${req.params.message} / ${req.params.label}`)
+    // NOTE: This endpoint uses custom logic to make a "static" badge
+    //  This needs to be fixed, the icon does not show up like shields
+    const query = structuredClone(req.query)
+    if (!req.params.label && !query.label && !query.labelColor) {
+        query.labelColor = query.color || 'brightgreen'
+    }
+    // debug('query:', query)
+    getBadge(req.params.message, query, { label: req.params.label }, res)
+})
 
 app.all('/:type/:url/:path', async (req, res, next) => {
     if (!['yaml', 'json'].includes(req.params.type)) return next()
@@ -287,32 +274,26 @@ app.all('/:type/:url/:path', async (req, res, next) => {
     next()
 })
 
-app.get(
-    '/:type/:url/:path',
-    errorBadgeHandler(async (req, res) => {
-        debug(req.originalUrl)
-        // debug('req.params.type:', req.params.type)
-        if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
+app.get('/:type/:url/:path', async (req, res) => {
+    debug(req.originalUrl)
+    // debug('req.params.type:', req.params.type)
+    if (!['yaml', 'json'].includes(req.params.type)) return res.sendStatus(404)
 
-        const message = await getJSONPath(req)
-        // debug('message:', message)
-        getBadge(message, req.query, { label: 'result', lucide: 'code-xml' }, res)
-    })
-)
+    const message = await getJSONPath(req)
+    // debug('message:', message)
+    getBadge(message, req.query, { label: 'result', lucide: 'code-xml' }, res)
+})
 
-app.get(
-    '/uptime',
-    errorBadgeHandler(async (req, res) => {
-        debug(req.originalUrl)
-        const message = getUptime()
-        // debug('message:', message)
-        getBadge(message, req.query, { label: 'uptime', lucide: 'clock-arrow-up' }, res)
-    })
-)
+app.get('/uptime', async (req, res) => {
+    debug(req.originalUrl)
+    const message = getUptime()
+    // debug('message:', message)
+    getBadge(message, req.query, { label: 'uptime', lucide: 'clock-arrow-up' }, res)
+})
 
-// Handler 404
+// Handler - 404
 app.use((req, res) => {
-    debug('404:', req.originalUrl)
+    debug('404 - originalUrl:', req.originalUrl)
     const data = {
         message: '404 - URL Not Found',
         color: 'red',
@@ -322,28 +303,28 @@ app.use((req, res) => {
     // noinspection JSCheckFunctionSignatures
     const badge = makeBadge(data)
     sendBadge(res, badge, 404)
+    incrKey('badges_404').catch(console.error)
 })
 
+// Handler - Error
+app.use(errorHandler)
+
+// Handler - Sentry Error - NOTE: This only catches errorHandler errors currently...
 if (Sentry) Sentry.setupExpressErrorHandler(app)
 
-// TODO: Move to express error handler...
-function errorBadgeHandler(handler) {
-    return async (req, res) => {
-        try {
-            await handler(req, res)
-        } catch (error) {
-            console.error(error)
-            debug('errorBadgeHandler:', error.message)
-            const data = {
-                message: error.message || 'Unknown Error',
-                color: 'red',
-                style: req.query.style || 'flat',
-            }
-            debug('data:', data)
-            const badge = makeBadge(data)
-            if (res) sendBadge(res, badge)
-        }
+function errorHandler(err, req, res) {
+    // console.log('errorHandler:', err)
+    debug('errorHandler - originalUrl:', req.originalUrl)
+    debug('err.message:', err.message)
+    const data = {
+        message: err.message || 'Unknown Error',
+        color: 'red',
+        style: req.query.style || 'flat',
     }
+    debug('data:', data)
+    const badge = makeBadge(data)
+    sendBadge(res, badge)
+    incrKey('badges_error').catch(console.error)
 }
 
 /**
@@ -358,8 +339,8 @@ function setHeaders(res) {
 /**
  * Send Badge
  * @param {express.Response} res
- * @param {String} badge
- * @param {Number} [status]
+ * @param {string} badge
+ * @param {number} [status]
  */
 function sendBadge(res, badge, status = 200) {
     setHeaders(res)
@@ -368,11 +349,11 @@ function sendBadge(res, badge, status = 200) {
 
 /**
  * Get Badge
- * @param {String} message Badge Message
- * @param {Object} [query] req.query Object
- * @param {Object} [options] Badge Options
+ * @param {string} message Badge Message
+ * @param {object} [query] req.query Object
+ * @param {object} [options] Badge Options
  * @param {express.Response} [res] To sendBadge
- * @return {String}
+ * @return {string}
  */
 function getBadge(message, query = {}, options = {}, res = null) {
     const opts = { color: '', label: '', icon: '', lucide: '', ...options }
@@ -392,16 +373,16 @@ function getBadge(message, query = {}, options = {}, res = null) {
     // debug('data:', data)
     const badge = makeBadge(data)
     if (res) sendBadge(res, badge)
-    incrBadge().catch(console.error)
+    incrKey('badges_total').catch(console.error)
     return badge
 }
 
 /**
  * Get Logo String
- * @param {Object} query
- * @param {Object} opts
- * @param {String} [color]
- * @return {String}
+ * @param {object} query
+ * @param {object} opts
+ * @param {string} [color]
+ * @return {string}
  */
 function getLogo(query, opts, color = '#fff') {
     // debug('query.icon:', query.icon)
@@ -439,7 +420,7 @@ function getLogo(query, opts, color = '#fff') {
 /**
  * Purge Key Response
  * @param {express.Response} res
- * @param {String} key
+ * @param {string} key
  * @return {Promise<void>}
  */
 async function purgeKey(res, key) {
@@ -451,8 +432,8 @@ async function purgeKey(res, key) {
 
 /**
  * Get Size String
- * @param {Number} bytes
- * @return {String}
+ * @param {number} bytes
+ * @return {string}
  */
 function formatSize(bytes) {
     if (bytes === 0) return '0 B'
@@ -463,7 +444,7 @@ function formatSize(bytes) {
 
 /**
  * Get Uptime String
- * @return {String}
+ * @return {string}
  */
 function getUptime() {
     const seconds = process.uptime()
@@ -479,9 +460,9 @@ function getUptime() {
 /**
  * Get Ranged Color w/ Options
  * @param {express.Request} req
- * @param {Number} index
- * @param {Object} [options]
- * @return {String}
+ * @param {number} index
+ * @param {object} [options]
+ * @return {string}
  */
 function getRangedColor(req, index, options = {}) {
     const opts = { total: 8, start: '#44cc11', end: '#e05d44', ...options }

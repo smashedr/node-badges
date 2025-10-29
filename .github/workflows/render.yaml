@@ -3,6 +3,10 @@ name: "Render"
 on:
   push:
     branches-ignore: [master]
+    paths:
+      - ".github/workflows/render.yaml"
+      - "src/**"
+      - "package*.json"
   workflow_call:
     #inputs:
     #  version:
