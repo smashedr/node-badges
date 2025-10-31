@@ -199,7 +199,7 @@ export async function getVTStats(hash) {
         stats = data?.data?.attributes?.last_analysis_stats
     }
     if (!stats) await cacheError(key, 'VT Stats Not Found')
-    await cacheSet(key, stats, 60 * 60 * 48)
+    await cacheSet(key, stats, 60 * 60 * 24 * 5)
     return stats
 }
 
@@ -278,6 +278,16 @@ async function cacheError(key, errorMessage, EX = 60 * 10) {
 export async function incrKey(key) {
     await client.incr(key)
 }
+
+// export async function incrPurge(result) {
+//     const multi = client.multi().incr('purge_count')
+//     // multi.incr('purge_count')
+//     if (result) {
+//         multi.incr('purge_hit')
+//     } else {
+//         multi.incr('purge_miss')
+//     }
+// }
 
 export async function sendInflux() {
     if (!influxClient) return debug('InfluxDB Not Configured.')
