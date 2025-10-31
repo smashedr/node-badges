@@ -86,6 +86,8 @@ app.get('/', async (req, res) => {
         links: {
             Source: 'https://github.com/smashedr/node-badges',
             Docs: 'https://smashedr.github.io/node-badges-docs',
+            Grafana:
+                'https://cssnr.grafana.net/public-dashboards/8a24a95171fe4127ada92afb071b9331',
         },
         // badges: [{ src: '', href: '' }],
     })
@@ -110,6 +112,7 @@ app.get('/colors{/:index}', async (req, res) => {
     debug('index:', index)
     const color = getRangedColor(req, index)
     debug('color:', color)
+    // noinspection HtmlRequiredLangAttribute
     res.send(`<html><body style="margin:0;background:${color}"></body></html>`)
 })
 
@@ -130,8 +133,8 @@ app.get('/colors{/:index}', async (req, res) => {
 // })
 
 app.all('/vt/:type/:hash', async (req, res, next) => {
-    if (req.method === 'PURGE') {
-        debug('PURGE:', req.originalUrl)
+    if (['PURGE', 'POST'].includes(req.method)) {
+        debug(`PURGE: ${req.method}`, req.originalUrl)
         if (!['id', 'sha'].includes(req.params.type)) return next()
         const hash = req.params.hash.includes(':')
             ? req.params.hash.split(':')[1]
@@ -164,8 +167,8 @@ app.get('/vt/:type/:hash', async (req, res) => {
 })
 
 app.all('/vt/:owner/:repo/:asset{/:tag}', async (req, res, next) => {
-    if (req.method === 'PURGE') {
-        debug('PURGE:', req.originalUrl)
+    if (['PURGE', 'POST'].includes(req.method)) {
+        debug(`PURGE: ${req.method}`, req.originalUrl)
         const tag = req.params.tag || 'latest'
         const key = `${req.params.owner}/${req.params.repo}/${req.params.asset}/${tag}`
         return purgeKey(res, key)
@@ -186,8 +189,8 @@ app.get('/vt/:owner/:repo/:asset{/:tag}', async (req, res) => {
 })
 
 app.all('/ghcr/tags/:owner/:package{/:latest}', async (req, res, next) => {
-    if (req.method === 'PURGE') {
-        debug('PURGE:', req.originalUrl)
+    if (['PURGE', 'POST'].includes(req.method)) {
+        debug(`PURGE: ${req.method}`, req.originalUrl)
         const key = `ghcr/tags/${req.params.owner}/${req.params.package}/tags/list`
         return purgeKey(res, key)
     }
@@ -230,8 +233,8 @@ app.get('/ghcr/tags/:owner/:package{/:latest}', async (req, res) => {
 })
 
 app.all('/ghcr/size/:owner/:package{/:tag}', async (req, res, next) => {
-    if (req.method === 'PURGE') {
-        debug('PURGE:', req.originalUrl)
+    if (['PURGE', 'POST'].includes(req.method)) {
+        debug(`PURGE: ${req.method}`, req.originalUrl)
         const tag = req.params.tag ? req.params.tag : 'latest'
         const key = `ghcr/size/${req.params.owner}/${req.params.package}/${tag}`
         return purgeKey(res, key)
@@ -267,8 +270,8 @@ app.get('/static/:message{/:label}', async (req, res) => {
 
 app.all('/:type/:url/:path', async (req, res, next) => {
     if (!['yaml', 'json'].includes(req.params.type)) return next()
-    if (req.method === 'PURGE') {
-        debug('PURGE:', req.originalUrl)
+    if (['PURGE', 'POST'].includes(req.method)) {
+        debug(`PURGE: ${req.method}`, req.originalUrl)
         return purgeKey(res, req.path)
     }
     next()
@@ -306,16 +309,22 @@ app.use((req, res) => {
     incrKey('badges_404').catch(console.error)
 })
 
-// Handler - Error
+// Error Handler
+// noinspection JSCheckFunctionSignatures
 app.use(errorHandler)
 
-// Handler - Sentry Error - NOTE: This only catches errorHandler errors currently...
+// Sentry Handler
+// NOTE: This only catches errorHandler errors currently...
 if (Sentry) Sentry.setupExpressErrorHandler(app)
 
-function errorHandler(err, req, res) {
+function errorHandler(err, req, res, next) {
     // console.log('errorHandler:', err)
     debug('errorHandler - originalUrl:', req.originalUrl)
     debug('err.message:', err.message)
+    if (res.headersSent) {
+        debug('SKIPPING: Headers Sent')
+        return next(err)
+    }
     const data = {
         message: err.message || 'Unknown Error',
         color: 'red',
@@ -428,6 +437,11 @@ async function purgeKey(res, key) {
     const result = await cacheDelete(key)
     debug('result:', result)
     res.send(result.toString())
+    if (result) {
+        incrKey('purge_hit').catch(console.error)
+    } else {
+        incrKey('purge_miss').catch(console.error)
+    }
 }
 
 /**
