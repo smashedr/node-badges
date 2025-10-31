@@ -309,16 +309,22 @@ app.use((req, res) => {
     incrKey('badges_404').catch(console.error)
 })
 
-// Handler - Error
+// Error Handler
+// noinspection JSCheckFunctionSignatures
 app.use(errorHandler)
 
-// Handler - Sentry Error - NOTE: This only catches errorHandler errors currently...
+// Sentry Handler
+// NOTE: This only catches errorHandler errors currently...
 if (Sentry) Sentry.setupExpressErrorHandler(app)
 
-function errorHandler(err, req, res) {
+function errorHandler(err, req, res, next) {
     // console.log('errorHandler:', err)
     debug('errorHandler - originalUrl:', req.originalUrl)
     debug('err.message:', err.message)
+    if (res.headersSent) {
+        debug('SKIPPING: Headers Sent')
+        return next(err)
+    }
     const data = {
         message: err.message || 'Unknown Error',
         color: 'red',
