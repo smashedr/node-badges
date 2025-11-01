@@ -2,9 +2,9 @@ services:
   - type: web
     name: node-badges
     plan: free
-    runtime: docker
-    repo: https://github.com/smashedr/node-badges
-    autoDeployTrigger: off
+    runtime: image
+    image:
+      url: ghcr.io/smashedr/node-badges:latest
     dockerCommand: npm start
     healthCheckPath: /app-health-check
     envVars:
