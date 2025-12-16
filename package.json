@@ -14,27 +14,27 @@
   "dependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
     "@octokit/rest": "^22.0.1",
-    "@sentry/node": "^10.22.0",
-    "axios": "^1.13.1",
+    "@sentry/node": "^10.31.0",
+    "axios": "^1.13.2",
     "badge-maker": "^5.0.2",
-    "camelcase": "^8.0.0",
-    "chroma-js": "^3.1.2",
+    "camelcase": "^9.0.0",
+    "chroma-js": "^3.2.0",
     "cors": "^2.8.5",
     "debug": "^4.4.3",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "jsonpath": "^1.1.1",
-    "lucide-static": "^0.552.0",
+    "lucide-static": "^0.561.0",
     "node-schedule": "^2.1.1",
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.11",
     "pug": "^3.0.3",
-    "redis": "^5.9.0",
+    "redis": "^5.10.0",
     "semver": "^7.7.3",
-    "simple-icons": "^15.18.0",
-    "yaml": "^2.8.1"
+    "simple-icons": "^16.2.0",
+    "yaml": "^2.8.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.0",
-    "eslint": "^9.39.0",
-    "prettier": "^3.6.2"
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4"
   }
 }

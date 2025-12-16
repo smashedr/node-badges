@@ -175,13 +175,13 @@ export async function getVTReleaseStats(req) {
  */
 export async function getVTStats(hash) {
     const key = `/vt/id/${hash}`
-    const timeout = 60 * 60 * 24 * 5
+    const timeout = 60 * 60 * 4
     debug('key:', key)
     // NOTE: Duplicate Code - 5 lines
     const cached = await cacheGet(key)
     if (cached) {
         if (cached.errorMessage) throw new Error(cached.errorMessage)
-        client.expire(key, timeout).catch(console.error) // reset expire on get
+        // client.expire(key, timeout).catch(console.error) // reset expire on get
         return cached
     }
     debug(`-- CACHE MISS: ${key}`)

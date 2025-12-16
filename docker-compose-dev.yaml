@@ -34,8 +34,17 @@ services:
           memory: 256M
     depends_on:
       - redis
-    volumes:
-      - ${APP_FILES:-./src}:/app/src
+    #volumes:
+    #  - ${APP_FILES:-./src}:/app/src
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: ./package-lock.json
+        - action: rebuild
+          path: ./docker-compose-dev.yaml
 
   redis:
     image: redis:6-alpine
@@ -45,7 +54,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: 128M
+          memory: 64M
     volumes:
       - redis_data:/data
 
