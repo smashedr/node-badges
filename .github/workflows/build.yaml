@@ -52,6 +52,9 @@ jobs:
           username: ${{ vars.GHCR_USER }}
           password: ${{ secrets.GHCR_PASS }}
 
+      - name: "Setup QEMU"
+        uses: docker/setup-qemu-action@v3
+
       - name: "Setup Buildx"
         uses: docker/setup-buildx-action@v3
         with:
