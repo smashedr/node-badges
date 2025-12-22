@@ -175,7 +175,7 @@ export async function getVTReleaseStats(req) {
  */
 export async function getVTStats(hash) {
     const key = `/vt/id/${hash}`
-    const timeout = 60 * 60 * 4
+    let timeout = 60 * 60 * 4
     debug('key:', key)
     // NOTE: Duplicate Code - 5 lines
     const cached = await cacheGet(key)
@@ -186,21 +186,34 @@ export async function getVTStats(hash) {
     }
     debug(`-- CACHE MISS: ${key}`)
     const vt = new VTApi(process.env.VT_API_KEY)
-    let stats
+    let stats, epoch
     if (hash.endsWith('==')) {
         debug('DEPRECATED - getAnalysis') // TODO: Deprecated
         const data = await vt.getAnalysis(hash)
-        // debug('data:', JSON.stringify(data, null, 2))
-        // noinspection JSUnresolvedReference
+        // debug('data:', JSON.stringify(data))
         stats = data?.data?.attributes?.stats
+        epoch = data?.data?.attributes?.date
     } else {
         // debug('getReport')
         const data = await vt.getReport(hash)
-        // debug('data:', JSON.stringify(data, null, 2))
+        // debug('data:', JSON.stringify(data))
         // noinspection JSUnresolvedReference
         stats = data?.data?.attributes?.last_analysis_stats
+        // noinspection JSUnresolvedReference
+        epoch = data?.data?.attributes?.last_analysis_date
     }
     if (!stats) await cacheError(key, 'VT Stats Not Found')
+    if (typeof epoch === 'number') {
+        const date = new Date(0)
+        date.setUTCSeconds(epoch)
+        const now = new Date()
+        const ms = now.getTime() - date.getTime()
+        const hours = Math.floor(ms / 1000 / 60 / 60)
+        debug('hours:', hours)
+        if (hours > 4) timeout = 60 * 60 * 24
+        if (hours > 48) timeout = 60 * 60 * 96
+    }
+    debug('timeout:', timeout)
     await cacheSet(key, stats, timeout)
     return stats
 }
