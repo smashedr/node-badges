@@ -14,7 +14,7 @@
   "dependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
     "@octokit/rest": "^22.0.1",
-    "@sentry/node": "^10.31.0",
+    "@sentry/node": "^10.32.1",
     "axios": "^1.13.2",
     "badge-maker": "^5.0.2",
     "camelcase": "^9.0.0",
@@ -23,7 +23,7 @@
     "debug": "^4.4.3",
     "express": "^5.2.1",
     "jsonpath": "^1.1.1",
-    "lucide-static": "^0.561.0",
+    "lucide-static": "^0.562.0",
     "node-schedule": "^2.1.1",
     "nodemon": "^3.1.11",
     "pug": "^3.0.3",
