@@ -20,6 +20,7 @@ import {
     getVTStats,
     GHCRApi,
     incrKey,
+    getGithubAssetSize,
     sendInflux,
 } from './api.js'
 
@@ -253,6 +254,27 @@ app.get('/ghcr/size/:owner/:package{/:tag}', async (req, res) => {
     const message = formatSize(total)
     // debug('message:', message)
     getBadge(message, req.query, { label: 'size', lucide: 'container' }, res)
+})
+
+app.get('/gh/release/:owner/:repo/:tag/asset/:asset/size', async (req, res) => {
+    debug(req.originalUrl)
+    debug('owner:', req.params.owner)
+    debug('repo:', req.params.repo)
+    debug('tag:', req.params.tag)
+    debug('asset:', req.params.asset)
+
+    const result = await getGithubAssetSize(
+        req.params.owner,
+        req.params.repo,
+        req.params.tag,
+        req.params.asset,
+    )
+    debug('result:', result)
+    if (result) {
+        const message = formatSize(result)
+        // debug('message:', message)
+        getBadge(message, req.query, { label: 'size', lucide: 'container' }, res)
+    }
 })
 
 app.get('/static/:message{/:label}', async (req, res) => {

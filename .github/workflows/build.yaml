@@ -43,7 +43,7 @@ jobs:
           echo "env.dev: ${{ env.dev }}"
 
       - name: "Checkout"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: "Docker Login"
         uses: docker/login-action@v3
@@ -63,7 +63,7 @@ jobs:
       - name: "Update Version Tags"
         if: ${{ !env.dev }}
         id: version
-        uses: cssnr/update-version-tags-action@v1
+        uses: cssnr/update-version-tags-action@v2
         with:
           prefix: ""
           tags: |
@@ -79,7 +79,7 @@ jobs:
 
       - name: "Generate Docker Tags"
         id: tags
-        uses: cssnr/docker-tags-action@v1
+        uses: cssnr/docker-tags-action@v2
         with:
           images: "ghcr.io/${{ github.repository }}"
           tags: |
@@ -111,6 +111,6 @@ jobs:
 
       - name: "Send Failure Notification"
         if: ${{ failure() }}
-        uses: sarisia/actions-status-discord@v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}

@@ -10,6 +10,7 @@ DEFAULT_VERSION="latest"
 BUILD_CONTEXT="."
 
 
+# shellcheck disable=SC1091
 if [ -f ".env" ];then
     echo "Sourcing Environment: .env"
     set -a

@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: "Setup Node"
         uses: actions/setup-node@v6
@@ -34,50 +34,46 @@ jobs:
         run: |
           npm ci
 
-      - name: "ESLint"
+      - name: "eslint"
         id: eslint
         if: ${{ !cancelled() }}
         run: |
           #npm run lint:report
           npm run lint
 
-      - name: "Prettier"
+      - name: "prettier"
         if: ${{ !cancelled() }}
         run: |
           npm run prettier:check
 
-      - name: "Yamllint"
+      - name: "yamllint"
         if: ${{ !cancelled() }}
         env:
-          CONFIG: "{extends: relaxed, ignore: [node_modules/], rules: {line-length: {max: 119}}}"
+          CONFIG: .github/yamllint.yaml
         run: |
           echo "::group::List Files"
-          yamllint -d '${{ env.CONFIG }}' --list-files .
+          yamllint -c "${{ env.CONFIG }}" --list-files .
           echo "::endgroup::"
-          yamllint -d '${{ env.CONFIG }}' .
+          yamllint -c "${{ env.CONFIG }}" .
 
-      - name: "Actionlint"
+      - name: "actionlint"
         if: ${{ !cancelled() }}
-        run: |
-          echo "::group::Download"
-          loc=$(curl -sI https://github.com/rhysd/actionlint/releases/latest | grep -i '^location:')
-          echo "loc: ${loc}"
-          tag=$(echo "${loc}" | sed -E 's|.*/tag/v?(.*)|\1|' | tr -d '\t\r\n')
-          echo "tag: ${tag}"
-          url="https://github.com/rhysd/actionlint/releases/latest/download/actionlint_${tag}_linux_amd64.tar.gz"
-          echo "url: ${url}"
-          curl -sL "${url}" | tar xz -C "${RUNNER_TEMP}" actionlint
-          file "${RUNNER_TEMP}/actionlint"
-          "${RUNNER_TEMP}/actionlint" --version
-          echo "::endgroup::"
-          "${RUNNER_TEMP}/actionlint" -color -verbose -shellcheck= -pyflakes=
+        uses: cssnr/actionlint-action@v1
+        with:
+          shellcheck_opts: -e SC2129
 
-      - name: "Hadolint"
+      - name: "hadolint"
         if: ${{ !cancelled() }}
-        uses: hadolint/hadolint-action@v3.3.0
+        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.3.0
         with:
           dockerfile: Dockerfile
           ignore: "DL3018"
+
+      - name: "ShellCheck"
+        if: ${{ !cancelled() }}
+        uses: ludeeus/action-shellcheck@master
+        env:
+          SHELLCHECK_OPTS: -x
 
       #- name: "ESLint Annotate"
       #  if: ${{ !cancelled() && steps.eslint.outcome != 'success' }}
