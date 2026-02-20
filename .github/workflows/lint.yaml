@@ -24,28 +24,6 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v6
 
-      - name: "Setup Node"
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: "Install"
-        id: install
-        run: |
-          npm ci
-
-      - name: "eslint"
-        id: eslint
-        if: ${{ !cancelled() }}
-        run: |
-          #npm run lint:report
-          npm run lint
-
-      - name: "prettier"
-        if: ${{ !cancelled() }}
-        run: |
-          npm run prettier:check
-
       - name: "yamllint"
         if: ${{ !cancelled() }}
         env:
@@ -79,3 +57,37 @@ jobs:
       #  if: ${{ !cancelled() && steps.eslint.outcome != 'success' }}
       #  continue-on-error: true
       #  uses: ataylorme/eslint-annotate-action@v3
+
+  npm-lint:
+    name: "NPM Lint"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      pull-requests: write
+      checks: write
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Setup Node"
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: "Install"
+        id: install
+        run: |
+          npm ci
+
+      - name: "eslint"
+        id: eslint
+        if: ${{ !cancelled() }}
+        run: |
+          npm run lint
+
+      - name: "prettier"
+        if: ${{ !cancelled() }}
+        run: |
+          npm run prettier:check
