@@ -1,9 +1,16 @@
+# Generic
 .idea/
 *.iml
 .vscode/
+.*cache*
 node_modules/
-eslint_report.json
+build/
+dist/
+out/
+*.dll
+*.exe
 .env
 .secrets
 .vars
 settings.env
+eslint_report.json

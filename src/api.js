@@ -141,13 +141,7 @@ export async function getVTReleaseStats(req) {
     }
     debug(`-- CACHE MISS: ${key}`)
 
-    const gh = new GitHubApi(process.env.GITHUB_TOKEN)
-    let release
-    if (tag === 'latest') {
-        release = await gh.getLatestRelease(req.params.owner, req.params.repo)
-    } else {
-        release = await gh.getReleaseByTag(req.params.owner, req.params.repo, tag)
-    }
+    const release = await getRelease(req.params.owner, req.params.repo, tag)
     // debug('release?.assets:', release?.assets)
     if (!release) await cacheError(key, 'Release Not Found')
     const asset = release.assets.find((a) => a.name === req.params.asset)
@@ -162,6 +156,37 @@ export async function getVTReleaseStats(req) {
     if (!stats) await cacheError(key, 'VT Stats Not Found')
     await cacheSet(key, stats)
     return stats
+}
+
+export async function getGithubAssetSize(owner, repo, tag, name) {
+    const key = `/gh/release/${owner}/${repo}/${tag}/asset/${name}`
+    debug('key:', key)
+    const cached = await cacheGet(key)
+    if (cached) return cached
+    const release = await getRelease(owner, repo, tag)
+    // debug('release.assets:', release.assets)
+    if (!release.assets) return
+    const asset = release?.assets?.find((a) => a.name === name)
+    debug('asset:', asset)
+    if (!asset) return
+    debug('asset:', asset.size)
+    await cacheSet(key, asset.size)
+    return asset.size
+}
+
+async function getRelease(owner, repo, tag) {
+    const key = `/gh/release/${owner}/${repo}/${tag}`
+    const cached = await cacheGet(key)
+    if (cached) return cached
+    const gh = new GitHubApi(process.env.GITHUB_TOKEN)
+    let data
+    if (tag === 'latest') {
+        data = await gh.getLatestRelease(owner, repo)
+    } else {
+        data = await gh.getReleaseByTag(owner, repo, tag)
+    }
+    if (data) await cacheSet(key, data)
+    return data
 }
 
 /**
