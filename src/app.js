@@ -273,7 +273,8 @@ app.get('/gh/release/:owner/:repo/:tag/asset/:asset/size', async (req, res) => {
     if (result) {
         const message = formatSize(result)
         // debug('message:', message)
-        getBadge(message, req.query, { label: 'size', lucide: 'hard-drive' }, res)
+        const label = req.params.label || req.params.asset
+        getBadge(message, req.query, { label, lucide: 'hard-drive' }, res)
     }
 })
 
