@@ -211,16 +211,23 @@ export async function getVTStats(hash) {
     }
     debug(`-- CACHE MISS: ${key}`)
     const vt = new VTApi(process.env.VT_API_KEY)
-    let stats, epoch
+    let stats, epoch, data
     if (hash.endsWith('==')) {
         debug('DEPRECATED - getAnalysis') // TODO: Deprecated
-        const data = await vt.getAnalysis(hash)
+        try {
+            data = await vt.getAnalysis(hash)
+        } catch (error) {
+            await cacheError(key, `Error ${error.status}`)
+        }
         // debug('data:', JSON.stringify(data))
         stats = data?.data?.attributes?.stats
         epoch = data?.data?.attributes?.date
     } else {
-        // debug('getReport')
-        const data = await vt.getReport(hash)
+        try {
+            data = await vt.getReport(hash)
+        } catch (error) {
+            await cacheError(key, `Error ${error.status}`)
+        }
         // debug('data:', JSON.stringify(data))
         // noinspection JSUnresolvedReference
         stats = data?.data?.attributes?.last_analysis_stats
