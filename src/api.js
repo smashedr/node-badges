@@ -12,6 +12,9 @@ import { InfluxDB, Point } from '@influxdata/influxdb-client'
 
 const debug = createDebug('app:api')
 
+// const vtClient = new VTApi(process.env.VT_API_KEY)
+const vtClient = process.env.VT_API_KEY ? new VTApi(process.env.VT_API_KEY) : null
+
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 console.log(`REDIS_URL: ${redisUrl}`)
 // NOTE: Increase connectTimeout for Render, consider using reconnectStrategy...
@@ -210,12 +213,11 @@ export async function getVTStats(hash) {
         return cached
     }
     debug(`-- CACHE MISS: ${key}`)
-    const vt = new VTApi(process.env.VT_API_KEY)
     let stats, epoch, data
     if (hash.endsWith('==')) {
         debug('DEPRECATED - getAnalysis') // TODO: Deprecated
         try {
-            data = await vt.getAnalysis(hash)
+            data = await vtClient.getAnalysis(hash)
         } catch (error) {
             await cacheError(key, `Error ${error.status}`)
         }
@@ -224,7 +226,7 @@ export async function getVTStats(hash) {
         epoch = data?.data?.attributes?.date
     } else {
         try {
-            data = await vt.getReport(hash)
+            data = await vtClient.getReport(hash)
         } catch (error) {
             await cacheError(key, `Error ${error.status}`)
         }

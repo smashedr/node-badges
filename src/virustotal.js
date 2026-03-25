@@ -5,13 +5,28 @@ const debug = createDebug('app:api')
 
 export class VTApi {
     /**
-     * GitHub Api
-     * @param {string} token
+     * VirusTotal API
+     * @param {string} tokens - CSV of API tokens
      */
-    constructor(token) {
+    constructor(tokens) {
+        this.tokens = tokens
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+        // debug('this.tokens:', this.tokens)
+        console.log(`Loaded ${this.tokens.length} VT API Keys`)
+
+        this.idx = 0
+
         this.client = axios.create({
             baseURL: 'https://www.virustotal.com/api/v3/',
-            headers: { 'X-APIKey': token },
+        })
+
+        this.client.interceptors.request.use((config) => {
+            config.headers['X-APIKey'] = this.tokens[this.idx]
+            this.idx = (this.idx + 1) % this.tokens.length
+            debug('Using token index %d/%d', this.idx, this.tokens.length)
+            return config
         })
     }
 
