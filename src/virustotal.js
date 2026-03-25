@@ -16,16 +16,16 @@ export class VTApi {
         // debug('this.tokens:', this.tokens)
         console.log(`Loaded ${this.tokens.length} VT API Keys`)
 
-        this.currentTokenIndex = 0
+        this.idx = 0
 
         this.client = axios.create({
             baseURL: 'https://www.virustotal.com/api/v3/',
         })
 
         this.client.interceptors.request.use((config) => {
-            config.headers['X-APIKey'] = this.tokens[this.currentTokenIndex]
-            this.currentTokenIndex = (this.currentTokenIndex + 1) % this.tokens.length
-            debug('Using token index %d/%d', this.currentTokenIndex, this.tokens.length)
+            config.headers['X-APIKey'] = this.tokens[this.idx]
+            this.idx = (this.idx + 1) % this.tokens.length
+            debug('Using token index %d/%d', this.idx, this.tokens.length)
             return config
         })
     }
