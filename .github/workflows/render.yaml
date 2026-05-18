@@ -68,7 +68,7 @@ jobs:
       # NOTE: Confirm we can do image and dockerfile deployments simultaneously...
       - name: "Deploy Image"
         if: ${{ inputs.version }}
-        uses: cssnr/web-request-action@v1
+        uses: cssnr/web-request-action@v2
         env:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
         with:
@@ -78,7 +78,7 @@ jobs:
 
       - name: "Deploy Branch"
         if: ${{ !inputs.version }}
-        uses: cssnr/web-request-action@v1
+        uses: cssnr/web-request-action@v2
         with:
           url: ${{ secrets.RENDER_HOOK }}
           params: |
