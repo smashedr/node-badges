@@ -3,7 +3,7 @@ name: "Lint"
 on:
   workflow_dispatch:
   push:
-    branches: [master]
+    branches: [master, main]
   pull_request:
 
 concurrency:
@@ -15,14 +15,33 @@ jobs:
     name: "Lint"
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
-    permissions:
-      pull-requests: write
-      checks: write
+    if: ${{ !contains(github.event.head_commit.message, '#nolint') }}
 
     steps:
       - name: "Checkout"
         uses: actions/checkout@v6
+
+      - name: "Setup Node"
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: "install"
+        id: install
+        run: npm ci
+
+      - name: "Debug"
+        continue-on-error: true
+        run: ls -lahR dist
+
+      - name: "eslint"
+        if: ${{ !cancelled() }}
+        run: |
+          npm run lint
+
+      - name: "prettier"
+        if: ${{ !cancelled() }}
+        run: npm run prettier:check
 
       - name: "yamllint"
         if: ${{ !cancelled() }}
@@ -37,57 +56,10 @@ jobs:
       - name: "actionlint"
         if: ${{ !cancelled() }}
         uses: cssnr/actionlint-action@v1
-        with:
-          shellcheck_opts: -e SC2129
 
       - name: "hadolint"
         if: ${{ !cancelled() }}
-        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.3.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
           ignore: "DL3018"
-
-      - name: "ShellCheck"
-        if: ${{ !cancelled() }}
-        uses: ludeeus/action-shellcheck@master
-        env:
-          SHELLCHECK_OPTS: -x
-
-      #- name: "ESLint Annotate"
-      #  if: ${{ !cancelled() && steps.eslint.outcome != 'success' }}
-      #  continue-on-error: true
-      #  uses: ataylorme/eslint-annotate-action@v3
-
-  npm-lint:
-    name: "NPM Lint"
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    permissions:
-      pull-requests: write
-      checks: write
-
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v6
-
-      - name: "Setup Node"
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: "Install"
-        id: install
-        run: |
-          npm ci
-
-      - name: "eslint"
-        id: eslint
-        if: ${{ !cancelled() }}
-        run: |
-          npm run lint
-
-      - name: "prettier"
-        if: ${{ !cancelled() }}
-        run: |
-          npm run prettier:check

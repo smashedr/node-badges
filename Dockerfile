@@ -9,8 +9,6 @@ LABEL org.opencontainers.image.authors="smashedr"
 
 RUN apk add --no-cache curl
 
-COPY docker-entrypoint.sh /
-
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -25,5 +23,4 @@ LABEL org.opencontainers.image.version="${VERSION}"
 
 USER node
 
-ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
 CMD ["npm", "start"]
