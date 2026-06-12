@@ -2,11 +2,13 @@ name: "Deploy"
 
 on:
   workflow_call:
-  workflow_dispatch:
-    inputs:
+    inputs: &inputs
       version:
         description: "Version Tag"
         required: false
+        type: string
+  workflow_dispatch:
+    inputs: *inputs
   #workflow_run:
   #  workflows: ["Build"]
   #  types: [completed]
@@ -29,12 +31,23 @@ jobs:
       url: https://badges.cssnr.com/
 
     steps:
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Debug event.json"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        run: cat "${GITHUB_EVENT_PATH}"
       - name: "Debug CTX github"
         if: ${{ !github.event.act }}
         continue-on-error: true
         env:
           GITHUB_CTX: ${{ toJSON(github) }}
         run: echo "$GITHUB_CTX"
+      - name: "Debug Environment"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        run: env
 
       - name: "Debug 1"
         continue-on-error: true
@@ -45,7 +58,7 @@ jobs:
           echo "env.version: ${{ env.version }}"
 
       - name: "Portainer Deploy"
-        uses: cssnr/portainer-stack-deploy-action@v1
+        uses: cssnr/portainer-stack-deploy-action@v2
         env:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
         with:
@@ -55,35 +68,27 @@ jobs:
           name: ${{ env.stack-name }}
           username: ${{ vars.GHCR_USER }}
           password: ${{ secrets.GHCR_PASS }}
-          env_json: |
-            {
-              "VERSION": "${{ env.version }}",
-              "STACK_NAME": "${{ env.stack-name }}",
-              "TRAEFIK_HOST": "${{ env.traefik-host }}",
-              "GITHUB_TOKEN": "${{ secrets.GH_PAT }}",
-              "VT_API_KEY": "${{ secrets.VT_API_KEY }}",
-              "SENTRY_URL": "${{ secrets.SENTRY_URL }}",
-              "SENTRY_ENVIRONMENT": "prod",
-              "INFLUX_URL": "${{ secrets.INFLUX_URL }}",
-              "INFLUX_TOKEN": "${{ secrets.INFLUX_TOKEN }}",
-              "INFLUX_ORG": "${{ vars.INFLUX_ORG }}",
-              "INFLUX_BUCKET": "${{ vars.INFLUX_BUCKET }}"
-            }
+          type: file
+          env_data: |
+            VERSION: "${{ env.version }}"
+            STACK_NAME: "${{ env.stack-name }}"
+            TRAEFIK_HOST: "${{ env.traefik-host }}"
+            GITHUB_TOKEN": "${{ secrets.GH_PAT }}"
+            VT_API_KEY": "${{ secrets.VT_API_KEY }}"
+            SENTRY_URL": "${{ secrets.SENTRY_URL }}"
+            SENTRY_ENVIRONMENT": "prod"
+            INFLUX_URL": "${{ secrets.INFLUX_URL }}"
+            INFLUX_TOKEN": "${{ secrets.INFLUX_TOKEN }}"
+            INFLUX_ORG": "${{ vars.INFLUX_ORG }}"
+            INFLUX_BUCKET": "${{ vars.INFLUX_BUCKET }}
 
-      #- name: "Debug 2"
-      #  continue-on-error: true
-      #  env:
-      #    version: ${{ env.version == 'master' && 'latest' || env.version }}
-      #  run: |
-      #    echo "env.version: ${{ env.version }}"
-      #    echo "ghcr.io/${{ github.repository }}:${{ env.version }}"
-      #
       ## https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
-      #- name: "Render Deploy"
+      #- name: "Deploy Image"
+      #  uses: cssnr/web-request-action@v2
       #  continue-on-error: true
-      #  uses: cssnr/web-request-action@v1
       #  env:
       #    version: ${{ env.version == 'master' && 'latest' || env.version }}
       #  with:
       #    url: ${{ secrets.RENDER_HOOK }}
-      #    params: '{"imgURL": "ghcr.io/${{ github.repository }}:${{ env.version }}"}'
+      #    params: |
+      #      imgURL: ghcr.io/${{ github.repository }}:${{ env.version }}

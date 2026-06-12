@@ -2,7 +2,7 @@ name: "Render"
 
 on:
   push:
-    branches-ignore: [master]
+    branches-ignore: [master, main]
     paths:
       - ".github/workflows/render.yaml"
       - "src/**"
@@ -16,9 +16,6 @@ on:
     inputs:
       version:
         description: "Version Tag"
-  #workflow_run:
-  #  workflows: ["Build"]
-  #  types: [completed]
 
 env:
   version: ${{ inputs.version || github.ref_name }}
@@ -37,14 +34,22 @@ jobs:
       url: https://node-badges.onrender.com/
 
     steps:
+      - name: "Debug event.json"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        run: cat "${GITHUB_EVENT_PATH}"
       - name: "Debug CTX github"
         if: ${{ !github.event.act }}
         continue-on-error: true
         env:
           GITHUB_CTX: ${{ toJSON(github) }}
         run: echo "$GITHUB_CTX"
+      - name: "Debug Environment"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        run: env
 
-      - name: "Debug Branch ref"
+      - name: "Debug ref"
         continue-on-error: true
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"
@@ -53,7 +58,7 @@ jobs:
           echo "--------------------"
           echo "ref: ${{ github.ref_name }}"
 
-      - name: "Debug Image version"
+      - name: "Debug imgURL"
         continue-on-error: true
         env:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
@@ -82,4 +87,4 @@ jobs:
         with:
           url: ${{ secrets.RENDER_HOOK }}
           params: |
-            ref: ${{ github.ref_name }}
+            ref: ${{ github.sha }}

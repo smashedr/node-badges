@@ -14,13 +14,13 @@ on:
   #  types: [published]
 
 env:
-  dev: ${{ inputs.dev || github.event.release.prerelease }}
+  dev: ${{ (inputs.dev || github.event.release.prerelease) && 'dev' || '' }}
 
 jobs:
   build:
     name: "Build"
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     permissions:
       contents: write
@@ -61,11 +61,11 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       - name: "Update Version Tags"
-        if: ${{ !env.dev }}
         id: version
         uses: cssnr/update-version-tags-action@v2
         with:
           prefix: ""
+          dry_run: true
           tags: |
             ${{ inputs.tags }}
 
@@ -73,7 +73,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"
-          echo "tags1: ${{ env.dev && 'dev' || '' }}"
+          echo "tags1: ${{ env.dev }}"
           echo "tags2: ${{ steps.version.outputs.tags }}"
           echo "tags3: ${{ inputs.tags }}"
 
@@ -83,7 +83,7 @@ jobs:
         with:
           images: "ghcr.io/${{ github.repository }}"
           tags: |
-            ${{ env.dev && 'dev' || '' }}
+            ${{ env.dev }}
             ${{ steps.version.outputs.tags }}
             ${{ inputs.tags }}
 
@@ -114,3 +114,4 @@ jobs:
         uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          description: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
