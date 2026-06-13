@@ -82,15 +82,14 @@ export class GHCRApi {
     const indexManifest = await this.getManifest(tag)
     debug('mediaType:', indexManifest.mediaType)
 
-    let totalSize = 0
-
     if (
       !indexManifest.mediaType.includes('list') &&
       !indexManifest.mediaType.includes('index')
     ) {
       // debug('indexManifest - !list + !index:', indexManifest)
+      // noinspection JSUnresolvedReference
       const size = indexManifest.layers.reduce((sum, layer) => sum + layer.size, 0)
-      totalSize = size + (indexManifest.config.size || 0)
+      const totalSize = size + (indexManifest.config.size || 0)
       // debug('totalSize:', totalSize)
       await cacheSet(key, totalSize)
       return totalSize
@@ -99,9 +98,9 @@ export class GHCRApi {
     debug('indexManifest.manifests?.length:', indexManifest.manifests?.length)
     // only process linux/amd64 or first item...
     const m =
-      indexManifest.manifests.find(
+      indexManifest.manifests?.find(
         (m) => m.platform?.os === 'linux' && m.platform?.architecture === 'amd64',
-      ) || indexManifest.manifests[0]
+      ) || indexManifest.manifests?.[0]
     debug('indexManifest:', m)
     await new Promise((resolve) => setTimeout(resolve, 50))
     const manifest = await this.getManifest(m.digest)
@@ -110,7 +109,7 @@ export class GHCRApi {
     // noinspection JSUnresolvedReference
     const layerSize = manifest.layers?.reduce((a, l) => a + (l.size || 0), 0) || 0
     // debug('layerSize:', layerSize)
-    totalSize = configSize + layerSize
+    const totalSize = configSize + layerSize
     // debug('totalSize:', totalSize)
     await cacheSet(key, totalSize, 60 * 60 * 4)
     return totalSize
