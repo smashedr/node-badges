@@ -97,16 +97,20 @@ export class GHCRApi {
     }
 
     debug('indexManifest.manifests?.length:', indexManifest.manifests?.length)
-    for (const m of indexManifest.manifests) {
-      await new Promise((resolve) => setTimeout(resolve, 50))
-      const manifest = await this.getManifest(m.digest)
-      const configSize = manifest.config?.size || 0
-      // debug('configSize:', configSize)
-      // noinspection JSUnresolvedReference
-      const layerSize = manifest.layers?.reduce((a, l) => a + (l.size || 0), 0) || 0
-      // debug('layerSize:', layerSize)
-      totalSize += configSize + layerSize
-    }
+    // only process linux/amd64 or first item...
+    const m =
+      indexManifest.manifests.find(
+        (m) => m.platform?.os === 'linux' && m.platform?.architecture === 'amd64',
+      ) || indexManifest.manifests[0]
+    debug('indexManifest:', m)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    const manifest = await this.getManifest(m.digest)
+    const configSize = manifest.config?.size || 0
+    // debug('configSize:', configSize)
+    // noinspection JSUnresolvedReference
+    const layerSize = manifest.layers?.reduce((a, l) => a + (l.size || 0), 0) || 0
+    // debug('layerSize:', layerSize)
+    totalSize = configSize + layerSize
     // debug('totalSize:', totalSize)
     await cacheSet(key, totalSize, 60 * 60 * 4)
     return totalSize
