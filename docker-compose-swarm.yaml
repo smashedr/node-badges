@@ -84,7 +84,7 @@ services:
           cpus: "1.0"
           memory: 64M
     volumes:
-      - redis_data:/data
+      - "/data/docker/${STACK_NAME}:/data"
     networks:
       - internal
 
