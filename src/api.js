@@ -97,6 +97,7 @@ export class GHCRApi {
 
     debug('indexManifest.manifests?.length:', indexManifest.manifests?.length)
     // only process linux/amd64 or first item...
+    // noinspection JSValidateTypes
     const m =
       indexManifest.manifests?.find(
         (m) => m.platform?.os === 'linux' && m.platform?.architecture === 'amd64',
