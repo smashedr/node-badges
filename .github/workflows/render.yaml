@@ -64,7 +64,7 @@ jobs:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"
-          echo "env.version: ${{ env.version }}"
+          echo "inputs.version: ${{ inputs.version }}"
           echo "env.version: ${{ env.version }}"
           echo "--------------------"
           echo "imgURL: ghcr.io/${{ github.repository }}:${{ env.version }}"
