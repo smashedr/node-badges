@@ -72,7 +72,7 @@ jobs:
       # https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
       # NOTE: Confirm we can do image and dockerfile deployments simultaneously...
       - name: "Deploy Image"
-        if: ${{ env.version }}
+        if: ${{ inputs.version }}
         uses: cssnr/web-request-action@v2
         env:
           version: ${{ env.version == 'master' && 'latest' || env.version }}
@@ -82,7 +82,7 @@ jobs:
             imgURL: ghcr.io/${{ github.repository }}:${{ env.version }}
 
       - name: "Deploy Branch"
-        if: ${{ !env.version }}
+        if: ${{ !inputs.version }}
         uses: cssnr/web-request-action@v2
         with:
           url: ${{ secrets.RENDER_HOOK }}
