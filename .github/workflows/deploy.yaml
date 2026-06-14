@@ -73,14 +73,14 @@ jobs:
             VERSION: "${{ env.version }}"
             STACK_NAME: "${{ env.stack-name }}"
             TRAEFIK_HOST: "${{ env.traefik-host }}"
-            GITHUB_TOKEN": "${{ secrets.GH_PAT }}"
-            VT_API_KEY": "${{ secrets.VT_API_KEY }}"
-            SENTRY_URL": "${{ secrets.SENTRY_URL }}"
-            SENTRY_ENVIRONMENT": "prod"
-            INFLUX_URL": "${{ secrets.INFLUX_URL }}"
-            INFLUX_TOKEN": "${{ secrets.INFLUX_TOKEN }}"
-            INFLUX_ORG": "${{ vars.INFLUX_ORG }}"
-            INFLUX_BUCKET": "${{ vars.INFLUX_BUCKET }}
+            GITHUB_TOKEN: "${{ secrets.GH_PAT }}"
+            VT_API_KEY: "${{ secrets.VT_API_KEY }}"
+            SENTRY_URL: "${{ secrets.SENTRY_URL }}"
+            SENTRY_ENVIRONMENT: "prod"
+            INFLUX_URL: "${{ secrets.INFLUX_URL }}"
+            INFLUX_TOKEN: "${{ secrets.INFLUX_TOKEN }}"
+            INFLUX_ORG: "${{ vars.INFLUX_ORG }}"
+            INFLUX_BUCKET: "${{ vars.INFLUX_BUCKET }}"
 
       ## https://render.com/docs/deploy-hooks#deploying-from-an-image-registry
       #- name: "Deploy Image"
