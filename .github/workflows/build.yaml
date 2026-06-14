@@ -26,9 +26,18 @@ jobs:
       contents: write
       packages: write
 
+    #environment:
+    #  name: docker
+    #  url: https://hub.docker.com/r/${{ github.repository }}
+
     steps:
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Debug event.json"
+        continue-on-error: true
+        run: cat "${GITHUB_EVENT_PATH}"
       - name: "Debug CTX github"
-        if: ${{ !github.event.act }}
         continue-on-error: true
         env:
           GITHUB_CTX: ${{ toJSON(github) }}
@@ -42,15 +51,27 @@ jobs:
           echo "inputs.dev: ${{ inputs.dev }}"
           echo "env.dev: ${{ env.dev }}"
 
-      - name: "Checkout"
-        uses: actions/checkout@v6
+      - name: "Update Package Version"
+        uses: cssnr/update-json-value-action@v2
+        with:
+          file: "package.json"
 
-      - name: "Docker Login"
+      - name: "Debug Package File"
+        continue-on-error: true
+        run: cat package.json
+
+      - name: "Docker Login - GHCR"
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ vars.GHCR_USER }}
           password: ${{ secrets.GHCR_PASS }}
+
+      #- name: "Docker Login - Hub"
+      #  uses: docker/login-action@v4
+      #  with:
+      #    username: ${{ vars.DOCKER_HUB_USER }}
+      #    password: ${{ secrets.DOCKER_HUB_PASS }}
 
       - name: "Setup QEMU"
         uses: docker/setup-qemu-action@v4
@@ -82,6 +103,9 @@ jobs:
         uses: cssnr/docker-tags-action@v2
         with:
           images: "ghcr.io/${{ github.repository }}"
+          #images: |
+          #  ${{ github.repository }}
+          #  ghcr.io/${{ github.repository }}
           tags: |
             ${{ env.dev }}
             ${{ steps.version.outputs.tags }}
@@ -108,6 +132,14 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ github.ref_name }}
+
+      #- name: "Docker Hub Description"
+      #  uses: peter-evans/dockerhub-description@v5
+      #  continue-on-error: true
+      #  with:
+      #    username: ${{ vars.DOCKER_HUB_USER }}
+      #    password: ${{ secrets.DOCKER_HUB_PASS }}
+      #    repository: ${{ github.repository }}
 
       - name: "Send Failure Notification"
         if: ${{ failure() }}
